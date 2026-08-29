@@ -173,6 +173,7 @@ function boteEintragen() {
             geheim: geheim.value.trim(),
           };
           Gerät.schreib('bote', Push.bote);
+          datenSchreib('einst/bote', Push.bote).catch(() => {});
           b.schliessen();
           await pushAnmelden();
           zeigeSeite('ich');
@@ -231,7 +232,7 @@ function pinNachtraeglich() {
 
 async function kopplungscodeNochmal() {
   if (!schluesselDa()) return;
-  const code = await kopplungscodeBauen(_schluesselRoh, Gerät.lies('zugang'), Gerät.lies('namen', {}));
+  const code = await kopplungscodeBauen(_schluesselRoh, Gerät.lies('zugang'), Gerät.lies('namen', {}), Gerät.lies('bote', null));
   zeigeKopplungscode(code, _schluesselRoh);
 }
 

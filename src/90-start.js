@@ -40,6 +40,17 @@ async function appStarten() {
 
   ablageSchreib('mitglieder/' + Ablage.ich, jetzt()).catch(() => {});
 
+  /* Kennt dieses Gerät den Boten nicht, holt es ihn aus der Ablage —
+     verschlüsselt hinterlegt vom Gerät, das ihn eingerichtet hat. So
+     braucht ein Folgegerät nie eine technische Angabe von Hand. */
+  if (!Push.bote) {
+    const geteilt = await datenLies('einst/bote').catch(() => null);
+    if (geteilt && geteilt.url) {
+      Gerät.schreib('bote', geteilt);
+      Push.bote = geteilt;
+    }
+  }
+
   await ampelLaden().catch(() => {});
   stimmungSetzen();
 

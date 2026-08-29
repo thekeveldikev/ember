@@ -155,8 +155,12 @@ function einrichtungErstes() {
 
     await datenSchreib('paar', { namen, begonnen: jetzt() });
 
+    /* Den Boten auch in die Ablage legen — verschlüsselt wie alles.
+       Geräte ohne Boten holen ihn sich von dort beim Start selbst. */
+    if (bote) datenSchreib('einst/bote', bote).catch(() => {});
+
     b.schliessen();
-    const code = await kopplungscodeBauen(roh, zugang, namen);
+    const code = await kopplungscodeBauen(roh, zugang, namen, bote);
     zeigeKopplungscode(code, roh);
   }
 }
@@ -234,6 +238,7 @@ function einrichtungCode() {
     Gerät.schreib('namen', gelesen.namen);
     Gerät.schreib('paarId', paarId);
     Gerät.schreib('rolle', 'sub');
+    if (gelesen.bote) Gerät.schreib('bote', gelesen.bote);
 
     b.schliessen();
     rolleWaehlenBeimEinrichten(gelesen.roh, gelesen.namen);

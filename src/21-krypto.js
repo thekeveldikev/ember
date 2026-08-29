@@ -162,13 +162,16 @@ function startpaketLesen(code) {
 
    Der Code ist der Hausschlüssel. Nur von Hand aufs eigene Gerät. */
 
-async function kopplungscodeBauen(roheBytes, ablage, namen) {
+async function kopplungscodeBauen(roheBytes, ablage, namen, bote) {
   const inhalt = {
     f: 1,
     s: roheZuB64(roheBytes),
     a: ablage,
     n: namen,
   };
+  /* Der Bote reist mit, wenn dieses Gerät ihn kennt — sonst stünde das
+     Folgegerät ohne Hinweise da und wüsste nicht einmal, warum. */
+  if (bote && bote.url) inhalt.b = bote;
   return 'EMBER1.' + b64Url(btoa(unescape(encodeURIComponent(JSON.stringify(inhalt)))));
 }
 
@@ -178,7 +181,7 @@ function kopplungscodeLesen(code) {
     if (!putz.startsWith('EMBER1.')) return null;
     const inhalt = JSON.parse(decodeURIComponent(escape(atob(ausB64Url(putz.slice(7))))));
     if (!inhalt.s || !inhalt.a || !inhalt.a.projekt) return null;
-    return { roh: b64ZuRohe(inhalt.s), ablage: inhalt.a, namen: inhalt.n || {} };
+    return { roh: b64ZuRohe(inhalt.s), ablage: inhalt.a, namen: inhalt.n || {}, bote: inhalt.b || null };
   } catch {
     return null;
   }
