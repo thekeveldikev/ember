@@ -64,6 +64,15 @@ Regelsprache der Echtzeit-Datenbank kennt kein numChildren() (nur
 hasChild/val/exists und Verwandte), und Kommentare gehen dort nur als
 echte //-Zeilen — ein "//"-SCHLÜSSEL ist ein ungültiger Pfadname.
 
+**Fallen vom ersten echten Push-Tag:** Im Cloudflare-Dashboard greifen
+Änderungen an Secrets erst nach einem ausdrücklichen Deploy — Löschen
+ohne Deploy sieht gelöscht aus und ist es nicht. Verlässlicher ist
+wrangler (`wrangler secret put NAME --name ember-bote`, Wert über die
+Standardeingabe). Und: Apple beantwortet ein VAPID-JWT, dessen sub auf
+eine .invalid-Adresse zeigt, mit 403 BadJwtToken — der ABSENDER muss
+eine echte mailto-Adresse sein. Der Bote reicht seither bei Fehlschlag
+den Grund des Zustelldienstes mit durch (`grund` in der Antwort).
+
 **Neue Fallen aus dieser Runde:** Das rohe `append(null)` schreibt den
 TEXT „null" in die Seite — bedingte Kinder immer über `el()` oder
 `anfuegen()` aus 20-core anhängen. Und: `navigator.vibrate` gibt es auf

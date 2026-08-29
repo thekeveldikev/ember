@@ -232,7 +232,11 @@ function sperreAblehnen(sperre, bitte) {
 }
 
 /* Der Horcher: Er soll die Bitte nicht erst beim Seitenwechsel sehen. */
+let _sperreHorcherLaeuft = false;
+
 function sperreHorcherStarten() {
+  if (_sperreHorcherLaeuft) return;
+  _sperreHorcherLaeuft = true;
   ablageHorch('sperrebitte', async () => {
     const bitte = await datenLies('sperrebitte');
     if (!bitte) return;

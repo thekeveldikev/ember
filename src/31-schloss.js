@@ -29,7 +29,8 @@ function zeigeSchloss() {
       el('div', { class: 'knopfbuehne' },
         el('button', {
           class: 'derknopf bitte',
-          onclick: async () => {
+          onclick: async (e) => {
+            e.target.disabled = true;
             const roh = b64ZuRohe(Gerät.lies('schluessel'));
             await schluesselLaden(roh);
             appStarten();

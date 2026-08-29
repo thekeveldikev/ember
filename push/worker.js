@@ -44,9 +44,12 @@ export default {
     try {
       const antwort = await zustellen(ziel, auftrag.last || {}, umgebung, !!auftrag.dringend);
       /* 404 und 410 heißen: diese Adresse gibt es nicht mehr. Die App
-         räumt sie dann selbst weg. */
+         räumt sie dann selbst weg. Schlägt die Zustellung fehl, reist
+         die Begründung des Zustelldienstes mit — ohne sie ist ein 403
+         ein Ratespiel. */
+      const grund = antwort.ok ? undefined : (await antwort.text().catch(() => '')).slice(0, 200);
       return neueAntwort(
-        { ok: antwort.ok, stand: antwort.status },
+        { ok: antwort.ok, stand: antwort.status, grund },
         antwort.ok ? 200 : antwort.status,
         umgebung
       );
@@ -84,10 +87,15 @@ async function zustellen(ziel, last, umgebung, dringend) {
 async function vapidKopf(endpunkt, umgebung) {
   const ziel = new URL(endpunkt).origin;
   const kopf = { typ: 'JWT', alg: 'ES256' };
+  /* Ein verunglückter Absender (Tippfehler, doppeltes @) soll die
+     Zustellung nicht reißen — dann lieber der neutrale Platzhalter. */
+  const roherAbsender = String(umgebung.ABSENDER || '').trim();
+  const absenderGueltig = /^mailto:[^@\s]+@[^@\s]+\.[^@\s]+$/.test(roherAbsender);
+
   const last = {
     aud: ziel,
     exp: Math.floor(Date.now() / 1000) + 12 * 3600,
-    sub: umgebung.ABSENDER || 'mailto:ember@example.invalid',
+    sub: absenderGueltig ? roherAbsender : 'mailto:ember@example.invalid',
   };
 
   const teil = (o) => b64url(new TextEncoder().encode(JSON.stringify(o)));

@@ -120,7 +120,11 @@ function ruheAus() {
 
 /* --- Zuhören -------------------------------------------------------------- */
 
+let _ampelHorcherLaeuft = false;
+
 function ampelHorcherStarten() {
+  if (_ampelHorcherLaeuft) return;
+  _ampelHorcherLaeuft = true;
   /* Eine Leitung für beide Farben: Jede offene Verbindung kostet auf dem
      Handy Strom, und hier reicht wirklich eine. */
   ablageHorch('ampel', async () => {
