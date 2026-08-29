@@ -51,6 +51,19 @@ darunter (iOS verkleinert das Layout bei Tastatur nicht von selbst;
 der Bühne statt an einer geratenen Zahl. Dazu: Doppeltipp-Zoom aus
 (`touch-action: manipulation` am html), Safe-Areas auch links und rechts.
 
+**Die teuerste Falle bisher — im Live-Betrieb gefunden:** `replace()` mit
+einer Zeichenkette ersetzt nur den ERSTEN Treffer. Der Platzhalter
+`__FASSUNG__` stand auch im Kommentar der Dienst-Vorlage — der Kommentar
+bekam die Nummer, der Code behielt den Platzhalter, und der ausgelieferte
+Dienst hieß in jeder Fassung gleich. Folge: Der ganze Aktualisierungsweg
+über den Lagernamen war tot, und kein lokaler Test hat es gesehen, weil
+keiner den GEBAUTEN sw.js las. Lehre: Nach jedem Deploy einmal das
+Ausgelieferte selbst ansehen (`curl …/sw.js | grep VERSION`), nicht das
+Lokale. Und zwei weitere Firebase-Lehren aus dem echten Einrichten: Die
+Regelsprache der Echtzeit-Datenbank kennt kein numChildren() (nur
+hasChild/val/exists und Verwandte), und Kommentare gehen dort nur als
+echte //-Zeilen — ein "//"-SCHLÜSSEL ist ein ungültiger Pfadname.
+
 **Neue Fallen aus dieser Runde:** Das rohe `append(null)` schreibt den
 TEXT „null" in die Seite — bedingte Kinder immer über `el()` oder
 `anfuegen()` aus 20-core anhängen. Und: `navigator.vibrate` gibt es auf
