@@ -119,6 +119,10 @@ async function _marke() {
 function _adresse(pfad) {
   const wurzel = Ablage.zugang.datenbank.replace(/\/+$/, '');
   const sauber = String(pfad).replace(/^\/+/, '');
+  /* Ein leerer Pfad meint den ganzen Bereich des Paares. Ohne diese
+     Weiche entstünde '…/.json' mit leerem Kindnamen — den lehnt die
+     Ablage ab. Gebraucht wird das nur von „Alles auf Anfang". */
+  if (!sauber) return wurzel + '/paare/' + Ablage.paarId + '.json';
   return wurzel + '/paare/' + Ablage.paarId + '/' + sauber + '.json';
 }
 

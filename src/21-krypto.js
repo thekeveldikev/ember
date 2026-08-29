@@ -46,6 +46,9 @@ async function schluesselLaden(roheBytes) {
 }
 
 function schluesselVergessen() {
+  /* Was mit dem alten Schlüssel gelesen wurde, darf den nächsten nicht
+     überleben. */
+  if (typeof _klarLager !== 'undefined') _klarLager.clear();
   _schluessel = null;
   if (_schluesselRoh) _schluesselRoh.fill(0);
   _schluesselRoh = null;

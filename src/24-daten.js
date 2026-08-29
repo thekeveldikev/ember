@@ -103,7 +103,14 @@ function spiegelSammlungSetzen(pfad, serverStand) {
 
 /* Aus dem rohen Bündel wird eine sortierte Liste offener Einträge. Was sich
    nicht entschlüsseln lässt, fällt still heraus — ein falscher Schlüssel
-   soll die Liste nicht sprengen, sondern leer lassen. */
+   soll die Liste nicht sprengen, sondern leer lassen.
+
+   Das Zwischenlager merkt sich, was ein Brocken ergab: Bei jeder neuen
+   Nachricht kommt sonst der GANZE Plausch noch einmal durchs Entschlüsseln —
+   bei ein paar hundert Nachrichten spürt man das auf einem älteren Gerät.
+   Der Schlüsselwechsel leert es, sonst zeigte es Fremdes. */
+const _klarLager = new Map();
+
 async function sammlungOeffnen(roh) {
   if (!roh || typeof roh !== 'object') return [];
   const kennungen = Object.keys(roh).sort();
@@ -111,7 +118,16 @@ async function sammlungOeffnen(roh) {
   for (const k of kennungen) {
     const eintrag = roh[k];
     if (!eintrag || !eintrag.g) continue;
-    const klar = await entschluessle(eintrag.g);
+
+    let klar;
+    if (_klarLager.has(eintrag.g)) {
+      klar = _klarLager.get(eintrag.g);
+    } else {
+      klar = await entschluessle(eintrag.g);
+      if (_klarLager.size > 900) _klarLager.clear();
+      _klarLager.set(eintrag.g, klar);
+    }
+
     if (!klar) continue;
     raus.push({ id: k, von: klar.von, wann: klar.wann, ...klar.w });
   }

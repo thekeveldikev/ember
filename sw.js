@@ -3,7 +3,7 @@
    räumt eine neue Fassung den alten Bestand beim Aktivieren selbst weg.
 
    Diese Datei wird gebaut, nicht von Hand geändert:
-   src/sw-vorlage.js -> sw.js (npm run build). 0.3.0 kommt aus package.json. */
+   src/sw-vorlage.js -> sw.js (npm run build). 0.3.1 kommt aus package.json. */
 
 const VERSION = '__FASSUNG__';
 const LAGER = 'ember-v1-' + VERSION;

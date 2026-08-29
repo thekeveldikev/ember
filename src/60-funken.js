@@ -17,16 +17,16 @@ async function funkeSenden() {
   const meine = alle.filter((f) => f.von === D.rolle);
 
   if (!meine.length) {
-    return blatt(
+    const knopf = el('button', { class: 'knopf glut breit' }, 'Topf füllen');
+    const bRef = blatt(
       el('h2', {}, 'Noch keine Funken'),
       el('p', { class: 'leise klein', style: { margin: '8px 0 16px', lineHeight: '1.5' } },
         'Leg ein paar Sätze in deinen Topf — beim Tippen fliegt später ein zufälliger davon zu ' +
         nameVon(andereRolle()) + '.'),
-      el('button', {
-        class: 'knopf glut breit',
-        onclick: () => { document.querySelectorAll('.deckel').forEach((d) => d.remove()); funkenPflegen(); },
-      }, 'Topf füllen')
+      knopf
     );
+    knopf.addEventListener('click', () => { bRef.schliessen(); funkenPflegen(); });
+    return;
   }
 
   const funke = zufall(meine);

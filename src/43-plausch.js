@@ -65,7 +65,6 @@ SEITEN.plausch = function (seite) {
     onclick: () => ablaufWaehlen((ms) => {
       ablauf = ms;
       ablaufKnopf.className = 'knopf' + (ms === null ? ' leer' : ' glut');
-      ablaufKnopf.textContent = ms === null ? '⏱' : '⏱';
       if (ms !== null) meldung('Die nächste Nachricht zieht sich zurück.');
     }),
   }, '⏱');

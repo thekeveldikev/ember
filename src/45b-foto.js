@@ -115,12 +115,12 @@ async function fotoAuftragKarte(platz) {
         ),
         el('button', {
           class: 'winzig still', style: { marginTop: '10px' },
-          onclick: async () => { await datenLoesch('fotoauftrag'); fotoAuftragKarte(platz.parentNode ? platz : platz); zeigeSeite('heim'); },
+          onclick: async () => { await datenLoesch('fotoauftrag'); zeigeSeite('heim'); },
         }, 'Zurückziehen')
       );
     } else {
       const dateiwahl = el('input', {
-        type: 'file', accept: 'image/*', capture: 'environment', hidden: true,
+        type: 'file', accept: 'image/*', hidden: true,
         onchange: async (e) => {
           const datei = e.target.files[0];
           if (!datei) return;

@@ -150,6 +150,27 @@ Fertig. Drückt einmal den Knopf.
 
 ---
 
+## Erst mal allein ausprobieren (mit einem iPad)
+
+Die App lässt sich vollständig zu zweit testen, bevor die zweite Person
+überhaupt davon weiß:
+
+1. **iPhone** wie oben einrichten (du bist der Sub — deine echte Rolle).
+2. **iPad**: dieselbe Adresse öffnen, zum Home-Bildschirm, **Ich habe
+   einen Code**, den Kopplungscode einfügen — und als Rolle **sie** wählen.
+3. Jetzt spielst du beide Seiten: iPhone ist deine Sicht, das iPad ihre.
+   Der Knopf, der Plausch, die Sperre — alles läuft echt über die Ablage.
+4. Falls du zwischendurch am iPhone ihre Sicht sehen willst:
+   *Ich → Sichtwechsel.* Derselbe Weg führt zurück.
+
+**Bevor du ihr die App gibst:** Auf dem iPad (oder wo immer gerade ihre
+Rolle liegt) *Ich → Verwaltung → Alles auf Anfang* — das löscht den ganzen
+Probelauf, behält aber Einrichtung und Schlüssel. Dann auf dem iPad *Ich →
+Dieses Gerät leeren*, und ihr Gerät kommt mit dem Kopplungscode herein,
+als wäre nichts gewesen.
+
+---
+
 ## Neue Fassung veröffentlichen
 
 Genau wie bei VANI — der Dienst trägt die Fassung in seinem Lagernamen,

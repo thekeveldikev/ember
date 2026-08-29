@@ -488,16 +488,16 @@ async function impulsPruefen() {
 
     const gezogen = zufall(topf);
     puls('befehl');
-    blatt(
+    const knopf = el('button', { class: 'knopf glut breit' }, 'Gelesen');
+    const bRef = blatt(
       el('p', { class: 'winzig still mitte', style: { marginBottom: '16px' } }, 'Gerade eben'),
       el('p', {
         class: 'zier mitte',
         style: { fontSize: '25px', lineHeight: '1.32', padding: '0 8px 22px' },
       }, gezogen.text),
-      el('button', {
-        class: 'knopf glut breit',
-        onclick: () => { document.querySelectorAll('.deckel').forEach((d) => d.remove()); },
-      }, 'Gelesen')
+      knopf
     );
+    /* Nur das eigene Blatt schließen — nicht alles, was offen ist. */
+    knopf.addEventListener('click', () => bRef.schliessen());
   } catch { /* dann eben morgen */ }
 }

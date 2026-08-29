@@ -62,6 +62,7 @@ SEITEN.ich = function (seite) {
     el('div', { class: 'abschnitt' },
       el('p', { class: 'winzig still', style: { margin: '0 0 9px 2px' } }, 'Die App'),
       zeile('Nach einer neuen Fassung sehen', 'Du hast ' + APP_VERSION, () => sucheAppUpdate(true)),
+      zeile('Sichtwechsel', 'Dieses Gerät als ' + nameVon(andereRolle()) + ' sehen', () => sichtWechseln()),
       zeile('Nachts leiser ab', Gerät.lies('spaetAb', 22) + ':00 Uhr', () => spaetSetzen()),
       istDomme() ? zeile('Kopplungscode zeigen', 'Für ein weiteres Gerät', () => kopplungscodeNochmal()) : null,
       zeile('Dieses Gerät leeren', 'Alles Gemeinsame bleibt in der Ablage', () => geraetLeeren(), true)
@@ -235,6 +236,66 @@ async function geraetLeeren() {
 
 /* --- Die Verwaltung (nur sie) --------------------------------------------- */
 
+/* Der Sichtwechsel tauscht die Rolle dieses Geräts — fürs Ausprobieren
+   mit zwei eigenen Geräten, bevor die zweite Person dazukommt. Er ist
+   absichtlich kein versteckter Schalter: Beide Rollen gehören ohnehin
+   demselben Schlüssel, hier wird nichts umgangen. */
+async function sichtWechseln() {
+  const neu = andereRolle();
+  const sicher = await frage(
+    'Sichtwechsel',
+    'Dieses Gerät zeigt danach die Sicht von ' + nameVon(neu) + ' — mit allem, was dazugehört. Zum Zurückwechseln denselben Weg.',
+    'Wechseln'
+  );
+  if (!sicher) return;
+
+  Gerät.schreib('rolle', neu);
+  D.rolle = neu;
+
+  /* Der Push-Briefkasten hängt an der Rolle: neu anmelden, sonst
+     klingelte dieses Gerät weiter für die alte. */
+  if (Push.bote && Notification.permission === 'granted') pushAnmelden(true);
+
+  baueFussleiste();
+  zeigeSeite('heim');
+  meldung('Du bist jetzt ' + nameVon(neu) + '.');
+}
+
+/* Räumt die ganze gemeinsame Ablage — für den Moment, in dem aus dem
+   Probelauf der Ernstfall wird: Die Testdaten verschwinden, Einrichtung,
+   Schlüssel und Geräte bleiben. */
+async function allesAufAnfang() {
+  const erste = await frage(
+    'Alles auf Anfang',
+    'Löscht ALLES Gemeinsame: Plausch, Aufträge, Regeln, Decks, das Buch, den Tresor — den ganzen Probelauf. Die Einrichtung, der Schlüssel und die gekoppelten Geräte bleiben.',
+    'Weiter', true
+  );
+  if (!erste) return;
+  const zweite = await frage(
+    'Wirklich alles?',
+    'Das lässt sich nicht rückgängig machen.',
+    'Alles löschen', true
+  );
+  if (!zweite) return;
+
+  meldung('Räume …');
+  try {
+    await ablageLoesch('');
+    /* Sich selbst wieder eintragen, sonst sperrt die Regel den Bereich. */
+    await ablageSchreib('mitglieder/' + Ablage.ich, jetzt());
+    await datenSchreib('paar', { namen: Gerät.lies('namen', {}), begonnen: jetzt() });
+  } catch (f) {
+    return meldung('Das Räumen ist hängengeblieben: ' + String(f.message || f).slice(0, 80), 6000);
+  }
+
+  spiegelLeeren();
+  /* Das andere Gerät trägt sich beim nächsten Öffnen von selbst wieder
+     ein — der Bereich steht Neulingen offen, solange Platz ist. */
+  if (Push.bote && Notification.permission === 'granted') pushAnmelden(true);
+  meldung('Leer. Wie am ersten Tag.');
+  setTimeout(() => location.reload(), 1200);
+}
+
 SEITEN.verwaltung = function (seite) {
   if (!istDomme()) return zeigeSeite('heim');
 
@@ -282,6 +343,13 @@ SEITEN.verwaltung = function (seite) {
     el('div', { class: 'abschnitt' },
       el('p', { class: 'winzig still', style: { margin: '0 0 9px 2px' } }, 'Namen'),
       zeile('Namen ändern', Object.values(Gerät.lies('namen', {})).join(' · '), () => namenAendern())
+    )
+  );
+
+  seite.append(
+    el('div', { class: 'abschnitt' },
+      el('p', { class: 'winzig still', style: { margin: '0 0 9px 2px' } }, 'Der Probelauf'),
+      zeile('Alles auf Anfang', 'Gemeinsames löschen, Einrichtung behalten', () => allesAufAnfang(), true)
     )
   );
 };
