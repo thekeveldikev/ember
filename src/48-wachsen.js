@@ -186,7 +186,11 @@ function karmaZeichnen(platz, stand) {
   }
 }
 
-async function karmaAendern(stand, richtung) {
+async function karmaAendern(_alterStand, richtung) {
+  /* Frisch lesen, nicht den Stand vom Zeichnen nehmen: Zwei schnelle
+     Tipper hintereinander rechneten sonst beide auf derselben Grundlage,
+     und einer der Punkte wäre stillschweigend weg. */
+  const stand = await datenLies('wachsen/stand', {});
   const karma = (stand.karma || 0) + richtung;
   const schwelle = stand.markenSchwelle || 20;
 

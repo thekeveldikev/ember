@@ -193,9 +193,24 @@ function datenHorch(pfad, beiListe) {
     } else {
       const teile = weg.replace(/^\/+/, '').split('/');
       const k = teile[0];
-      if (wert === null) delete bestand[k];
-      else if (teile.length === 1) bestand[k] = wert;
-      else bestand[k] = { ...(bestand[k] || {}), ...wert };
+      if (teile.length === 1) {
+        if (wert === null) delete bestand[k];
+        else bestand[k] = wert;
+      } else {
+        /* Ein Ereignis tiefer im Baum: den Pfad entlanggehen und genau
+           dort setzen. Der alte flache Mischgriff hätte etwa eine
+           Zeichenkette in Ziffern-Schlüssel zerlegt. */
+        bestand[k] = bestand[k] && typeof bestand[k] === 'object' ? bestand[k] : {};
+        let zeiger = bestand[k];
+        for (let i = 1; i < teile.length - 1; i++) {
+          const t = teile[i];
+          zeiger[t] = zeiger[t] && typeof zeiger[t] === 'object' ? zeiger[t] : {};
+          zeiger = zeiger[t];
+        }
+        const letzt = teile[teile.length - 1];
+        if (wert === null) delete zeiger[letzt];
+        else zeiger[letzt] = wert;
+      }
     }
     senden();
   }).catch(() => null);   /* Ohne Leitung bleibt es beim Spiegel. */

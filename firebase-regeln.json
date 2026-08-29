@@ -1,6 +1,10 @@
 // EMBER — Regeln für die Echtzeit-Datenbank.
 // In der Firebase-Konsole unter Realtime Database -> Regeln einfügen und
 // veröffentlichen. Diese Kommentarzeilen versteht Firebase.
+//
+// Wichtig für später: Die Regelsprache der Echtzeit-Datenbank kennt nur
+// val(), child(), parent(), hasChild(), hasChildren(), exists() und die
+// is…()-Prüfungen. Kein numChildren(), kein query, keine Schleifen.
 {
   "rules": {
     ".read": false,
@@ -10,20 +14,19 @@
       "$paar": {
 
         // Der Pfadname ist aus eurem Schlüssel abgeleitet und hat 128 Bit
-        // Entropie: erraten lässt er sich nicht. Diese Regeln sind die
-        // zweite Linie dahinter — selbst mit bekanntem Pfad kommen nur
-        // eingetragene Geräte heran.
+        // Entropie — erraten lässt er sich nicht. Er ist die eigentliche
+        // Tür. Diese Regeln sorgen dafür, dass hinter der Tür nur
+        // eingetragene Geräte lesen und schreiben.
         ".read": "auth != null && data.child('mitglieder').hasChild(auth.uid)",
-        ".write": "auth != null && (data.child('mitglieder').hasChild(auth.uid) || data.child('mitglieder').numChildren() < 6)",
+        ".write": "auth != null && data.child('mitglieder').hasChild(auth.uid)",
 
         "mitglieder": {
-          // Ein Gerät trägt nur sich selbst ein, nie ein anderes. Sechs
-          // Plätze, damit Handy, Tablet und Laptop hineinpassen — und ein
-          // geleertes Gerät wieder zurückkann (es bekommt beim Neuanmelden
-          // eine neue Kennung). Ist der Bereich voll: in der Konsole unter
-          // paare/<euer Pfad>/mitglieder alte Einträge löschen.
+          // Eintreten darf, wer den Pfad kennt — der Kopplungscode IST
+          // der Hausschlüssel. Ein Gerät trägt dabei nur sich selbst ein,
+          // nie ein anderes; hinauswerfen können sich Mitglieder
+          // gegenseitig (das braucht „Alles auf Anfang").
           "$uid": {
-            ".write": "auth != null && $uid === auth.uid && (data.exists() || data.parent().numChildren() < 6)",
+            ".write": "auth != null && $uid === auth.uid",
             ".validate": "newData.isNumber()"
           }
         }

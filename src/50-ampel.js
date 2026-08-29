@@ -121,21 +121,23 @@ function ruheAus() {
 /* --- Zuhören -------------------------------------------------------------- */
 
 function ampelHorcherStarten() {
-  ['domme', 'sub'].forEach((rolle) => {
-    ablageHorch('ampel/' + rolle, async () => {
+  /* Eine Leitung für beide Farben: Jede offene Verbindung kostet auf dem
+     Handy Strom, und hier reicht wirklich eine. */
+  ablageHorch('ampel', async () => {
+    for (const rolle of ['domme', 'sub']) {
       const stand = await datenLies('ampel/' + rolle);
-      if (!stand) return;
+      if (!stand) continue;
       const vorher = D.ampel[rolle];
       D.ampel[rolle] = stand.farbe;
-      leisteAuffrischen();
 
       if (rolle === andereRolle() && stand.farbe !== vorher) {
         if (stand.farbe === 'rot') ruheAn(false);
         else if (D.ruhe && D.ampel[D.rolle] !== 'rot') ruheAus();
         else meldung(nameVon(rolle) + ': ' + ampelWort(stand.farbe));
       }
-    });
-  });
+    }
+    leisteAuffrischen();
+  }).catch(() => {});
 }
 
 async function ampelLaden() {

@@ -56,6 +56,10 @@ function leisteAuffrischen() {
 function zeigeSeite(id) {
   if (!SEITEN[id]) id = 'heim';
 
+  /* Offene Blätter gehören zur alten Seite. Bleiben sie stehen, liegen
+     sie über der neuen — mit Knöpfen, deren Umfeld es nicht mehr gibt. */
+  $$('.deckel').forEach((d) => d.remove());
+
   _aufraeumen.forEach((f) => { try { f(); } catch {} });
   _aufraeumen = [];
 

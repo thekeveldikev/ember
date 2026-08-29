@@ -242,6 +242,11 @@ function knopfHorcherStarten() {
 /* --- Der Befehl auf seinem Bildschirm ------------------------------------- */
 
 function befehlZeigen(befehl) {
+  /* Rot heißt: nichts geht weiter. Auch kein neuer Befehl — er bleibt
+     liegen und kommt hoch, wenn die Ruhe vorbei ist und der Horcher das
+     nächste Mal hinsieht. */
+  if (D.ruhe) return;
+
   if (_befehlOffen) _befehlOffen.remove();
   puls('befehl');
 

@@ -189,7 +189,13 @@ function blatt(...inhalt) {
     document.removeEventListener('keydown', beiTaste);
   }
 
-  const beiTaste = (e) => { if (e.key === 'Escape') schliessen(); };
+  const beiTaste = (e) => {
+    /* Wurde das Blatt anderweitig abgeräumt — etwa durch einen
+       Seitenwechsel —, räumt sich auch der Horcher weg, statt für immer
+       an der Tastatur zu hängen. */
+    if (!deckel.isConnected) { document.removeEventListener('keydown', beiTaste); return; }
+    if (e.key === 'Escape') schliessen();
+  };
   document.addEventListener('keydown', beiTaste);
   document.body.append(deckel);
   return { deckel, schliessen };
