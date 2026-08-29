@@ -94,6 +94,10 @@ function regelWachePruefen() {
 
 (async function () {
 
+  /* Vor allem anderen: In welchem Raum sind wir? Ohne dieses Vorzeichen
+     läse jeder Griff zum Gerät die falsche Welt. */
+  raumMigration();
+
   stimmungSetzen();
   dienstAnmelden();
 

@@ -31,7 +31,12 @@ function zeigeEinrichtung() {
       el('button', { class: 'knopf leer breit', style: { marginTop: '9px' }, onclick: einrichtungCode },
         'Ich habe einen Code')
     ),
-    el('p', { class: 'still klein mitte', style: { marginTop: '22px' } }, 'Fassung ' + APP_VERSION)
+    el('p', { class: 'still klein mitte', style: { marginTop: '22px' } }, 'Fassung ' + APP_VERSION),
+    el('button', {
+      class: 'still klein mitte',
+      style: { display: 'block', margin: '10px auto 0', padding: '8px' },
+      onclick: raumWechslerBlatt,
+    }, 'Raum: ' + (raumName() || '—') + ' · wechseln')
   );
 
   b.append(seite);

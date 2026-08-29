@@ -25,6 +25,7 @@ const jsDateien = [
   'src/22-firebase.js',
   'src/23-push.js',
   'src/24-daten.js',
+  'src/25-raeume.js',
   'src/30-setup.js',
   'src/31-schloss.js',
   'src/40-huelle.js',

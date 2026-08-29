@@ -125,7 +125,9 @@ function treffZeichnen(platz, liste) {
             : null,
           el('button', {
             class: 'winzig still', style: { marginTop: '10px' },
-            onclick: async () => {
+            onclick: async (e) => {
+              /* Zweimal getippt hieße zweimal auf der Liste. */
+              e.target.disabled = true;
               await datenAnhaengen('liste', { text: t.meins.text, stand: 'geplant' });
               meldung('Steht auf der Liste.');
             },

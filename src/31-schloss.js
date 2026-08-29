@@ -85,6 +85,15 @@ function zeigeSchloss() {
     setTimeout(() => feld.focus(), 300);
   }
 
+  /* Welcher Raum hier gerade offen ist — und der Weg zu den anderen.
+     Über „Neuer Raum" beginnt auch die zweite Einrichtung auf einem
+     Gerät, das schon einen Raum trägt. */
+  seite.append(el('button', {
+    class: 'still klein mitte',
+    style: { display: 'block', margin: '30px auto 0', padding: '8px' },
+    onclick: raumWechslerBlatt,
+  }, 'Raum: ' + (raumName() || '—') + ' · wechseln'));
+
   b.append(seite);
   $('#vorhang').classList.add('weg');
 }
@@ -94,13 +103,11 @@ function zeigeSchloss() {
 async function alleszurueck() {
   const sicher = await frage(
     'PIN vergessen',
-    'Ohne PIN lässt sich der Schlüssel auf diesem Gerät nicht öffnen. Du kannst dieses Gerät leeren und dich mit dem Kopplungscode vom anderen Gerät neu verbinden. Alles Gemeinsame bleibt dabei erhalten — es liegt in der Ablage.',
-    'Gerät leeren', true
+    'Ohne PIN lässt sich der Schlüssel dieses Raums nicht öffnen. Du kannst den Raum von diesem Gerät nehmen und mit dem Kopplungscode vom anderen Gerät neu hereinkommen. Alles Gemeinsame bleibt dabei erhalten — es liegt in der Ablage.',
+    'Raum vom Gerät nehmen', true
   );
   if (!sicher) return;
-  Gerät.alleLoeschen();
-  spiegelLeeren();
-  location.reload();
+  raumEntfernen(aktiverRaumId());
 }
 
 /* --- Abschließen ---------------------------------------------------------- */

@@ -150,28 +150,38 @@ Fertig. Drückt einmal den Knopf.
 
 ---
 
-## Erst mal allein ausprobieren (mit einem iPad)
+## Räume: Probe und Ernst
 
-Die App lässt sich vollständig zu zweit testen, bevor die zweite Person
-überhaupt davon weiß:
+Ein Gerät kann mehrere **Räume** tragen — jeder mit eigenem Schlüssel,
+eigenem Bereich in der Ablage, eigener PIN. Nichts teilt sich. Gewechselt
+wird am Schloss oder unter *Ich → Räume*.
 
-1. **iPhone** wie oben einrichten (du bist der Sub — deine echte Rolle).
-2. **iPad**: dieselbe Adresse öffnen, zum Home-Bildschirm, **Ich habe
-   einen Code**, den Kopplungscode einfügen — und als Rolle **sie** wählen.
-3. Jetzt spielst du beide Seiten: iPhone ist deine Sicht, das iPad ihre.
-   Der Knopf, der Plausch, die Sperre — alles läuft echt über die Ablage.
-4. Falls du zwischendurch am iPhone ihre Sicht sehen willst:
-   *Ich → Sichtwechsel.* Derselbe Weg führt zurück.
+Der Plan für den Start:
 
-**Bevor du ihr die App gibst:** Auf dem iPad (oder wo immer gerade ihre
-Rolle liegt) *Ich → Verwaltung → Alles auf Anfang* — das löscht den ganzen
-Probelauf, behält aber Einrichtung und Schlüssel. Dann auf dem iPad *Ich →
-Dieses Gerät leeren*, und ihr Gerät kommt mit dem Kopplungscode herein,
-als wäre nichts gewesen.
+| Gerät | Räume |
+|---|---|
+| Dein iPhone | **„Probe"** (Test) und **„Wir"** (echt) — umschaltbar |
+| Dein iPad | nur „Probe", als ihre Test-Seite |
+| Der Rechner (Claude) | nur „Probe", zum Mitklicken beim Entwickeln |
+| Ihr iPhone (später) | nur „Wir" — vom Proberaum erfährt es nie |
+
+1. **iPhone:** ersten Raum einrichten, „Probe" nennen (Namen frei erfinden,
+   z. B. Testnamen statt eurer echten). Ohne PIN — schneller beim Testen.
+2. **iPad:** gleiche Adresse → „Ich habe einen Code" → Probe-Code → ihre
+   Rolle wählen.
+3. **iPhone, zweiter Raum:** *Ich → Räume → Neuer Raum* → „Wir" → echte
+   Namen, gleiche Firebase- und Boten-Angaben, **mit PIN**. Der „Wir"-Code
+   wandert später NUR direkt auf ihr iPhone — nie in einen Chat, nie auf
+   einen Rechner.
+4. Im Proberaum alles ausprobieren, kaputtmachen, wieder aufbauen. Der
+   „Wir"-Raum bleibt davon unberührt und jungfräulich, bis es losgeht.
+
+**Vor der Übergabe** den Proberaum nicht löschen — er bleibt euer
+Spielplatz für künftige Fassungen. Nur auf ihrem iPhone existiert er nie.
 
 ---
 
-## Neue Fassung veröffentlichen
+## Neue Fassung veröffentlichen## Neue Fassung veröffentlichen
 
 Genau wie bei VANI — der Dienst trägt die Fassung in seinem Lagernamen,
 deshalb räumt eine neue Fassung die alte von selbst weg.

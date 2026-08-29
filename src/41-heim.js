@@ -11,7 +11,13 @@ SEITEN.heim = function (seite) {
       (() => {
         /* Der Weg in die Tarnung hängt am Schriftzug — und muss es bei
            jedem Zeichnen aufs Neue, weil die Seite jedes Mal neu entsteht. */
-        const zug = el('div', { class: 'zier glutschrift', style: { fontSize: '26px', letterSpacing: '.1em' } }, 'EMBER');
+        const zug = el('div', {},
+          el('div', { class: 'zier glutschrift', style: { fontSize: '26px', letterSpacing: '.1em' } }, 'EMBER'),
+          /* Wer zwei Welten trägt, soll immer sehen, in welcher er steht. */
+          raeumeLies().length > 1
+            ? el('div', { class: 'winzig still', style: { marginTop: '1px' } }, raumName())
+            : null
+        );
         tippenDreimal(zug, tarnungAn);
         return zug;
       })(),

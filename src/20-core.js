@@ -239,25 +239,37 @@ function puls(art = 'hinweis') {
 
 /* --- Speicher auf dem Gerät ----------------------------------------------- */
 
+/* Alles Örtliche gehört einem Raum. Das Vorzeichen ('r1.' usw.) setzt die
+   Raumverwaltung beim Start — vor ihr ist es leer, was dem Zustand vor
+   den Räumen entspricht und den Prüfstand unverändert lässt. */
+let _raumVorzeichen = '';
+
+function raumVorzeichenSetzen(v) { _raumVorzeichen = v || ''; }
+const geraetKey = (s) => 'ember.' + _raumVorzeichen + s;
+
 /* Alles, was nur dieses Gerät angeht: Rolle, PIN-Prüfsumme, Schlüssel.
-   Wandert nie ins Netz. */
+   Wandert nie ins Netz — und bleibt im eigenen Raum. */
 const Gerät = {
   lies(schluessel, ersatz = null) {
     try {
-      const roh = localStorage.getItem('ember.' + schluessel);
+      const roh = localStorage.getItem(geraetKey(schluessel));
       return roh == null ? ersatz : JSON.parse(roh);
     } catch { return ersatz; }
   },
   schreib(schluessel, wert) {
-    try { localStorage.setItem('ember.' + schluessel, JSON.stringify(wert)); return true; }
+    try { localStorage.setItem(geraetKey(schluessel), JSON.stringify(wert)); return true; }
     catch { return false; }
   },
   loesch(schluessel) {
-    try { localStorage.removeItem('ember.' + schluessel); } catch {}
+    try { localStorage.removeItem(geraetKey(schluessel)); } catch {}
   },
+  /* Leert den AKTIVEN Raum. Die Raumliste und andere Räume bleiben. */
   alleLoeschen() {
     try {
-      Object.keys(localStorage).filter((k) => k.startsWith('ember.')).forEach((k) => localStorage.removeItem(k));
+      const vorzeichen = geraetKey('');
+      Object.keys(localStorage)
+        .filter((k) => k.startsWith(vorzeichen) && !['ember.raeume', 'ember.aktiverRaum'].includes(k))
+        .forEach((k) => localStorage.removeItem(k));
     } catch {}
   },
 };

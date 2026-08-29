@@ -245,13 +245,13 @@ function spiegelSetzen(pfad, wert) {
   try {
     const text = JSON.stringify(wert);
     if (text.length > SPIEGEL_GRENZE) return;
-    localStorage.setItem('ember.spiegel.' + pfad, text);
+    localStorage.setItem(geraetKey('spiegel.' + pfad), text);
   } catch { /* voll oder gesperrt — der Spiegel ist Beiwerk, kein Muss */ }
 }
 
 function spiegelHolen(pfad) {
   try {
-    const roh = localStorage.getItem('ember.spiegel.' + pfad);
+    const roh = localStorage.getItem(geraetKey('spiegel.' + pfad));
     return roh ? JSON.parse(roh) : null;
   } catch { return null; }
 }
@@ -275,13 +275,13 @@ function spiegelEintragLoeschen(pfad, id) {
 }
 
 function spiegelLoeschen(pfad) {
-  try { localStorage.removeItem('ember.spiegel.' + pfad); } catch {}
+  try { localStorage.removeItem(geraetKey('spiegel.' + pfad)); } catch {}
 }
 
 function spiegelLeeren() {
   try {
     Object.keys(localStorage)
-      .filter((k) => k.startsWith('ember.spiegel.'))
+      .filter((k) => k.startsWith(geraetKey('spiegel.')))
       .forEach((k) => localStorage.removeItem(k));
   } catch {}
 }

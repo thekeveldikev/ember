@@ -46,6 +46,20 @@ SEITEN.ich = function (seite) {
   seite.append(pushplatz);
   pushAbschnittBauen(pushplatz);
 
+  /* --- Räume --- */
+  seite.append(
+    el('div', { class: 'abschnitt' },
+      el('p', { class: 'winzig still', style: { margin: '0 0 9px 2px' } }, 'Räume'),
+      zeile('Dieser Raum: ' + (raumName() || '—'), 'Wechseln oder neuen anlegen', () => raumWechslerBlatt()),
+      zeile('Raum umbenennen', '', () => {
+        eingabeBlatt({ titel: 'Raum umbenennen', wert: raumName(), jaText: 'Umbenennen' }, (name) => {
+          raumUmbenennen(aktiverRaumId(), name);
+          zeigeSeite('ich');
+        });
+      })
+    )
+  );
+
   /* --- Sicherheit --- */
   seite.append(
     el('div', { class: 'abschnitt' },
@@ -65,7 +79,7 @@ SEITEN.ich = function (seite) {
       zeile('Sichtwechsel', 'Dieses Gerät als ' + nameVon(andereRolle()) + ' sehen', () => sichtWechseln()),
       zeile('Nachts leiser ab', Gerät.lies('spaetAb', 22) + ':00 Uhr', () => spaetSetzen()),
       istDomme() ? zeile('Kopplungscode zeigen', 'Für ein weiteres Gerät', () => kopplungscodeNochmal()) : null,
-      zeile('Dieses Gerät leeren', 'Alles Gemeinsame bleibt in der Ablage', () => geraetLeeren(), true)
+      zeile('Diesen Raum vom Gerät nehmen', 'Alles Gemeinsame bleibt in der Ablage', () => geraetLeeren(), true)
     )
   );
 
@@ -223,15 +237,13 @@ async function kopplungscodeNochmal() {
 
 async function geraetLeeren() {
   const sicher = await frage(
-    'Dieses Gerät leeren',
-    'Schlüssel, PIN und Zwischenspeicher verschwinden von diesem Gerät. Alles Gemeinsame bleibt in der Ablage und kommt mit dem Kopplungscode zurück.',
-    'Leeren', true
+    'Diesen Raum vom Gerät nehmen',
+    'Schlüssel, PIN und Zwischenspeicher dieses Raums verschwinden von diesem Gerät — andere Räume bleiben. Alles Gemeinsame bleibt in der Ablage und kommt mit dem Kopplungscode zurück.',
+    'Vom Gerät nehmen', true
   );
   if (!sicher) return;
   await pushAbmelden().catch(() => {});
-  Gerät.alleLoeschen();
-  spiegelLeeren();
-  location.reload();
+  raumEntfernen(aktiverRaumId());
 }
 
 /* --- Die Verwaltung (nur sie) --------------------------------------------- */
