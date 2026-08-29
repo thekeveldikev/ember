@@ -1,0 +1,377 @@
+/* ==========================================================================
+   20-core.js — Werkzeug, das alles andere benutzt.
+   Ein gemeinsamer globaler Raum, wie bei VANI. Keine Module, keine Imports.
+   ========================================================================== */
+
+/* --- Kürzel --------------------------------------------------------------- */
+
+const $ = (w, wo = document) => wo.querySelector(w);
+const $$ = (w, wo = document) => [...wo.querySelectorAll(w)];
+
+/* el('div', {class:'karte'}, 'Text', el('span', {}, '!'))
+   Merkmale: Zeichenketten werden gesetzt, Funktionen als Ereignis gebunden
+   (onclick -> click), true/false schalten leere Merkmale. */
+function el(art, merkmale = {}, ...kinder) {
+  const k = document.createElement(art);
+  for (const [name, wert] of Object.entries(merkmale || {})) {
+    if (wert == null || wert === false) continue;
+    if (name === 'style' && typeof wert === 'object') Object.assign(k.style, wert);
+    else if (name.startsWith('on') && typeof wert === 'function') k.addEventListener(name.slice(2), wert);
+    else if (name === 'html') k.innerHTML = wert;
+    else if (wert === true) k.setAttribute(name, '');
+    else k.setAttribute(name, wert);
+  }
+  for (const kind of kinder.flat(Infinity)) {
+    if (kind == null || kind === false) continue;
+    k.append(kind.nodeType ? kind : document.createTextNode(String(kind)));
+  }
+  return k;
+}
+
+/* Sinnbilder als schlanke Striche — nichts Gefülltes, nichts Buntes. */
+function sinnbild(name, groesse = 23) {
+  const wege = {
+    heim: '<path d="M4 11.5 12 4l8 7.5"/><path d="M6 10.5V20h12v-9.5"/>',
+    plausch: '<path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H9l-5 4z"/>',
+    spiel: '<rect x="3.5" y="6" width="11" height="14" rx="2"/><path d="M8.5 3.4 18 5.1a2 2 0 0 1 1.6 2.3L18 17"/>',
+    auftrag: '<rect x="4.5" y="3.5" width="15" height="17" rx="2.5"/><path d="M8.5 9h7M8.5 13h7M8.5 17h4"/>',
+    ich: '<circle cx="12" cy="8.5" r="3.8"/><path d="M4.8 20.2c.8-3.7 3.7-5.7 7.2-5.7s6.4 2 7.2 5.7"/>',
+    zurueck: '<path d="M14.5 5 8 12l6.5 7"/>',
+    schliessen: '<path d="M6 6l12 12M18 6L6 18"/>',
+    mehr: '<circle cx="12" cy="5.5" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="12" cy="18.5" r="1.3"/>',
+    haken: '<path d="M4.5 12.5 9.5 17.5 19.5 6.5"/>',
+    kreuz: '<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>',
+    flamme: '<path d="M12 3.5c3.4 3.2 5.5 6 5.5 9a5.5 5.5 0 1 1-11 0c0-1.6.6-3 1.7-4.4.4 1.3 1.1 2 2.1 2.2-.4-2.6.2-4.9 1.7-6.8z"/>',
+    schloss: '<rect x="4.8" y="10.5" width="14.4" height="10" rx="2.4"/><path d="M8.2 10.5V7.6a3.8 3.8 0 0 1 7.6 0v2.9"/>',
+    glocke: '<path d="M6.5 16.5v-5a5.5 5.5 0 0 1 11 0v5l1.6 2.4H4.9z"/><path d="M10 21.2a2.3 2.3 0 0 0 4 0"/>',
+    auge: '<path d="M2.6 12S6.3 5.8 12 5.8 21.4 12 21.4 12 17.7 18.2 12 18.2 2.6 12 2.6 12z"/><circle cx="12" cy="12" r="2.7"/>',
+  };
+  const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  s.setAttribute('viewBox', '0 0 24 24');
+  s.setAttribute('width', groesse);
+  s.setAttribute('height', groesse);
+  s.setAttribute('fill', 'none');
+  s.setAttribute('stroke', 'currentColor');
+  s.setAttribute('stroke-width', '1.5');
+  s.setAttribute('stroke-linecap', 'round');
+  s.setAttribute('stroke-linejoin', 'round');
+  s.innerHTML = wege[name] || wege.flamme;
+  return s;
+}
+
+/* --- Zeit ----------------------------------------------------------------- */
+
+const jetzt = () => Date.now();
+
+/* Ein Tagesstempel als 2026-08-29. Wird für die Tagesnachricht, das
+   Glückskeks und die Wärmekarte gebraucht — überall dieselbe Regel. */
+function tagstempel(zeit = Date.now()) {
+  const d = new Date(zeit);
+  const p = (n) => String(n).padStart(2, '0');
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+}
+
+function uhrzeit(zeit) {
+  const d = new Date(zeit);
+  return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+
+/* Aus 95 Sekunden wird 1:35 — für alle Countdowns. */
+function dauerText(ms) {
+  const s = Math.max(0, Math.round(ms / 1000));
+  const std = Math.floor(s / 3600);
+  const min = Math.floor((s % 3600) / 60);
+  const sek = s % 60;
+  const p = (n) => String(n).padStart(2, '0');
+  return std > 0 ? std + ':' + p(min) + ':' + p(sek) : min + ':' + p(sek);
+}
+
+function vorZeit(zeit) {
+  const d = Math.max(0, Date.now() - zeit);
+  if (d < 60e3) return 'gerade eben';
+  if (d < 3600e3) return Math.floor(d / 60e3) + ' Min';
+  if (d < 86400e3) return Math.floor(d / 3600e3) + ' Std';
+  if (d < 7 * 86400e3) return Math.floor(d / 86400e3) + ' Tage';
+  return new Date(zeit).toLocaleDateString('de-DE', { day: 'numeric', month: 'short' });
+}
+
+/* --- Kleinkram ------------------------------------------------------------ */
+
+/* Die Kennung trägt die Zeit voran — und zwar in fester Länge, denn die
+   Reihenfolge in der Ablage entsteht allein durch das Sortieren der
+   Kennungen. Dort liegt kein Datum, nach dem man sonst sortieren könnte.
+
+   Der Zähler dahinter fängt den Fall ab, dass zwei Dinge in derselben
+   Millisekunde entstehen: zwei schnell getippte Nachrichten, zweimal
+   dieselbe Schnellreaktion. Ohne ihn entschiede der Zufall, welche zuerst
+   steht — und der Plausch käme durcheinander. */
+
+let _letzteKennungszeit = 0;
+let _kennungszaehler = 0;
+
+function kennung() {
+  const t = Date.now();
+  if (t === _letzteKennungszeit) {
+    _kennungszaehler++;
+  } else {
+    _letzteKennungszeit = t;
+    _kennungszaehler = 0;
+  }
+  return t.toString(36).padStart(9, '0') +
+    _kennungszaehler.toString(36).padStart(3, '0') +
+    Math.random().toString(36).slice(2, 7);
+}
+
+function entprellt(fn, ms = 300) {
+  let t;
+  return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+}
+
+const zufall = (liste) => liste[Math.floor(Math.random() * liste.length)];
+
+/* Nutzerinhalte wandern grundsätzlich als Text in den Baum, nie als HTML.
+   Wo doch einmal HTML nötig ist, geht es hier durch. */
+const sicher = (s) => String(s == null ? '' : s)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+/* --- Meldungen ------------------------------------------------------------ */
+
+function meldung(text, ms = 3200) {
+  const m = el('div', { class: 'meldung' }, text);
+  $('#meldungen').append(m);
+  setTimeout(() => {
+    m.classList.add('geht');
+    setTimeout(() => m.remove(), 260);
+  }, ms);
+  return m;
+}
+
+function meldungMitTat(text, tatText, tat, ms = 8000) {
+  const m = el('div', { class: 'meldung' },
+    el('span', { style: { flex: '1' } }, text),
+    el('button', {
+      onclick: () => { m.remove(); tat(); },
+    }, tatText)
+  );
+  $('#meldungen').append(m);
+  setTimeout(() => {
+    if (!m.isConnected) return;
+    m.classList.add('geht');
+    setTimeout(() => m.remove(), 260);
+  }, ms);
+  return m;
+}
+
+/* --- Blätter (Eingaben von unten) ----------------------------------------- */
+
+function blatt(...inhalt) {
+  const b = el('div', { class: 'blatt' }, el('div', { class: 'blattgriff' }), ...inhalt);
+  const deckel = el('div', {
+    class: 'deckel',
+    onclick: (e) => { if (e.target === deckel) schliessen(); },
+  }, b);
+
+  function schliessen() {
+    deckel.style.animation = 'deckelAn .2s ease reverse';
+    setTimeout(() => deckel.remove(), 190);
+    document.removeEventListener('keydown', beiTaste);
+  }
+
+  const beiTaste = (e) => { if (e.key === 'Escape') schliessen(); };
+  document.addEventListener('keydown', beiTaste);
+  document.body.append(deckel);
+  return { deckel, schliessen };
+}
+
+/* Eine Rückfrage, die eine Zusage erzwingt statt sie zu unterstellen. */
+function frage(titel, text, jaText = 'Ja', warnend = false) {
+  return new Promise((fertig) => {
+    const b = blatt(
+      el('h2', {}, titel),
+      text ? el('p', { class: 'leise', style: { marginTop: '8px' } }, text) : null,
+      el('div', { class: 'knopfreihe', style: { marginTop: '20px' } },
+        el('button', { class: 'knopf leer', onclick: () => { b.schliessen(); fertig(false); } }, 'Abbrechen'),
+        el('button', {
+          class: 'knopf ' + (warnend ? 'warnend' : 'glut'),
+          onclick: () => { b.schliessen(); fertig(true); },
+        }, jaText)
+      )
+    );
+  });
+}
+
+/* --- Vibration ------------------------------------------------------------ */
+
+/* Muster statt Zufall: jede Art hat ihren eigenen Rhythmus, damit die
+   Bedeutung schon in der Tasche ankommt, ohne hinzusehen. */
+const PULS = {
+  befehl: [140, 70, 140, 70, 300],
+  bitte: [60, 40, 60],
+  denkAnDich: [40, 60, 40],
+  antwortJa: [90, 50, 180],
+  antwortNein: [220],
+  hinweis: [50],
+};
+
+function puls(art = 'hinweis') {
+  try {
+    if (navigator.vibrate) navigator.vibrate(PULS[art] || PULS.hinweis);
+  } catch { /* manche Browser mögen das nicht — dann eben still */ }
+}
+
+/* --- Speicher auf dem Gerät ----------------------------------------------- */
+
+/* Alles, was nur dieses Gerät angeht: Rolle, PIN-Prüfsumme, Schlüssel.
+   Wandert nie ins Netz. */
+const Gerät = {
+  lies(schluessel, ersatz = null) {
+    try {
+      const roh = localStorage.getItem('ember.' + schluessel);
+      return roh == null ? ersatz : JSON.parse(roh);
+    } catch { return ersatz; }
+  },
+  schreib(schluessel, wert) {
+    try { localStorage.setItem('ember.' + schluessel, JSON.stringify(wert)); return true; }
+    catch { return false; }
+  },
+  loesch(schluessel) {
+    try { localStorage.removeItem('ember.' + schluessel); } catch {}
+  },
+  alleLoeschen() {
+    try {
+      Object.keys(localStorage).filter((k) => k.startsWith('ember.')).forEach((k) => localStorage.removeItem(k));
+    } catch {}
+  },
+};
+
+/* --- Der laufende Zustand ------------------------------------------------- */
+
+/* D hält alles, was die Oberfläche gerade zeigt. Was hier steht, kommt
+   entweder vom Gerät oder entschlüsselt aus der Ablage. */
+const D = {
+  rolle: null,          // 'domme' | 'sub'
+  eingerichtet: false,
+  offen: false,         // Schloss auf?
+  seite: 'heim',
+  paar: null,           // { id, namen: {domme, sub} }
+  ampel: { domme: 'gruen', sub: 'gruen' },
+  ruhe: false,          // nach Rot: alles hält an
+  daten: {},            // was aus der Ablage kam, entschlüsselt
+  horcher: {},          // laufende Verbindungen zur Ablage
+};
+
+const istDomme = () => D.rolle === 'domme';
+const andereRolle = () => (D.rolle === 'domme' ? 'sub' : 'domme');
+
+function nameVon(rolle) {
+  return (D.paar && D.paar.namen && D.paar.namen[rolle]) || (rolle === 'domme' ? 'Sie' : 'Er');
+}
+
+/* --- Stimmung ------------------------------------------------------------- */
+
+/* Spät am Abend wird die App von selbst leiser. Rot überschreibt alles. */
+function stimmungSetzen(erzwungen) {
+  let s = erzwungen;
+  if (!s) {
+    if (D.ruhe) s = 'ruhe';
+    else {
+      const std = new Date().getHours();
+      const spaetAb = Gerät.lies('spaetAb', 22);
+      s = (std >= spaetAb || std < 6) ? 'spaet' : 'nacht';
+    }
+  }
+  document.documentElement.setAttribute('data-stimmung', s);
+  const farbe = getComputedStyle(document.documentElement).getPropertyValue('--statusleiste').trim();
+  const marke = document.querySelector('meta[name=theme-color]');
+  if (marke && farbe) marke.setAttribute('content', farbe);
+}
+
+/* --- Aktualisierung der App ----------------------------------------------- */
+
+/* Wortgleich zum Verfahren in VANI: Der Dienst trägt die Fassung im
+   Lagernamen, ein neuer Dienst meldet sich selbst. Dieser Knopf ist nur
+   für die Ungeduld da. */
+
+let _dienst = null;
+
+function _warteAufArbeiter(arbeiter, ms = 10000) {
+  return new Promise((fertig) => {
+    let durch = false;
+    const ende = (w) => { if (!durch) { durch = true; fertig(w); } };
+    if (arbeiter.state === 'installed' || arbeiter.state === 'activated') return ende(true);
+    arbeiter.addEventListener('statechange', () => {
+      if (arbeiter.state === 'installed' || arbeiter.state === 'activated') ende(true);
+      if (arbeiter.state === 'redundant') ende(false);
+    });
+    setTimeout(() => ende(false), ms);
+  });
+}
+
+async function sucheAppUpdate(neuLaden = true) {
+  if (!('serviceWorker' in navigator) || !location.protocol.startsWith('http')) {
+    meldung('Hier läuft die Vorschau. Aktualisierungen kommen am Symbol auf dem Startbildschirm an.');
+    return false;
+  }
+  try {
+    const alterFuehrer = navigator.serviceWorker.controller;
+    const fuehrerWechsel = new Promise((fertig) => {
+      let durch = false;
+      const ende = (w) => { if (!durch) { durch = true; fertig(w); } };
+      navigator.serviceWorker.addEventListener('controllerchange', () => ende(true), { once: true });
+      setTimeout(() => ende(false), 8000);
+    });
+
+    _dienst = _dienst || await navigator.serviceWorker.getRegistration();
+    if (!_dienst) _dienst = await navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' });
+
+    await _dienst.update();
+    if (_dienst.installing) await _warteAufArbeiter(_dienst.installing);
+    if (_dienst.waiting) _dienst.waiting.postMessage({ typ: 'AKTIVIEREN' });
+
+    const gibtNeues = alterFuehrer !== navigator.serviceWorker.controller || _dienst.waiting || _dienst.installing;
+    if (neuLaden && gibtNeues) {
+      meldung('Neue Fassung wird geöffnet …');
+      await fuehrerWechsel;
+      location.reload();
+      return true;
+    }
+    meldung('Du hast die aktuelle Fassung ' + APP_VERSION + '.');
+    return true;
+  } catch {
+    meldung('Gerade konnte ich nicht nachsehen. Die jetzige Fassung läuft trotzdem.');
+    return false;
+  }
+}
+
+/* Beim Start: den Dienst anmelden und auf eine neue Fassung horchen. */
+function dienstAnmelden() {
+  if (!('serviceWorker' in navigator) || !location.protocol.startsWith('http')) return;
+  try {
+    let gemeldet = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (gemeldet) return;
+      gemeldet = true;
+      meldungMitTat('Die neue Fassung ist da.', 'Jetzt öffnen', () => location.reload(), 12000);
+    });
+
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then((reg) => {
+      _dienst = reg;
+      const melden = () => meldungMitTat('Eine neue Fassung liegt bereit.', 'Neu laden', () => location.reload(), 8000);
+      reg.addEventListener('updatefound', () => {
+        const neu = reg.installing;
+        if (!neu) return;
+        neu.addEventListener('statechange', () => {
+          if (neu.state === 'installed' && navigator.serviceWorker.controller) melden();
+        });
+      });
+      if (reg.waiting) melden();
+    }).catch(() => {});
+
+    navigator.serviceWorker.addEventListener('message', (e) => {
+      const n = e.data || {};
+      if (n.typ === 'PUSH_ERNEUERN' && typeof pushAnmelden === 'function') pushAnmelden(true);
+      if (n.typ === 'PUSH_GEOEFFNET' && typeof zeigeSeite === 'function' && D.offen) zeigeSeite('heim');
+    });
+  } catch { /* ohne Dienst läuft die App auch, nur ohne Offline */ }
+}

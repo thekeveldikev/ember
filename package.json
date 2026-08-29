@@ -1,0 +1,19 @@
+{
+  "name": "ember",
+  "version": "0.2.0",
+  "private": true,
+  "description": "EMBER — ein privater Begleiter für zwei.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node werkzeug/build-web.mjs",
+    "start": "node werkzeug/server.mjs",
+    "fassung": "node werkzeug/fassung.mjs",
+    "test": "node --test test/*.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

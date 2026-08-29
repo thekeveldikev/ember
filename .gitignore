@@ -1,0 +1,15 @@
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+
+# Nie ins Repository: alles, was nach Schlüssel aussieht.
+vapid*.json
+*.secret
+geheim*
+
+# Der Gesprächsverlauf. Enthält alles — gehört nicht ins Repository.
+ember-umzug.json
+
+# Frisch erzeugte Boten-Schlüssel — niemals committen.
+BOTE-SCHLUESSEL.txt

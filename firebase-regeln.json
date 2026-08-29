@@ -1,0 +1,27 @@
+{
+  "rules": {
+    "//": "EMBER — Regeln für die Echtzeit-Datenbank. In der Firebase-Konsole unter Realtime Database -> Regeln einfügen und veröffentlichen. Die Kommentarzeilen dürfen stehenbleiben.",
+
+    ".read": false,
+    ".write": false,
+
+    "paare": {
+      "$paar": {
+
+        "//": "Der Pfadname ist aus eurem Schlüssel abgeleitet und hat 128 Bit Entropie: erraten lässt er sich nicht. Diese Regeln sind die zweite Linie dahinter — sie sorgen dafür, dass selbst mit bekanntem Pfad nur eingetragene Geräte herankommen.",
+
+        ".read": "auth != null && data.child('mitglieder').hasChild(auth.uid)",
+        ".write": "auth != null && (data.child('mitglieder').hasChild(auth.uid) || data.child('mitglieder').numChildren() < 6)",
+
+        "mitglieder": {
+          "//": "Ein Gerät trägt nur sich selbst ein, nie ein anderes. Sechs Plätze, damit Handy, Tablet und Laptop hineinpassen — und ein geleertes Gerät wieder zurückkann, denn es bekommt beim Neuanmelden eine neue Kennung. Ist der Bereich voll: in der Firebase-Konsole unter paare/<eurem Pfad>/mitglieder die alten Einträge löschen.",
+
+          "$uid": {
+            ".write": "auth != null && $uid === auth.uid && (data.exists() || data.parent().numChildren() < 6)",
+            ".validate": "newData.isNumber()"
+          }
+        }
+      }
+    }
+  }
+}
