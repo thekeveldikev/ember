@@ -56,10 +56,36 @@ function einrichtungErstes() {
     );
   };
 
+  /* Das Startpaket füllt alle technischen Felder auf einen Schlag. */
+  const paketFeld = el('textarea', {
+    class: 'feld', rows: 3, placeholder: 'EMBERSTART.…',
+    style: { fontSize: '12px', fontFamily: 'ui-monospace, Menlo, monospace' },
+    autocapitalize: 'off', autocorrect: 'off', spellcheck: 'false',
+    oninput: () => {
+      const paket = startpaketLesen(paketFeld.value);
+      if (!paket) return;
+      felder.projekt.value = paket.zugang.projekt;
+      felder.apikey.value = paket.zugang.schluessel;
+      felder.datenbank.value = paket.zugang.datenbank;
+      if (paket.bote) {
+        felder.boteUrl.value = paket.bote.url || '';
+        felder.boteSchluessel.value = paket.bote.oeffentlich || '';
+        felder.boteGeheim.value = paket.bote.geheim || '';
+      }
+      paketFeld.style.borderColor = 'rgba(125,155,106,.55)';
+      meldung('Übernommen. Es fehlen nur noch die Namen' +
+        (paket.bote && !paket.bote.url ? ' und die Boten-Adresse.' : '.'), 4200);
+    },
+  });
+
   const b = blatt(
     el('h2', {}, 'Einrichten'),
     el('p', { class: 'leise klein', style: { marginTop: '7px' } },
-      'Die Zugangsdaten stehen in der Anleitung (EINRICHTEN.md). Sie bleiben auf diesem Gerät.'),
+      'Hast du ein Startpaket bekommen? Unten einfügen — es füllt alles Technische aus.'),
+
+    el('div', { class: 'trenner' }),
+    el('p', { class: 'winzig still' }, 'Das Startpaket (wenn du eins hast)'),
+    paketFeld,
 
     el('div', { class: 'trenner' }),
     el('p', { class: 'winzig still' }, 'Die Namen'),
@@ -79,14 +105,17 @@ function einrichtungErstes() {
     feld('boteGeheim', 'Geheimnis', '…', 'Ohne Boten läuft alles, nur ohne Hinweise.'),
 
     el('div', { style: { marginTop: '24px' } },
-      el('button', { class: 'knopf glut breit', onclick: () => los() }, 'Einrichten')
+      el('button', { class: 'knopf glut breit', onclick: (e) => los(e.target) }, 'Einrichten')
     )
   );
 
-  async function los() {
+  async function los(knopf) {
     const wert = (n) => felder[n].value.trim();
-    if (!wert('domme') || !wert('sub')) return meldung('Beide Namen fehlen noch.');
+    if (knopf) { knopf.disabled = true; knopf.textContent = 'Verbinde …'; }
+    const freigeben = () => { if (knopf) { knopf.disabled = false; knopf.textContent = 'Einrichten'; } };
+    if (!wert('domme') || !wert('sub')) { freigeben(); return meldung('Beide Namen fehlen noch.'); }
     if (!wert('projekt') || !wert('apikey') || !wert('datenbank')) {
+      freigeben();
       return meldung('Ohne die drei Firebase-Angaben geht es nicht.');
     }
 
@@ -114,6 +143,7 @@ function einrichtungErstes() {
       await ablageSchreib('mitglieder/' + Ablage.ich, jetzt());
     } catch (f) {
       schluesselVergessen();
+      freigeben();
       return meldung('Die Ablage nimmt uns nicht an: ' + String(f.message || f).slice(0, 90), 7000);
     }
 
@@ -174,13 +204,15 @@ function einrichtungCode() {
       'Den Code vom eingerichteten Gerät hier hineinlegen.'),
     feld,
     el('div', { style: { marginTop: '16px' } },
-      el('button', { class: 'knopf glut breit', onclick: los }, 'Verbinden')
+      el('button', { class: 'knopf glut breit', onclick: (e) => los(e.target) }, 'Verbinden')
     )
   );
 
-  async function los() {
+  async function los(knopf) {
     const gelesen = kopplungscodeLesen(feld.value);
     if (!gelesen) return meldung('Das sieht nicht nach einem EMBER-Code aus.');
+    if (knopf) { knopf.disabled = true; knopf.textContent = 'Verbinde …'; }
+    const freigeben = () => { if (knopf) { knopf.disabled = false; knopf.textContent = 'Verbinden'; } };
 
     meldung('Verbinde …');
     const paarId = await paarKennung(gelesen.roh);
@@ -194,6 +226,7 @@ function einrichtungCode() {
       if (!paar) throw new Error('Der Schlüssel passt nicht zu dieser Ablage.');
     } catch (f) {
       schluesselVergessen();
+      freigeben();
       return meldung(String(f.message || f).slice(0, 110), 7000);
     }
 

@@ -135,6 +135,25 @@ async function schluesselAufschliessen(schrank, pin) {
   }
 }
 
+/* --- Das Startpaket -------------------------------------------------------- */
+
+/* Ein Startpaket trägt die technischen Angaben der Einrichtung — Ablage
+   und Bote —, aber KEINEN Schlüssel und keine Namen. Es macht aus acht
+   Feldern zwei: Wer einrichtet, fügt das Paket ein und tippt nur noch die
+   Namen. Es darf deshalb auch bequemer reisen als ein Kopplungscode. */
+
+function startpaketLesen(code) {
+  try {
+    const putz = String(code).trim().replace(/\s+/g, '');
+    if (!putz.startsWith('EMBERSTART.')) return null;
+    const inhalt = JSON.parse(decodeURIComponent(escape(atob(ausB64Url(putz.slice(11))))));
+    if (!inhalt.a || !inhalt.a.projekt || !inhalt.a.schluessel || !inhalt.a.datenbank) return null;
+    return { zugang: inhalt.a, bote: inhalt.b || null };
+  } catch {
+    return null;
+  }
+}
+
 /* --- Der Kopplungscode ---------------------------------------------------- */
 
 /* Er trägt alles, was das zweite Gerät braucht: den Schlüssel, die Namen und

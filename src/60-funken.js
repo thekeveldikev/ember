@@ -13,7 +13,7 @@
    ========================================================================== */
 
 async function funkeSenden() {
-  const alle = await datenListe('funken');
+  const alle = await datenListe('funken').catch(() => []);
   const meine = alle.filter((f) => f.von === D.rolle);
 
   if (!meine.length) {

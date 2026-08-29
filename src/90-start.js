@@ -147,7 +147,7 @@ function regelWachePruefen() {
       el('button', {
         class: 'knopf leer breit', style: { marginTop: '10px' },
         onclick: () => { Gerät.alleLoeschen(); spiegelLeeren(); location.reload(); },
-      }, 'Gerät leeren und neu beginnen')
+      }, 'Diesen Raum leeren und neu beginnen')
     ));
   }
 
