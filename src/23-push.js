@@ -66,8 +66,10 @@ async function pushAnmelden(still = false) {
     let anmeldung = await reg.pushManager.getSubscription();
 
     /* Wechselt der Schlüssel des Boten, passt die alte Anmeldung nicht
-       mehr — dann muss sie weg, bevor eine neue entstehen kann. */
-    if (anmeldung && still === true) {
+       mehr — dann muss sie weg, bevor eine neue entstehen kann. Das gilt
+       beim stillen Erneuern UND beim Einschalten von Hand: subscribe mit
+       einem anderen Schlüssel über einer alten Anmeldung wirft sonst. */
+    if (anmeldung) {
       const alt = Gerät.lies('pushSchluessel');
       if (alt && alt !== Push.bote.oeffentlich) {
         await anmeldung.unsubscribe().catch(() => {});

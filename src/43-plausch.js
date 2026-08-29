@@ -93,6 +93,17 @@ SEITEN.plausch = function (seite) {
   seite.append(kopf, liste, schnell, eingabe);
   schnellReaktionenBauen(schnell);
 
+  /* Geht die Tastatur auf, schrumpft die Sichthöhe — die Liste soll dann
+     am Ende stehen, nicht irgendwo in der Mitte des Gesprächs. */
+  if (window.visualViewport) {
+    const nachziehen = () => {
+      if (!liste.isConnected) { window.visualViewport.removeEventListener('resize', nachziehen); return; }
+      requestAnimationFrame(() => { liste.scrollTop = liste.scrollHeight; });
+    };
+    window.visualViewport.addEventListener('resize', nachziehen);
+    beimVerlassen(() => window.visualViewport.removeEventListener('resize', nachziehen));
+  }
+
   async function senden() {
     const text = feld.value.trim();
     if (!text) return;
