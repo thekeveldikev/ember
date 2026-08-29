@@ -106,7 +106,12 @@ schreib('index.html', index);
 
 /* Der Dienst bekommt dieselbe Fassung. Sein Zwischenlager trägt sie im
    Namen — dadurch räumt ein neuer Dienst den alten Bestand selbst weg. */
-const dienst = lies('src/sw-vorlage.js').replace('__FASSUNG__', fassung);
+/* Global ersetzen, nicht nur den ersten Treffer: Der Platzhalter stand
+   auch im Kommentar der Vorlage, und replace mit Zeichenkette nimmt nur
+   das erste Vorkommen — der Kommentar bekam die Nummer, der Code behielt
+   den Platzhalter. Der Lagername war dadurch in jeder Fassung derselbe,
+   und der ganze Aktualisierungsweg lief ins Leere. */
+const dienst = lies('src/sw-vorlage.js').replace(/__FASSUNG__/g, fassung);
 schreib('sw.js', dienst);
 
 /* Auch das Anzeigeblatt kennt die Fassung, damit installierte Symbole
