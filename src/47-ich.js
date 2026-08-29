@@ -138,7 +138,7 @@ function pushAbschnittBauen(platz) {
     return;
   }
 
-  const an = Notification.permission === 'granted' && Push.erlaubt;
+  const an = pushErlaubnisErteilt() && Push.erlaubt;
 
   platz.append(
     zeile(an ? 'Hinweise sind an' : 'Hinweise einschalten',
@@ -266,7 +266,7 @@ async function sichtWechseln() {
 
   /* Der Push-Briefkasten hängt an der Rolle: neu anmelden, sonst
      klingelte dieses Gerät weiter für die alte. */
-  if (Push.bote && Notification.permission === 'granted') pushAnmelden(true);
+  if (Push.bote && pushErlaubnisErteilt()) pushAnmelden(true);
 
   baueFussleiste();
   zeigeSeite('heim');
@@ -303,7 +303,7 @@ async function allesAufAnfang() {
   spiegelLeeren();
   /* Das andere Gerät trägt sich beim nächsten Öffnen von selbst wieder
      ein — der Bereich steht Neulingen offen, solange Platz ist. */
-  if (Push.bote && Notification.permission === 'granted') pushAnmelden(true);
+  if (Push.bote && pushErlaubnisErteilt()) pushAnmelden(true);
   meldung('Leer. Wie am ersten Tag.');
   setTimeout(() => location.reload(), 1200);
 }

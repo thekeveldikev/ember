@@ -55,11 +55,12 @@ function befehlBlatt(mitZeit = false) {
     ) : null,
     el('div', { class: 'knopfreihe', style: { marginTop: '18px' } },
       el('button', { class: 'knopf leer', onclick: () => b.schliessen() }, 'Doch nicht'),
-      el('button', { class: 'knopf glut', onclick: senden }, 'Senden')
+      el('button', { class: 'knopf glut', onclick: (e) => senden(e.target) }, 'Senden')
     )
   );
 
-  async function senden() {
+  async function senden(knopf) {
+    if (knopf) knopf.disabled = true;
     const text = feld.value.trim();
     const frist = mitZeit ? parseInt(minuten.value, 10) : 0;
     b.schliessen();

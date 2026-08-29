@@ -59,7 +59,7 @@ async function appStarten() {
   spannungPruefen();
 
   /* Hinweise stillschweigend erneuern, falls die Anmeldung abgelaufen ist. */
-  if (Push.bote && Notification.permission === 'granted') pushAnmelden(true);
+  if (Push.bote && pushErlaubnisErteilt()) pushAnmelden(true);
 }
 
 /* Kommt die App aus dem Hintergrund zurück, kann inzwischen ein Krümel

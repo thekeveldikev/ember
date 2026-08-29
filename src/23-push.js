@@ -20,6 +20,13 @@ function pushMoeglich() {
   return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
 }
 
+/* Safari im Browser-Reiter auf dem iPhone kennt das ganze Notification-
+   Objekt nicht — nur die installierte App hat es. Jeder nackte Griff
+   danach stürzt dort ab. Deshalb geht jede Nachfrage hier durch. */
+function pushErlaubnisErteilt() {
+  return typeof Notification !== 'undefined' && Notification.permission === 'granted';
+}
+
 /* iOS gibt Push nur der installierten App. Vorher zu fragen wäre eine
    Erlaubnis, die nichts bewirkt — deshalb erst den Hinweis. */
 function istInstalliert() {
