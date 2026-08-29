@@ -132,11 +132,11 @@ const PUSH_HUELLEN = {
 };
 
 async function pushSenden(anRolle, art = 'hinweis', eigenerText) {
-  if (!Push.bote || !Push.bote.url) return false;
+  if (!Push.bote || !Push.bote.url) { Push.letzterStand = 'kein Bote hinterlegt'; return false; }
 
   try {
     const ziel = await ablageLies('push/' + anRolle).catch(() => null);
-    if (!ziel || !ziel.anmeldung) return false;
+    if (!ziel || !ziel.anmeldung) { Push.letzterStand = 'kein Briefkasten für ' + anRolle; return false; }
 
     const huelle = PUSH_HUELLEN[art] || PUSH_HUELLEN.hinweis;
     const antwort = await fetch(Push.bote.url.replace(/\/+$/, '') + '/senden', {
@@ -162,16 +162,29 @@ async function pushSenden(anRolle, art = 'hinweis', eigenerText) {
       /* Die Zustelladresse ist erloschen. Aufräumen, damit es nicht
          bei jedem Versuch erneut scheitert. */
       await ablageLoesch('push/' + anRolle).catch(() => {});
+      Push.letzterStand = 'Briefkasten erloschen';
       return false;
     }
+    Push.letzterStand = antwort.ok ? 'zugestellt' : 'Bote antwortete ' + antwort.status;
     return antwort.ok;
   } catch {
+    Push.letzterStand = 'Bote nicht erreichbar';
     return false;
   }
 }
 
-/* Ein Impuls an mich selbst — zum Ausprobieren, ob alles sitzt. */
+/* Ein Impuls an mich selbst — zum Ausprobieren, ob alles sitzt. Und
+   wenn nicht, sagt die Probe WORAN es lag, statt nur zu schweigen. */
 async function pushProbe() {
   const ok = await pushSenden(D.rolle, 'hinweis', 'Die Zustellung steht.');
-  meldung(ok ? 'Losgeschickt. Gleich müsste es klingeln.' : 'Der Bote hat nicht angenommen.');
+  if (ok) return meldung('Losgeschickt. Gleich müsste es klingeln.');
+
+  const grund = String(Push.letzterStand || 'unbekannt');
+  if (grund.includes('401')) {
+    meldung('Der Bote lehnt ab: Das GEHEIMNIS in Cloudflare stimmt nicht mit dem der App überein.', 7000);
+  } else if (grund.includes('403')) {
+    meldung('Der Zustelldienst lehnt ab: Der VAPID-Schlüssel im Boten passt nicht zur Anmeldung.', 7000);
+  } else {
+    meldung('Nicht zugestellt: ' + grund, 6000);
+  }
 }
