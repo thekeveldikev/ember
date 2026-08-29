@@ -271,6 +271,9 @@ SEITEN.verwaltung = function (seite) {
       zeile('Pfad', 'Stufen, die aufeinander liegen', () => pfadAnlegen()),
       zeile('Verborgenes', 'Mit Enthüllungsdatum', () => verborgenAnlegen()),
       zeile('Krümel streuen', 'Über den Tag verteilt', () => kruemelAnlegen()),
+      zeile('Foto-Auftrag', 'Mit laufender Uhr', () => fotoAuftragGeben()),
+      zeile('Sperre', 'Nichts ohne deine Erlaubnis', () => sperreSetzen()),
+      zeile('Boss', 'Eine Prüfung mit Belohnung', () => bossAnlegen()),
       zeile('Impuls', 'Kommt, wann er kommt', () => impulsAnlegen())
     )
   );

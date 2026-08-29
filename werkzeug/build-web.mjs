@@ -38,6 +38,7 @@ const jsDateien = [
   'src/44d-wahrheit.js',
   'src/44e-rubbeln.js',
   'src/45-auftraege.js',
+  'src/45b-foto.js',
   'src/46-buch.js',
   'src/47-ich.js',
   'src/48-wachsen.js',
@@ -51,6 +52,10 @@ const jsDateien = [
   'src/54-tresor.js',
   'src/55-vertrag.js',
   'src/56-rituale.js',
+  'src/57-sperre.js',
+  'src/58-boss.js',
+  'src/59-quiz.js',
+  'src/60-funken.js',
   'src/90-start.js',
 ];
 

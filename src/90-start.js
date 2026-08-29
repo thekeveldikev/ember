@@ -28,9 +28,6 @@ async function appStarten() {
   zeigeSeite('heim');
   $('#vorhang').classList.add('weg');
 
-  /* Dreimal auf den Schriftzug: die Notizliste. */
-  const schriftzug = $('.seite .glutschrift');
-  if (schriftzug) tippenDreimal(schriftzug, tarnungAn);
   if (Gerät.lies('schuetteln')) schuettelnHorchen();
 
   try {
@@ -48,6 +45,7 @@ async function appStarten() {
 
   knopfHorcherStarten();
   ampelHorcherStarten();
+  sperreHorcherStarten();
   regelWachePruefen();
   leisteAuffrischen();
 
@@ -63,6 +61,17 @@ async function appStarten() {
   /* Hinweise stillschweigend erneuern, falls die Anmeldung abgelaufen ist. */
   if (Push.bote && Notification.permission === 'granted') pushAnmelden(true);
 }
+
+/* Kommt die App aus dem Hintergrund zurück, kann inzwischen ein Krümel
+   oder der Impuls des Tages fällig geworden sein. Höchstens einmal pro
+   Minute nachsehen — öfter brächte nichts. */
+let _zuletztGeprueft = 0;
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible' || !D.offen) return;
+  if (Date.now() - _zuletztGeprueft < 60000) return;
+  _zuletztGeprueft = Date.now();
+  spannungPruefen();
+});
 
 /* Eine Regeländerung meldet sich, ohne zu verraten, worum es ging. */
 function regelWachePruefen() {
@@ -87,6 +96,19 @@ function regelWachePruefen() {
 
   stimmungSetzen();
   dienstAnmelden();
+
+  /* Die sichtbare Höhe mitschreiben. Auf dem iPhone ist das der einzige
+     verlässliche Weg, von der Tastatur zu erfahren: Das Layout bleibt
+     gleich groß, nur der sichtbare Ausschnitt schrumpft. */
+  if (window.visualViewport) {
+    const messen = () => {
+      document.documentElement.style.setProperty('--vvh', window.visualViewport.height + 'px');
+    };
+    window.visualViewport.addEventListener('resize', messen);
+    messen();
+    /* Nach dem Schließen der Tastatur meldet iOS die Höhe gern verspätet. */
+    window.addEventListener('focusout', () => setTimeout(messen, 250));
+  }
 
   /* Der Vorhang geht nach einem Wimpernschlag auf, ganz gleich, was das
      Netz gerade treibt. Sonst starrt man bei zähem Empfang minutenlang

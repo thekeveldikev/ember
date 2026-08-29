@@ -10,12 +10,12 @@ Der Code erklärt das *Was*. Hier steht das *Warum*.
 
 ## Stand
 
-**Fassung 0.2.0.** Läuft, ist aber noch nirgends veröffentlicht und war noch
+**Fassung 0.3.0.** Läuft, ist aber noch nirgends veröffentlicht und war noch
 nie mit einer echten Ablage verbunden. Was geprüft ist und was nicht, steht
 weiter unten.
 
-33 Quelldateien, rund 8300 Zeilen, 205 KB ausgeliefert. 22 Seiten,
-21 selbsttätige Prüfungen.
+38 Quelldateien, 230 KB ausgeliefert. 23 Seiten, 21 selbsttätige
+Prüfungen, alle Seiten in beiden Rollen ohne eine Ausnahme in der Konsole.
 
 **V1** (alles gebaut): Profilwahl mit PIN · der Knopf in beide Richtungen ·
 Plausch · Aufträge, Regeln, Ausstehendes · Ampel · Notausgang · Decks ·
@@ -32,9 +32,33 @@ Buch mit Wärmekarte · Tarnung · Aktualisierung.
 | Plausch | Sprachnachrichten · Nachrichten mit Ablauf · geheime Signale |
 | Sonstiges | Tresor · Rituale mit Serie · Countdowns · „An diesem Tag" |
 
-**Was aus dem ursprünglichen Entwurf noch fehlt:** Paar-Level, Boss-Fights,
-Seasons, Quiz, gemeinsames Schreiben, Playlist, Kompliment-Knopf,
-KI-Anbindung.
+**V3** (dazugekommen):
+
+| Bereich | Was drin ist |
+|---|---|
+| Foto-Auftrag | Mit laufender Uhr auf seinem Heim; versäumt wandert von selbst in die Warteschlange (die Strafe legt nur das Domme-Gerät an, sonst gäbe es sie doppelt) |
+| Die Sperre | Erlaubnis-Kontrolle mit Siegel auf beiden Heim-Seiten; er kann bitten, sie kann gewähren, ablehnen — oder ablehnen und verlängern |
+| Boss | Eine Prüfung zur Zeit, Belohnung verhüllt bis zum Sieg, Scheitern wahlweise mit Folgen |
+| Quiz | Fragen übereinander mit echtem Einsatz: verliert er, Warteschlange; verliert sie, Wunsch-Marke für ihn |
+| Funken | Ein Topf eigener Sätze, ein Tipp schickt einen zufälligen; langer Druck füllt den Topf |
+| Paar-Level | Wächst nebenbei durch abgehakte Aufträge, Buch-Einträge, Rituale, Siege, Quizrunden, beidseitiges Danach |
+
+**Fürs iPhone (12 und 17 Pro Max) in dieser Runde:** Die sichtbare Höhe
+wird über visualViewport als `--vvh` mitgeschrieben und die Hülle hängt
+daran — damit liegt das Schreibfeld im Plausch ÜBER der Tastatur statt
+darunter (iOS verkleinert das Layout bei Tastatur nicht von selbst;
+`interactive-widget` gilt dort nicht). Der Plausch misst sich seither an
+der Bühne statt an einer geratenen Zahl. Dazu: Doppeltipp-Zoom aus
+(`touch-action: manipulation` am html), Safe-Areas auch links und rechts.
+
+**Neue Fallen aus dieser Runde:** Das rohe `append(null)` schreibt den
+TEXT „null" in die Seite — bedingte Kinder immer über `el()` oder
+`anfuegen()` aus 20-core anhängen. Und: `navigator.vibrate` gibt es auf
+iOS schlicht nicht; alle `puls()`-Aufrufe sind dort wirkungslos, die
+Rhythmen kommen nur über Push an. Das ist Apples Grenze, kein Fehler.
+
+**Was aus dem ursprünglichen Entwurf noch fehlt:** Seasons, gemeinsames
+Schreiben, Playlist, KI-Anbindung, Voting.
 
 ---
 

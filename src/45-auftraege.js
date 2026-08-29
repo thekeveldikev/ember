@@ -73,6 +73,7 @@ function auftraegeZeichnen(platz, liste) {
           class: 'knopf glut', style: { minHeight: '38px', fontSize: '13px' },
           onclick: async () => {
             await datenAendern('auftraege', a.id, { bestaetigt: true, bestaetigtWann: jetzt() });
+            paarXp(5);
             puls('antwortJa');
             meldung('Abgehakt.');
           },

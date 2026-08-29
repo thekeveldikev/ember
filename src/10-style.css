@@ -105,6 +105,8 @@ html {
   height: 100%;
   overflow: hidden;
   background: var(--grund);
+  /* Nimmt dem iPhone den Doppeltipp-Zoom, ohne das Tippen zu verzögern. */
+  touch-action: manipulation;
 }
 
 body {
@@ -188,7 +190,14 @@ h3 { font-size: 18px; }
 
 #huelle {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Nicht bis zum Boden, sondern bis zur Sichtkante: --vvh ist die Höhe
+     des sichtbaren Ausschnitts und schrumpft, wenn die Tastatur kommt.
+     iOS verkleinert das Layout dabei nämlich nicht von selbst — ohne
+     dieses Maß läge das Schreibfeld im Plausch unter der Tastatur. */
+  height: var(--vvh, 100%);
   display: flex;
   flex-direction: column;
 }
@@ -200,8 +209,13 @@ h3 { font-size: 18px; }
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   /* Oben bleibt ein Streifen frei: dort sitzt der Notausgang, und er darf
-     mit keiner Seitenüberschrift ins Gehege kommen. */
-  padding: calc(env(safe-area-inset-top) + 50px) 18px 24px;
+     mit keiner Seitenüberschrift ins Gehege kommen. Links und rechts
+     zählen die Aussparungen des Geräts mit — quer gehalten säße der
+     Inhalt sonst unter der Kamerainsel. */
+  padding: calc(env(safe-area-inset-top) + 50px)
+           calc(env(safe-area-inset-right) + 18px)
+           24px
+           calc(env(safe-area-inset-left) + 18px);
 }
 
 #buehne > .seite {

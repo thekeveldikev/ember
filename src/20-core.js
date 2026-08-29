@@ -28,6 +28,17 @@ function el(art, merkmale = {}, ...kinder) {
   return k;
 }
 
+/* Wie el(), nur zum Nachrüsten: hängt Kinder an einen bestehenden Knoten
+   und übergeht nulls. Das rohe append() würde aus einem null den TEXT
+   "null" machen — ein bedingtes Kind wäre dann wörtlich zu lesen. */
+function anfuegen(ziel, ...kinder) {
+  for (const kind of kinder.flat(Infinity)) {
+    if (kind == null || kind === false) continue;
+    ziel.append(kind.nodeType ? kind : document.createTextNode(String(kind)));
+  }
+  return ziel;
+}
+
 /* Sinnbilder als schlanke Striche — nichts Gefülltes, nichts Buntes. */
 function sinnbild(name, groesse = 23) {
   const wege = {

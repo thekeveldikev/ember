@@ -14,13 +14,19 @@ SEITEN.spiel = function (seite) {
   /* Die Wege zu den einzelnen Spielen. Sie stehen oben, weil die Decks
      darunter beliebig lang werden können. */
   seite.append(
-    el('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '9px', marginBottom: '22px' } },
+    el('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '9px', marginBottom: '14px' } },
       spielKachel('Rad', 'Drehen lassen', 'rad'),
       spielKachel('Baukasten', 'Würfeln', 'szenario'),
       spielKachel('Wahrheit', 'oder Pflicht', 'wahrheit'),
-      spielKachel('Lose', 'Freirubbeln', 'rubbeln')
+      spielKachel('Lose', 'Freirubbeln', 'rubbeln'),
+      spielKachel('Quiz', 'Kennst du mich?', 'quiz')
     )
   );
+
+  const bossplatz = el('div', { style: { marginBottom: '22px' } });
+  seite.append(bossplatz);
+  const bossStopp = datenHorch('bosse', (bosse) => bossZeichnen(bossplatz, bosse));
+  beimVerlassen(bossStopp);
 
   seite.append(kopfzeile('Decks',
     istDomme() ? el('button', { class: 'winzig still', onclick: () => dareAnlegen() }, '+ Karte') : null

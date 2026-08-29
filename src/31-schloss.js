@@ -111,6 +111,16 @@ function abschliessen() {
   D.offen = false;
   D.daten = {};
 
+  /* Läuft gerade die Tarnung, gibt es die Bühne nicht — das Schloss zu
+     zeichnen würde ins Leere greifen und stürzen. Die Notizliste bleibt
+     stehen; der Rückweg aus der Tarnung führt dann von selbst ans
+     Schloss, weil die App nicht mehr offen ist. */
+  if (typeof _getarnt !== 'undefined' && _getarnt) {
+    const griffGetarnt = $('#notaus');
+    if (griffGetarnt) griffGetarnt.remove();
+    return;
+  }
+
   /* Der Notausgang gehört zur geöffneten App. Bliebe er stehen, führte er
      ins Leere: Ohne Schlüssel lässt sich keine Ampel mehr setzen. */
   const griff = $('#notaus');

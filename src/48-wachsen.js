@@ -46,6 +46,8 @@ SEITEN.wachsen = function (seite) {
   const zeichnen = async () => {
     const stand = await datenLies('wachsen/stand', {});
     standZeichnen(standplatz, stand);
+    const paarstand = await datenLies('paarstand', { xp: 0 });
+    paarKarte(standplatz, paarstand);
     werteZeichnen(werteplatz, stand);
     karmaZeichnen(karmaplatz, stand);
   };

@@ -8,7 +8,13 @@
 SEITEN.heim = function (seite) {
   seite.append(
     el('div', { style: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '4px' } },
-      el('div', { class: 'zier glutschrift', style: { fontSize: '26px', letterSpacing: '.1em' } }, 'EMBER'),
+      (() => {
+        /* Der Weg in die Tarnung hängt am Schriftzug — und muss es bei
+           jedem Zeichnen aufs Neue, weil die Seite jedes Mal neu entsteht. */
+        const zug = el('div', { class: 'zier glutschrift', style: { fontSize: '26px', letterSpacing: '.1em' } }, 'EMBER');
+        tippenDreimal(zug, tarnungAn);
+        return zug;
+      })(),
       el('button', {
         class: 'winzig still',
         style: { padding: '6px 2px' },
@@ -17,12 +23,16 @@ SEITEN.heim = function (seite) {
     )
   );
 
+  const sperrplatz = el('div');
+  const fotoplatz = el('div');
   const tagesplatz = el('div');
   const knopfplatz = el('div');
   const untenplatz = el('div');
-  seite.append(tagesplatz, knopfplatz, untenplatz);
+  seite.append(sperrplatz, fotoplatz, tagesplatz, knopfplatz, untenplatz);
 
   knopfBuehneBauen(knopfplatz);
+  sperreKarte(sperrplatz);
+  fotoAuftragKarte(fotoplatz);
   tagesNachrichtLaden(tagesplatz);
   untenBauen(untenplatz);
 };
@@ -138,10 +148,18 @@ function tagesNachrichtSetzen(platz) {
 function untenBauen(platz) {
   platz.innerHTML = '';
 
+  const funkenKnopf = el('button', {
+    class: 'knopf leer', style: { fontSize: '13.5px', padding: '12px 8px' },
+    onclick: funkeSenden,
+  }, 'Funke');
+  /* Langer Druck auf den Funken-Knopf: den eigenen Topf füllen. */
+  langerDruck(funkenKnopf, funkenPflegen);
+
   platz.append(
     el('div', { class: 'knopfreihe', style: { marginTop: '8px' } },
       el('button', {
         class: 'knopf leer',
+        style: { fontSize: '13.5px', padding: '12px 8px' },
         onclick: async () => {
           puls('denkAnDich');
           await datenSchreib('puls/' + andereRolle(), { wann: jetzt() });
@@ -149,7 +167,11 @@ function untenBauen(platz) {
           meldung('Angekommen.');
         },
       }, 'Denk an dich'),
-      el('button', { class: 'knopf leer', onclick: () => ampelBlatt() }, 'Wie geht\'s dir?')
+      funkenKnopf,
+      el('button', {
+        class: 'knopf leer', style: { fontSize: '13.5px', padding: '12px 8px' },
+        onclick: () => ampelBlatt(),
+      }, 'Ampel')
     )
   );
 

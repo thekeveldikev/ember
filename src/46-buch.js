@@ -188,6 +188,7 @@ function logAnlegen() {
           await datenAnhaengen('log', {
             tag: tagstempel(), flammen, stimmung, satz: satz.value.trim(),
           });
+          paarXp(10);
           meldung('Steht im Buch.');
         },
       }, 'Eintragen')

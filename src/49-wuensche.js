@@ -290,6 +290,7 @@ function listeAbhaken(e) {
         await datenAnhaengen('log', {
           tag: tagstempel(), flammen, stimmung: '✦', satz: 'Von der Liste: ' + e.text,
         });
+        paarXp(20);
         meldung('Steht als geschafft.');
       },
     }, 'Eintragen')

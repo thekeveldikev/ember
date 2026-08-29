@@ -110,6 +110,7 @@ function ritualeZeichnen(platz, liste) {
             onclick: async () => {
               const neue = [...tage, heute].slice(-400);
               await datenAendern('rituale', r.id, { tage: neue });
+              paarXp(2);
               puls('antwortJa');
               const neueSerie = serieAus(neue);
               meldung(neueSerie > 1 ? neueSerie + ' Tage in Folge.' : 'Eingehalten.');

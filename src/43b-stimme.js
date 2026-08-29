@@ -115,6 +115,8 @@ async function stimmeAufnehmen() {
 /* Eine schlichte Zeile mit Knopf und Balken. Kein Wellenbild — das würde
    die Aufnahme im Vorhinein verraten, und darum geht es hier nicht. */
 
+let _spieltGerade = null;
+
 function stimmeZeile(nachricht, meins) {
   const ton = new Audio(nachricht.stimme);
   let laeuft = false;
@@ -146,8 +148,11 @@ function stimmeZeile(nachricht, meins) {
 
   knopf.addEventListener('click', () => {
     if (laeuft) { ton.pause(); return; }
-    /* Immer nur eine Stimme zur Zeit. */
-    document.querySelectorAll('audio').forEach((a) => a.pause());
+    /* Immer nur eine Stimme zur Zeit. Über eine Merkstelle, nicht über
+       den Baum — new Audio() hängt in keinem Baum und wäre über
+       querySelectorAll nie zu finden gewesen. */
+    if (_spieltGerade && _spieltGerade !== ton) _spieltGerade.pause();
+    _spieltGerade = ton;
     ton.play().catch(() => meldung('Das ließ sich nicht abspielen.'));
   });
 

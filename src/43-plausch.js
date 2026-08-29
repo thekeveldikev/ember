@@ -9,11 +9,17 @@
 const REAKTIONEN_FEST = ['🔥', '🧎', '❤️', '💦', '😈'];
 
 SEITEN.plausch = function (seite) {
-  /* Der Plausch trägt seine eigene Höhe: Liste oben, Eingabe unten, und
-     die Bühne selbst scrollt hier nicht. */
+  /* Der Plausch füllt die Bühne, statt eine Höhe zu erraten: Die Bühne
+     hört auf zu scrollen, die Seite nimmt den ganzen Platz, und die Liste
+     darin scrollt selbst. Schrumpft die Sichthöhe — Tastatur —, schrumpft
+     alles mit, und das Schreibfeld bleibt über den Tasten. */
+  const buehne = $('#buehne');
+  buehne.style.overflowY = 'hidden';
+  beimVerlassen(() => { buehne.style.overflowY = ''; });
+
   seite.style.display = 'flex';
   seite.style.flexDirection = 'column';
-  seite.style.height = 'calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 154px)';
+  seite.style.height = '100%';
 
   const kopf = el('div', { style: { flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' } },
     el('h2', {}, nameVon(andereRolle())),

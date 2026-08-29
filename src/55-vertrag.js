@@ -353,6 +353,9 @@ function nachherSchreiben() {
             weniger: weniger.value.trim(),
             gefuehl: gefuehl.value.trim(),
           });
+          /* Haben jetzt beide geschrieben, zählt der Tag fürs Paar. */
+          const heutige = (await datenListe('nachher')).filter((x) => (x.tag || '') === tagstempel());
+          if (heutige.some((x) => x.von === 'domme') && heutige.some((x) => x.von === 'sub')) paarXp(15);
           pushSenden(andereRolle(), 'hinweis', 'Etwas wartet auf deine Antwort.');
           meldung('Geschrieben.');
         },
