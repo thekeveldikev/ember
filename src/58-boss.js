@@ -143,6 +143,9 @@ async function bossEntscheiden(boss, bestanden) {
       satz: 'Boss besiegt: ' + boss.titel + (boss.belohnung ? ' — ' + boss.belohnung : ''),
     });
     paarXp(50);
+    if (typeof kontoBuchen === 'function' && ladenAn()) {
+      kontoBuchen(2, 'siegel', 'Boss besiegt: ' + boss.titel).catch(() => {});
+    }
     pushSenden('sub', 'hinweis', 'Bestanden.');
     puls('antwortJa');
 

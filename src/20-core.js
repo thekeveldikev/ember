@@ -205,7 +205,9 @@ function istGetarnt() {
 function meldung(text, ms = 3200) {
   if (istGetarnt()) return el('div');
   const m = el('div', { class: 'meldung' }, text);
-  $('#meldungen').append(m);
+  const halter = $('#meldungen');
+  if (!halter) return m;
+  halter.append(m);
   setTimeout(() => {
     m.classList.add('geht');
     setTimeout(() => m.remove(), 260);
@@ -221,7 +223,9 @@ function meldungMitTat(text, tatText, tat, ms = 8000) {
       onclick: () => { m.remove(); tat(); },
     }, tatText)
   );
-  $('#meldungen').append(m);
+  const halter = $('#meldungen');
+  if (!halter) return m;
+  halter.append(m);
   setTimeout(() => {
     if (!m.isConnected) return;
     m.classList.add('geht');

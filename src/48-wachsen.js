@@ -414,6 +414,10 @@ function stufeAufFeiern(stufe, rang) {
   puls('befehl');
   tonSpielen('weich');
   if (typeof konfetti === 'function') konfetti();
+  /* Eine Stufe prägt ein Siegel — die seltene Währung des Ladens. */
+  if (typeof kontoBuchen === 'function' && ladenAn()) {
+    kontoBuchen(1, 'siegel', 'Stufe ' + stufe + ' erreicht').catch(() => {});
+  }
   const schirm = el('div', {
     style: {
       position: 'fixed', inset: '0', zIndex: '790', display: 'grid', placeItems: 'center',

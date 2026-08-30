@@ -276,6 +276,39 @@ alle versprochenen Dateien (Schriften, Icons, sw) liegen wirklich da.
 Quiz-Antwort-Blatt ist BLATT_FEST (kein Deckel-Tipp verschluckt den
 Weiter-Knopf mitten in der Runde).
 
+**0.8.0 — Der Laden (Glut & Siegel, 94 Prüfungen):** Die Ökonomie aus
+inhalt/content-12, übersetzt in Ember-Sprache statt Excel: Karma heißt
+in der Anzeige „Glut" (●), Siegel (✦) gibt es nur für Meilensteine
+(Stufe +1, Boss +2, 30-Tage-Serie +1), Kurs 50 ●, nur einschmelzbar,
+nie zurück. src/66-laden.js trägt einen PUREN Rechenkern
+(schuldenStufe, zinsenAuf, inflationAuf, ladenPreisVon,
+ladenCooldownRest — einzeln geprüft) und den Buchungsfluss:
+kontoBuchen schreibt nie den Stand allein, immer Stand + Zeile im
+kontobuch mit Saldo. Verdienst-Hooks: Tagesaufgabe +2 (Stufe 4/5: +4,
+Deckel 1/Tag), Auftrag +1 (Deckel 3/Tag), Serien 3/7/14/30. Automatik
+(nur ihr Gerät): Sonntag-20-Uhr-Gehalt (kürzbar, wortlos) + 10 %
+Wochenzins auf Schulden; Monatserster: 5 % Glutverlust auf freies
+Guthaben ab 20 (Erspartes und Schulden nie) + Abo-Abbuchung (wer nicht
+zahlen kann, verliert das Privileg sofort). Sechs Abteilungen mit
+feinen Namen (Kleine Gesten / Haut & Hände / Freiheiten / Gnade / Das
+Große ✦ / Das Risiko), 48 Artikel mit Sperrfristen, Ausverkauft und
+24-h-Angeboten mit Countdown; das Risiko wirkt sofort (gekaufte Lose
+landen bei den Losen, Verdopplung per Münze, Rad des Schicksals).
+Sparziel per langem Druck (Balken auf dem Heim), Siegel-Schmelze,
+Bußgeldkatalog für beide sichtbar, Wiederholung binnen 7 Tagen zählt
+von selbst doppelt — und bei Rot wird NIE berechnet (fest). Ihre
+Hebel: geben/nehmen, Bußgeld, Sonderabgabe, Gehalt, Versiegeln
+(Sperrkonto), je Artikel Preis/Ausverkauft/Angebot, Laden schließen
+(alles ruht, nichts geht verloren). Bewusst NICHT drin
+(Balance-Warnung aus der Content-Datei): kein automatischer Eingriff
+in die Dynamik bei Schulden — die App sperrt höchstens den Laden, nie
+den Menschen. Frisch eröffnete Konten stempeln gehaltZuletzt und
+glutMonat, sonst gäbe es rückwirkend Zahltag. meldung() und
+meldungMitTat() sind halter-defensiv (Prüfstand-Fund). Neuer Klang
+„muenze" (verdient klingt anders als bezahlt). Der ganze Kreislauf im
+Browser verifiziert: eröffnen → kaufen → einlösen anfragen → sie löst
+ein → Bußgeld — das Buch stimmt Zeile für Zeile mit Saldo.
+
 ## Was in der Bugjagd zutage kam
 
 Sieben Fehler, alle vor der Veröffentlichung gefunden. Sie stehen hier,

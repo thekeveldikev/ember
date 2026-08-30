@@ -30,7 +30,8 @@ SEITEN.spiel = function (seite) {
       spielKachel('Lose', 'Freirubbeln', 'rubbeln'),
       spielKachel('Quiz', 'Kennst du mich?', 'quiz'),
       spielKachel('Regie', 'Die App dirigiert', 'regie'),
-      spielKachel('Timer', 'Auch mit Zufall', 'timer')
+      spielKachel('Timer', 'Auch mit Zufall', 'timer'),
+      spielKachel('Der Laden', 'Glut verdienen, Glut ausgeben', 'laden')
     )
   );
 

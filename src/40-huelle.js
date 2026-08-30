@@ -98,7 +98,7 @@ function zeigeSeite(id) {
 
 const ZURUECK_ZIEL = {
   rad: 'spiel', szenario: 'spiel', wahrheit: 'spiel', rubbeln: 'spiel',
-  quiz: 'spiel', regie: 'spiel', timer: 'spiel',
+  quiz: 'spiel', regie: 'spiel', timer: 'spiel', laden: 'spiel',
   wachsen: 'ich', pfade: 'ich', spannung: 'ich', signale: 'ich',
   wuensche: 'ich', grenzen: 'ich', koerper: 'ich', tresor: 'ich',
   rituale: 'ich', vertrag: 'ich', nachher: 'ich', reparatur: 'ich',

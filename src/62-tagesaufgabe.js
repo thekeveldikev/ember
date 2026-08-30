@@ -140,6 +140,10 @@ function _aufgabeBlatt(aufgabe, fuerRolle, platz) {
             await datenSchreib('wachsen/stand', { ...stand, xp: (stand.xp || 0) + 10 }).catch(() => {});
           }
           if (typeof paarXp === 'function') paarXp(10);
+          if (D.rolle === 'sub' && typeof kontoVerdienst === 'function') {
+            kontoVerdienst('aufgabe', (aufgabe.intensitaet || 1) >= 4 ? 4 : 2, 'karma', 1,
+              'Tagesaufgabe erfüllt').catch(() => {});
+          }
           tonSpielen('weich');
           pushSenden(andereRolle(), 'hinweis', 'Tagesaufgabe erledigt.');
           puls('antwortJa');
@@ -193,4 +197,12 @@ async function _serieZaehlen() {
   const zahl = (serie.letzterTag === gestern || rot) ? (serie.zahl || 0) + 1 : 1;
   await datenSchreib('aufgabenSerie', { zahl, letzterTag: heute }).catch(() => {});
   if (typeof maschineEreignis === 'function') maschineEreignis('serie', { zahl });
+
+  /* Serien zahlen sich aus — und die Dreißig prägt ein Siegel. */
+  if (typeof kontoBuchen === 'function' && ladenAn()) {
+    if (zahl === 3) kontoBuchen(2, 'karma', 'Drei Tage in Folge').catch(() => {});
+    else if (zahl === 7) kontoBuchen(6, 'karma', 'Sieben Tage in Folge').catch(() => {});
+    else if (zahl === 14) kontoBuchen(15, 'karma', 'Vierzehn Tage in Folge').catch(() => {});
+    else if (zahl === 30) kontoBuchen(1, 'siegel', 'Dreißig Tage in Folge').catch(() => {});
+  }
 }

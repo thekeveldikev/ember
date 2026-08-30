@@ -32,6 +32,11 @@ const vorrat = {
   regieBausteine: [],  // [{key,text,dauer_sek,typ}]
   regeln: [],          // Wenn-Dann-Bibliothek: [{id,name,aktiv,ausloeser,bedingungen,aktionen}]
   toysMeta: null,      // {felder,kategorien,material_warnungen}
+  laden: [],           // Artikel: [{id,artikel,preis,waehrung,kategorie,vorrat,cooldown_h}]
+  bussgelder: [],      // [{vergehen,betrag,kategorie}]
+  einnahmen: [],       // Verdienstquellen als Nachschlagewerk für sie
+  abos: [],            // [{name,kosten_monat,beschreibung}]
+  gehalt: null,        // {betrag,...}
 };
 
 /* Die Stimme geraderücken: Texte, die BEI den beiden ankommen, dürfen
@@ -99,6 +104,7 @@ for (const datei of dateien) {
     if (Array.isArray(wert)) {
       const erst = wert[0] || {};
       if (erst.typ === 'wahrheit' || erst.typ === 'pflicht') { vorrat.wup.push(...wert); continue; }
+      if (erst.artikel && erst.preis !== undefined) { vorrat.laden.push(...wert); continue; }
       if (erst.seltenheit !== undefined) { vorrat.lose.push(...wert); continue; }
       if (erst.ausloeser && erst.aktionen) { vorrat.regeln.push(...wert); continue; }
       if (erst.deck) { vorrat.dares.push(...wert); continue; }
@@ -129,6 +135,13 @@ for (const datei of dateien) {
     if (wert.serien) { vorrat.loseSerien.push(...wert.serien); continue; }
     if (wert.bausteine) { vorrat.regieBausteine.push(...wert.bausteine); continue; }
     if (wert.felder && wert.material_warnungen) { vorrat.toysMeta = wert; continue; }
+    if (wert.bussgelder) { vorrat.bussgelder.push(...wert.bussgelder.filter((b) => typeof b.betrag === 'number')); continue; }
+    if (wert.einnahmen) { vorrat.einnahmen.push(...wert.einnahmen); continue; }
+    if (wert.abos) { vorrat.abos.push(...wert.abos); continue; }
+    if (wert.grundgehalt) { vorrat.gehalt = wert.grundgehalt; continue; }
+    if (wert.waehrungen || wert.preismechaniken || wert.sparziel || wert.geldwertverfall
+      || wert.kredit || wert.kautionen || wert.auktion || wert.schwarzmarkt
+      || wert.investition || wert.sperrkonto || wert.geschenk || wert.bilanz_ansicht) continue;
     if (wert.muster) continue;            // Haptik: die Muster leben als PULS im Code
     if (wert.ausloeser || wert.bedingungen || wert.aktionen) continue; // Katalog: der Code kennt nur, was er kann
     if (wert.mechanik || wert.sicherungen || wert.beispiel_kette || wert.beispiel_eintraege) continue;

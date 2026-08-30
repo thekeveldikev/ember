@@ -222,6 +222,9 @@ export function ladeApp({ rolle = 'domme', dateien, ablage = baueAblage() } = {}
       ...(typeof mischen === 'function' ? { mischen } : {}),
       ...(typeof zeigeSeite === 'function' ? { SEITEN, zeigeSeite } : {}),
       ...(typeof maschineFeuern === 'function' ? { maschineFeuern } : {}),
+      ...(typeof kontoBuchen === 'function'
+        ? { kontoBuchen, kontoVerdienst, kontoBussgeld, kontoLaden, ladenAn,
+            schuldenStufe, zinsenAuf, inflationAuf, ladenPreisVon, ladenCooldownRest } : {}),
     };
   `;
 

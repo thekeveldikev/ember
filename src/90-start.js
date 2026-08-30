@@ -73,6 +73,10 @@ async function appStarten() {
   /* Der Vorrat: erst die Einstellung, dann die Tagesaufgabe des Tages. */
   await vorratLaden().catch(() => {});
   tagesaufgabenStart().catch(() => {});
+
+  /* Der Laden: Konto laden, dann rechnet ihr Gerät Gehalt, Zinsen und
+     den Glutverlust nach — einmal je Fälligkeit, nie doppelt. */
+  kontoLaden().then(() => ladenPflegen()).catch(() => {});
   datenListe('toys').then((l) => { D.toysVorhanden = l.some((t) => t.aktiv !== false); }).catch(() => {});
 
   /* Der Glimm-Punkt am Auftrag-Reiter: zählt, was auf MICH wartet —

@@ -57,9 +57,10 @@ SEITEN.heim = function (seite) {
   const tagesplatz = el('div');
   const aufgabenplatz = el('div');
   const frageplatz = el('div');
+  const kontoplatz = el('div');
   const knopfplatz = el('div');
   const untenplatz = el('div');
-  seite.append(sperrplatz, fotoplatz, tagesplatz, aufgabenplatz, frageplatz, knopfplatz, untenplatz);
+  seite.append(sperrplatz, fotoplatz, tagesplatz, aufgabenplatz, frageplatz, kontoplatz, knopfplatz, untenplatz);
 
   _heim = { sperre: sperrplatz, foto: fotoplatz, aufgaben: aufgabenplatz, knopf: knopfplatz };
 
@@ -69,6 +70,7 @@ SEITEN.heim = function (seite) {
   tagesNachrichtLaden(tagesplatz);
   tagesaufgabeKarte(aufgabenplatz);
   checkinZeile(frageplatz);
+  heimKontoZeile(kontoplatz);
   untenBauen(untenplatz);
 };
 

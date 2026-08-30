@@ -92,6 +92,9 @@ function auftraegeZeichnen(platz, liste) {
               meldung('Abgehakt.');
             }
             paarXp(5);
+            if (typeof kontoVerdienst === 'function') {
+              kontoVerdienst('auftrag', 1, 'karma', 3, 'Auftrag: ' + a.titel.slice(0, 40)).catch(() => {});
+            }
             puls('antwortJa');
           },
         }, 'Abhaken')

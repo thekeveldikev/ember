@@ -896,6 +896,18 @@ textarea.feld { resize: none; line-height: 1.5; }
   50% { transform: rotate(2.5deg) translateY(-3px); filter: drop-shadow(0 10px 22px rgba(196,120,90,.45)); }
 }
 
+/* Der Kontostand bewegt sich: Verdientes steigt, Bezahltes sinkt. */
+@keyframes kontoRauf {
+  0% { opacity: 0; transform: translateY(6px); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-34px); }
+}
+@keyframes kontoRunter {
+  0% { opacity: 0; transform: translateY(-6px); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(34px); }
+}
+
 @keyframes herzFlug {
   0% { opacity: 0; transform: scale(.4) translateY(0); }
   25% { opacity: 1; transform: scale(1.25) translateY(-14px); }

@@ -205,6 +205,20 @@ function tonSpielen(art) {
       laut.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
       o.connect(laut).connect(_klangSumme);
       o.start(t); o.stop(t + 0.06);
+    } else if (art === 'muenze') {
+      /* Glut klimpert: zwei helle Metallpings, der zweite eine Quinte
+         höher — verdient klingt anders als bezahlt. */
+      [[1318.5, 0], [1975.5, 0.07]].forEach(([freq, ab]) => {
+        const o = raum.createOscillator();
+        o.type = 'triangle';
+        o.frequency.value = freq;
+        const laut = raum.createGain();
+        laut.gain.setValueAtTime(0.0001, t + ab);
+        laut.gain.exponentialRampToValueAtTime(0.09, t + ab + 0.012);
+        laut.gain.exponentialRampToValueAtTime(0.001, t + ab + 0.32);
+        o.connect(laut).connect(_klangSumme);
+        o.start(t + ab); o.stop(t + ab + 0.36);
+      });
     } else if (art === 'plopp' || art === 'ploppRein') {
       /* Ein weicher Tropfen: abwärts heißt gesendet, aufwärts heißt
          angekommen — nach zwei Tagen unterscheidet das Ohr von selbst. */
