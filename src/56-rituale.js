@@ -260,10 +260,9 @@ function damalsZeichnen(platz, log) {
       el('p', { class: 'winzig still', style: { marginBottom: '7px' } },
         'vor ' + jahreHer + (jahreHer === 1 ? ' Jahr' : ' Jahren')),
       el('div', { style: { display: 'flex', gap: '12px', alignItems: 'flex-start' } },
-        el('div', { style: { fontSize: '20px' } }, e.stimmung || '·'),
+        el('div', { class: 'zier', style: { fontSize: '13px', color: 'var(--glut-hell)', minWidth: '42px' } }, e.stimmung || '·'),
         el('div', { style: { flex: '1' } },
-          el('div', { style: { color: 'var(--glut-hell)', fontSize: '12px', letterSpacing: '.1em' } },
-            '🔥'.repeat(Math.max(1, Math.min(5, e.flammen || 1)))),
+          el('div', {}, glutPunkte(Math.max(1, Math.min(5, e.flammen || 1)))),
           e.satz ? el('p', { style: { marginTop: '5px' } }, e.satz) : null
         )
       )

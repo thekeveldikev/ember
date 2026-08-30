@@ -29,8 +29,11 @@ function auftraegeZeichnen(platz, liste) {
     istDomme() ? el('button', { class: 'winzig still', onclick: () => auftragAnlegen() }, '+ Neu') : null
   ));
 
-  const offen = liste.filter((a) => !a.bestaetigt);
-  if (!offen.length) {
+  /* Wiederkehrende, die gerade ruhen, stehen als schmale Zeile unten. */
+  const ruhende = liste.filter((a) => a.ruhtBis && a.ruhtBis > jetzt());
+  const offen = liste.filter((a) => !a.bestaetigt && !(a.ruhtBis && a.ruhtBis > jetzt()));
+
+  if (!offen.length && !ruhende.length) {
     platz.append(leerlauf('Nichts offen', istDomme() ? 'Gib ihm etwas.' : 'Gerade ist nichts zu tun.'));
     return;
   }
@@ -72,10 +75,24 @@ function auftraegeZeichnen(platz, liste) {
         el('button', {
           class: 'knopf glut', style: { minHeight: '38px', fontSize: '13px' },
           onclick: async () => {
-            await datenAendern('auftraege', a.id, { bestaetigt: true, bestaetigtWann: jetzt() });
+            if (a.rhythmus) {
+              /* Wiederkehrend: nicht abschließen, sondern schlafen legen —
+                 morgen (oder nächste Woche) steht er von selbst wieder da. */
+              const pause = a.rhythmus === 'woechentlich' ? 7 * 86400000 : 0;
+              const wieder = new Date();
+              wieder.setHours(5, 0, 0, 0);
+              await datenAendern('auftraege', a.id, {
+                erledigt: false, bestaetigt: false,
+                ruhtBis: wieder.getTime() + 86400000 + pause,
+                zuletztErledigt: jetzt(),
+              });
+              meldung('Abgehakt — kommt ' + (a.rhythmus === 'woechentlich' ? 'nächste Woche' : 'morgen') + ' wieder.');
+            } else {
+              await datenAendern('auftraege', a.id, { bestaetigt: true, bestaetigtWann: jetzt() });
+              meldung('Abgehakt.');
+            }
             paarXp(5);
             puls('antwortJa');
-            meldung('Abgehakt.');
           },
         }, 'Abhaken')
       ));
@@ -94,6 +111,20 @@ function auftraegeZeichnen(platz, liste) {
 
     platz.append(karte);
   });
+
+  if (ruhende.length) {
+    platz.append(el('p', { class: 'winzig still', style: { margin: '14px 0 6px 2px' } }, 'Kommt wieder'));
+    ruhende.forEach((a) => {
+      const zeile = el('div', { class: 'aufgabenzeile', style: { opacity: '.6' } },
+        el('span', { class: 'lichtpunkt gruen' }),
+        el('span', { class: 'klein', style: { flex: '1', textAlign: 'left' } }, a.titel),
+        el('span', { class: 'winzig still', style: { flex: 'none' } },
+          'ab ' + new Date(a.ruhtBis).toLocaleDateString('de-DE', { weekday: 'short' }))
+      );
+      if (istDomme()) langerDruck(zeile, () => auftragVerwerfen(a));
+      platz.append(zeile);
+    });
+  }
 }
 
 function fristText(zeit) {
@@ -107,16 +138,41 @@ async function auftragVerwerfen(a) {
   if (weg) await datenEintragLoeschen('auftraege', a.id);
 }
 
+const AUFTRAG_RHYTHMEN = [
+  { key: null, name: 'Einmalig', wort: '' },
+  { key: 'taeglich', name: 'Täglich', wort: 'täglich' },
+  { key: 'woechentlich', name: 'Wöchentlich', wort: 'wöchentlich' },
+];
+
 function auftragAnlegen() {
+  let rhythmus = null;
+
   const titel = el('input', { class: 'feld', placeholder: 'Was soll geschehen?' });
   const text = el('textarea', { class: 'feld', rows: 3, placeholder: 'Genauer, wenn nötig.', style: { marginTop: '9px' } });
-  const fach = el('input', { class: 'feld', placeholder: 'Täglich · Wöchentlich · Einmalig …', style: { marginTop: '9px' } });
   const frist = el('input', { class: 'feld', type: 'datetime-local', style: { marginTop: '9px' } });
+
+  /* Zum Antippen statt zum Hineinschreiben: Wie oft kommt er wieder? */
+  const reihe = el('div', { style: { display: 'flex', gap: '7px', marginTop: '4px' } });
+  const zeichne = () => {
+    reihe.innerHTML = '';
+    AUFTRAG_RHYTHMEN.forEach((r) => {
+      reihe.append(el('button', {
+        class: 'knopf' + (rhythmus === r.key ? ' glut' : ' leer'),
+        style: { flex: '1', minHeight: '40px', fontSize: '13px' },
+        onclick: () => { rhythmus = r.key; zeichne(); },
+      }, r.name));
+    });
+  };
+  zeichne();
 
   const b = blatt(
     el('h2', {}, 'Neuer Auftrag'),
     el('div', { style: { height: '12px' } }),
-    titel, text, fach,
+    titel, text,
+    el('p', { class: 'winzig still', style: { margin: '15px 0 0' } }, 'Wie oft'),
+    reihe,
+    el('p', { class: 'still klein', style: { margin: '6px 2px 0' } },
+      'Wiederkehrende Aufträge tauchen nach dem Abhaken von selbst wieder auf.'),
     el('label', { class: 'feldmarke', style: { marginTop: '15px' } }, 'Bis wann (freiwillig)'),
     frist,
     el('div', { class: 'knopfreihe', style: { marginTop: '16px' } },
@@ -129,7 +185,8 @@ function auftragAnlegen() {
           await datenAnhaengen('auftraege', {
             titel: titel.value.trim(),
             text: text.value.trim(),
-            fach: fach.value.trim(),
+            fach: (AUFTRAG_RHYTHMEN.find((r) => r.key === rhythmus) || {}).wort || '',
+            rhythmus,
             frist: frist.value ? new Date(frist.value).getTime() : null,
             art: 'auftrag', erledigt: false, bestaetigt: false,
           });

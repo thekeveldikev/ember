@@ -5,7 +5,7 @@
    steht da etwas, das sich zu lesen lohnt.
    ========================================================================== */
 
-const STIMMUNGEN = ['🔥', '😈', '🥺', '😮‍💨', '🫠', '🖤', '😌', '🙃'];
+const STIMMUNGEN = ['Glut', 'Frech', 'Weich', 'Atemlos', 'Dunkel', 'Still', 'Zart', 'Wild'];
 
 SEITEN.buch = function (seite) {
   seite.append(kopfzeile('Buch',
@@ -111,10 +111,9 @@ function logListeZeichnen(platz, liste) {
     }
 
     const karte = el('div', { class: 'karte', style: { display: 'flex', gap: '13px', alignItems: 'flex-start' } },
-      el('div', { style: { fontSize: '22px', lineHeight: '1' } }, e.stimmung || '·'),
+      el('div', { class: 'zier', style: { fontSize: '14px', lineHeight: '1.3', color: 'var(--glut-hell)', minWidth: '46px' } }, e.stimmung || '·'),
       el('div', { style: { flex: '1', minWidth: '0' } },
-        el('div', { style: { color: 'var(--glut-hell)', letterSpacing: '.12em', fontSize: '13px' } },
-          '🔥'.repeat(Math.max(1, Math.min(5, e.flammen || 1)))),
+        el('div', {}, glutPunkte(Math.max(1, Math.min(5, e.flammen || 1)))),
         e.satz ? el('p', { style: { marginTop: '6px', whiteSpace: 'pre-wrap' } }, e.satz) : null,
         el('p', { class: 'winzig still', style: { marginTop: '7px' } },
           new Date(wann).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'short' }) +
@@ -148,7 +147,7 @@ function logAnlegen() {
           transform: i <= flammen ? 'none' : 'scale(.86)',
         },
         onclick: () => { flammen = i; zeichneFlammen(); puls('hinweis'); },
-      }, '🔥'));
+      }, el('span', { style: { color: 'var(--glut-hell)' } }, sinnbild('flamme', 26))));
     }
   };
   zeichneFlammen();
@@ -159,7 +158,7 @@ function logAnlegen() {
     STIMMUNGEN.forEach((s) => {
       stimmreihe.append(el('button', {
         style: {
-          fontSize: '23px', padding: '7px 9px', borderRadius: '11px',
+          fontSize: '13.5px', padding: '9px 12px', borderRadius: '11px',
           border: '1px solid ' + (stimmung === s ? 'rgba(196,120,90,.5)' : 'transparent'),
           background: stimmung === s ? 'var(--flaeche-hoch)' : 'transparent',
           opacity: stimmung === s ? '1' : '.5',

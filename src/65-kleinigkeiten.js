@@ -418,7 +418,7 @@ SEITEN.reparatur = function (seite) {
       platz.append(el('button', {
         class: 'knopf glut breit', style: { marginTop: '14px' },
         onclick: async () => {
-          await datenAnhaengen('log', { tag: tagstempel(), flammen: 2, stimmung: '🕊', satz: 'Etwas repariert.' }).catch(() => {});
+          await datenAnhaengen('log', { tag: tagstempel(), flammen: 2, stimmung: 'Ruhe', satz: 'Etwas repariert.' }).catch(() => {});
           await datenLoesch('reparatur/aktuell');
           if (typeof paarXp === 'function') paarXp(20);
           meldung('Abgeschlossen. Das zählt mehr als jedes Spiel.');

@@ -158,7 +158,7 @@ async function offeneBitteZeigen(platz) {
     pushSenden('sub', 'antwort');
     puls(ok ? 'antwortJa' : 'antwortNein');
     meldung(ok ? 'Ja.' : 'Nein.');
-    zeigeSeite('heim');
+    heimAuffrischen('knopf');
   }
 
   function antwortMitBedingung() {
@@ -190,7 +190,7 @@ function bitteBlatt() {
     puls('bitte');
     meldung('Gefragt.');
     if (typeof maschineEreignis === 'function') maschineEreignis('knopf');
-    zeigeSeite('heim');
+    heimAuffrischen('knopf');
   });
 }
 
@@ -212,7 +212,7 @@ async function eigeneBitteZeigen(platz, knopf) {
         aktuell.antwort.text ? el('p', { class: 'leise', style: { marginTop: '9px' } }, aktuell.antwort.text) : null,
         el('button', {
           class: 'winzig still', style: { marginTop: '13px' },
-          onclick: async () => { await datenLoesch('knopf/aktuell'); zeigeSeite('heim'); },
+          onclick: async () => { await datenLoesch('knopf/aktuell'); heimAuffrischen('knopf'); },
         }, 'Wegräumen')
       )
     );
@@ -272,7 +272,7 @@ function knopfHorcherStarten() {
     if (aktuell.art === 'befehl' && istDomme() && aktuell.quittiert && !ersterDurchlauf) {
       puls('antwortJa');
       meldung(nameVon('sub') + ': Jawohl.');
-      if (D.seite === 'heim') zeigeSeite('heim');
+      heimAuffrischen('knopf');
       return;
     }
 
@@ -286,7 +286,7 @@ function knopfHorcherStarten() {
       meldungMitTat('Sie hat geantwortet.', 'Ansehen', () => zeigeSeite('heim'), 10000);
     }
 
-    if (D.seite === 'heim' && !_befehlOffen) zeigeSeite('heim');
+    if (!_befehlOffen) heimAuffrischen('knopf');
   });
 
   /* Der stille Impuls: kein Wort, nur Anwesenheit. */

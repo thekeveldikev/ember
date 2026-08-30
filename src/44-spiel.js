@@ -8,6 +8,15 @@
 /* Nur Vorschläge für den Namen eines neuen Fachs — kein Inhalt. */
 const FACH_VORSCHLAEGE = ['Sanft', 'Scharf', 'Hart', 'Draußen', 'Strafe', 'Verwöhnen', 'Romantik'];
 
+/* Jedes Vorrat-Deck bekommt sein eigenes Strich-Sinnbild — Emojis
+   wirken hier billig, und die App hat eine eigene Handschrift. */
+const DECK_SINNBILDER = {
+  soft: 'kerze', spicy: 'flamme', hardcore: 'kette', oral: 'mund',
+  haende: 'hand', toys: 'zauber', public: 'mond', bestrafung: 'waage',
+  verwoehnen: 'geschenk', romantik: 'herz', training: 'pfeilauf',
+  distanz: 'brief', kontrolle: 'schloss', sinne: 'feder', worte: 'plausch',
+};
+
 SEITEN.spiel = function (seite) {
   seite.append(kopfzeile('Spiel'));
 
@@ -117,7 +126,8 @@ function deckZeichnen(platz, karten) {
           titel: null, text: k.text, stufe: k.intensitaet, dauer: k.dauer_min, vorrat: true,
         }))),
       },
-        el('div', { style: { fontSize: '19px', marginBottom: '3px' } }, deck.icon || '🂠'),
+        el('div', { style: { marginBottom: '5px', color: 'var(--glut-hell)' } },
+          sinnbild(DECK_SINNBILDER[deck.key] || 'flamme', 21)),
         el('div', { class: 'zier', style: { fontSize: '16px' } }, deck.name),
         el('div', { class: 'still klein', style: { marginTop: '1px' } },
           deck.karten.length + ' · ' + deck.beschreibung)
@@ -152,9 +162,10 @@ function karteZiehen(fach, karten) {
       animation: 'einblenden .34s ease',
     },
   },
-    el('p', { class: 'winzig still', style: { marginBottom: '11px' } },
-      fach + (karte.stufe ? ' · ' + '🔥'.repeat(karte.stufe) : '') +
-      (karte.dauer ? ' · ~' + karte.dauer + ' Min' : '')),
+    el('p', { class: 'winzig still', style: { marginBottom: '11px', display: 'flex', alignItems: 'center', gap: '8px' } },
+      fach,
+      karte.stufe ? glutPunkte(karte.stufe) : null,
+      karte.dauer ? '~' + karte.dauer + ' Min' : null),
     karte.titel
       ? el('div', { class: 'zier', style: { fontSize: '23px', lineHeight: '1.3', marginBottom: '10px' } }, karte.titel)
       : null,

@@ -230,9 +230,8 @@ h3 { font-size: 18px; }
   to { opacity: 1; transform: none; }
 }
 
-/* Dieselbe Seite, nur frisch gezeichnet: nichts schiebt sich herein. */
-#buehne > .seite.still-wechsel { animation: stillNeu .16s ease; }
-@keyframes stillNeu { from { opacity: .55 } to { opacity: 1 } }
+/* Dieselbe Seite, nur frisch gezeichnet: gar keine Regung. */
+#buehne > .seite.still-wechsel { animation: none; }
 
 #fussleiste {
   flex: none;
@@ -288,6 +287,11 @@ h3 { font-size: 18px; }
   box-shadow: 0 0 7px currentColor;
 }
 .punkt.gruen { background: var(--gruen); color: var(--gruen); }
+.punkt.glut-punkt {
+  background: var(--glut-hell);
+  color: var(--glut-hell);
+  animation: funkeln 2.4s ease-in-out infinite;
+}
 .punkt.gelb { background: var(--gelb); color: var(--gelb); }
 .punkt.rot { background: var(--rot); color: var(--rot); }
 
@@ -754,6 +758,9 @@ textarea.feld { resize: none; line-height: 1.5; }
   display: block;
   margin: 0 auto;
   filter: drop-shadow(0 6px 16px rgba(0, 0, 0, .5));
+  /* Die auseinandergebrochenen Hälften wandern über den Zeichenrahmen
+     hinaus — ohne dies würden sie links und rechts hart abgeschnitten. */
+  overflow: visible;
 }
 
 .keks:active .keksbild { transform: scale(.96); }

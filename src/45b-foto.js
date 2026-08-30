@@ -75,13 +75,13 @@ function fotoHorcherStarten() {
       puls('befehl');
       meldungMitTat('Ein Foto-Auftrag — die Uhr läuft.', 'Ansehen', () => zeigeSeite('heim'), 10000);
     }
-    if (D.seite === 'heim') zeigeSeite('heim');
+    heimAuffrischen('foto');
   }).catch(() => {});
 }
 
 /* --- Die Karte auf dem Heim ----------------------------------------------- */
 
-async function fotoAuftragKarte(platz) {
+async function fotoAuftragKarte(platz, ruhig = false) {
   const auftrag = await datenLies('fotoauftrag');
   if (!auftrag || !auftrag.status) return;
 
@@ -139,7 +139,7 @@ async function fotoAuftragKarte(platz) {
         ),
         el('button', {
           class: 'winzig still', style: { marginTop: '10px' },
-          onclick: async () => { await datenLoesch('fotoauftrag'); zeigeSeite('heim'); },
+          onclick: async () => { await datenLoesch('fotoauftrag'); heimAuffrischen('foto'); },
         }, 'Zurückziehen')
       );
     } else {
@@ -178,7 +178,7 @@ async function fotoAuftragKarte(platz) {
           pushSenden('domme', 'hinweis', 'Es ist da.');
           puls('antwortJa');
           meldung('Angekommen.');
-          zeigeSeite('heim');
+          heimAuffrischen('foto');
         },
       });
 
@@ -204,7 +204,7 @@ async function fotoAuftragKarte(platz) {
             }, 'Ansehen'),
             el('button', {
               class: 'knopf glut', style: { minHeight: '38px', fontSize: '13px' },
-              onclick: async () => { await datenLoesch('fotoauftrag'); paarXp(10); zeigeSeite('heim'); },
+              onclick: async () => { await datenLoesch('fotoauftrag'); paarXp(10); heimAuffrischen('foto'); },
             }, 'Gut so')
           )
         : null
@@ -218,11 +218,11 @@ async function fotoAuftragKarte(platz) {
       istDomme()
         ? el('button', {
             class: 'winzig still', style: { marginTop: '9px' },
-            onclick: async () => { await datenLoesch('fotoauftrag'); zeigeSeite('heim'); },
+            onclick: async () => { await datenLoesch('fotoauftrag'); heimAuffrischen('foto'); },
           }, 'Wegräumen')
         : null
     );
   }
 
-  sanftEinfuegen(platz, karte);
+  sanftEinfuegen(platz, karte, ruhig);
 }

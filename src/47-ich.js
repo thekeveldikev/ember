@@ -21,31 +21,43 @@ SEITEN.ich = function (seite) {
     )
   );
 
-  /* --- Wege --- */
-  /* Jede Zeile sagt in einem Alltagssatz, was dahinter passiert — wer
-     hier rät, hat schon verloren. Die Texte kennen die Rolle. */
+  /* --- Wege, in vier Klappen ---------------------------------------------
+     Achtzehn gleiche Zeilen untereinander erschlagen jeden. In Gruppen
+     mit Gedächtnis (auf/zu bleibt gemerkt) findet man stattdessen. */
   const sie = istDomme();
   seite.append(
     el('div', { class: 'abschnitt' },
-      zeile('Wachsen', sie ? 'Seine Stufe, seine Punkte — du vergibst Auszeichnungen' : 'Deine Stufe und Punkte. Erledigtes zahlt hier ein', () => zeigeSeite('wachsen')),
-      zeile('Pfade', sie ? 'Baue ihm Stufenpläne — er sieht nur die nächste' : 'Deine Stufenpläne. Die nächste Stufe siehst du, mehr nicht', () => zeigeSeite('pfade')),
-      zeile('Spannung', sie ? 'Countdown stellen, Hinweise streuen, Überraschungen legen' : 'Was heute noch kommt — wenn sie etwas gelegt hat', () => zeigeSeite('spannung')),
-      zeile('Signale', 'Eigene Codewörter mit fester Bedeutung anlegen', () => zeigeSeite('signale')),
-      zeile('Wünsche', 'Jeder trägt blind ein — die App zeigt nur, was beide wollen', () => zeigeSeite('wuensche')),
-      zeile('Grenzen', 'Festhalten, was geht, was nicht und was vielleicht', () => zeigeSeite('grenzen')),
-      zeile('Körperkarte', 'Zone für Zone: Liebe ich, mag ich, bitte nicht', () => zeigeSeite('koerper')),
-      zeile('Tresor', sie ? 'Bilder hochladen und einzeln für ihn freigeben' : 'Bilder, die sie für dich freigegeben hat', () => zeigeSeite('tresor')),
-      zeile('Rituale', 'Was regelmäßig wiederkehrt — mit Serie fürs Dranbleiben', () => zeigeSeite('rituale')),
-      zeile('Der Vertrag', 'Unsere Abmachung, schwarz auf weiß, von beiden unterschrieben', () => zeigeSeite('vertrag')),
-      zeile('Danach', 'Nach einer Session: getrennt schreiben, dann zusammen lesen', () => zeigeSeite('nachher')),
-      zeile('Reparatur', 'Nach einem Streit: drei ruhige Schritte, keine Punkte', () => zeigeSeite('reparatur')),
-      zeile('Unsere Wörter', 'Das Wörterbuch für alles, was nur wir zwei verstehen', () => zeigeSeite('glossar')),
-      zeile('Das Regal', 'Was an Spielzeug da ist — die Decks richten sich danach', () => zeigeSeite('toys')),
-      zeile('Wenn — Dann', sie ? 'Regeln bauen, die von selbst feuern' : 'Ob gerade Regeln über dich laufen', () => zeigeSeite('maschine')),
-      zeile('Nur für dich', 'Private Notizen. Verlassen dieses Gerät nie', () => zeigeSeite('eigenes')),
-      zeile('Das Buch', 'Unser Tagebuch: Einträge, Flammen, Wärmekarte', () => zeigeSeite('buch')),
       zeile('Wie geht\'s dir?', 'Deine Ampel steht auf ' + ampelWort(D.ampel[D.rolle]) + ' — antippen zum Ändern', () => ampelBlatt()),
-      istDomme() ? zeile('Verwaltung', 'Dein Werkzeugkasten: anlegen, steuern, aufräumen', () => zeigeSeite('verwaltung')) : null
+      istDomme() ? zeile('Verwaltung', 'Dein Werkzeugkasten: anlegen, steuern, aufräumen', () => zeigeSeite('verwaltung')) : null,
+
+      klappGruppe('spiel', 'Wachsen & Spannung', 'Stufen, Pläne, Überraschungen, Regeln',
+        zeile('Wachsen', sie ? 'Seine Stufe, seine Punkte — du vergibst Auszeichnungen' : 'Deine Stufe und Punkte. Erledigtes zahlt hier ein', () => zeigeSeite('wachsen')),
+        zeile('Pfade', sie ? 'Baue ihm Stufenpläne — er sieht nur die nächste' : 'Deine Stufenpläne. Die nächste Stufe siehst du, mehr nicht', () => zeigeSeite('pfade')),
+        zeile('Spannung', sie ? 'Countdown stellen, Hinweise streuen, Überraschungen legen' : 'Was heute noch kommt — wenn sie etwas gelegt hat', () => zeigeSeite('spannung')),
+        zeile('Wenn — Dann', sie ? 'Regeln bauen, die von selbst feuern' : 'Ob gerade Regeln über dich laufen', () => zeigeSeite('maschine'))
+      ),
+
+      klappGruppe('naehe', 'Wissen & Nähe', 'Wünsche, Grenzen, Körper, unsere Sprache',
+        zeile('Wünsche', 'Jeder trägt blind ein — die App zeigt nur, was beide wollen', () => zeigeSeite('wuensche')),
+        zeile('Grenzen', 'Festhalten, was geht, was nicht und was vielleicht', () => zeigeSeite('grenzen')),
+        zeile('Körperkarte', 'Zone für Zone: Liebe ich, mag ich, bitte nicht', () => zeigeSeite('koerper')),
+        zeile('Signale', 'Eigene Codewörter mit fester Bedeutung anlegen', () => zeigeSeite('signale')),
+        zeile('Unsere Wörter', 'Das Wörterbuch für alles, was nur wir zwei verstehen', () => zeigeSeite('glossar'))
+      ),
+
+      klappGruppe('uns', 'Für uns', 'Vertrag, Buch, Rituale, Danach, Reparatur',
+        zeile('Der Vertrag', 'Unsere Abmachung, schwarz auf weiß, von beiden unterschrieben', () => zeigeSeite('vertrag')),
+        zeile('Das Buch', 'Unser Tagebuch: Einträge, Flammen, Wärmekarte', () => zeigeSeite('buch')),
+        zeile('Rituale', 'Was regelmäßig wiederkehrt — mit Serie fürs Dranbleiben', () => zeigeSeite('rituale')),
+        zeile('Danach', 'Nach einer Session: getrennt schreiben, dann zusammen lesen', () => zeigeSeite('nachher')),
+        zeile('Reparatur', 'Nach einem Streit: drei ruhige Schritte, keine Punkte', () => zeigeSeite('reparatur'))
+      ),
+
+      klappGruppe('sammlung', 'Sammlung & Privates', 'Tresor, Regal, eigene Notizen',
+        zeile('Tresor', sie ? 'Bilder hochladen und einzeln für ihn freigeben' : 'Bilder, die sie für dich freigegeben hat', () => zeigeSeite('tresor')),
+        zeile('Das Regal', 'Was an Spielzeug da ist — die Decks richten sich danach', () => zeigeSeite('toys')),
+        zeile('Nur für dich', 'Private Notizen. Verlassen dieses Gerät nie', () => zeigeSeite('eigenes'))
+      )
     )
   );
 
@@ -103,6 +115,47 @@ SEITEN.ich = function (seite) {
 
 /* --- Bausteine ------------------------------------------------------------ */
 
+/* Eine Gruppe von Zeilen hinter einem Kopf zum Aufklappen. Ob sie offen
+   steht, merkt sich das Gerät — wer immer nur „Wünsche" braucht, hat
+   seine Klappe beim nächsten Mal schon offen. */
+function klappGruppe(schluessel, titel, unter, ...zeilen) {
+  const stand = Gerät.lies('ichKlappen', {});
+  let offen = !!stand[schluessel];
+
+  const pfeil = el('span', {
+    class: 'still',
+    style: { fontSize: '15px', flex: 'none', transition: 'transform .25s ease', transform: offen ? 'rotate(90deg)' : 'none' },
+  }, '›');
+
+  const inhalt = el('div', { class: 'aufklapp' + (offen ? ' offen' : ''), style: { paddingLeft: '10px' } },
+    el('div', { style: { minHeight: '0' } }, ...zeilen.filter(Boolean)));
+
+  const kopf = el('button', {
+    class: 'karte',
+    style: {
+      width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center',
+      justifyContent: 'space-between', gap: '12px', marginTop: '9px', padding: '13px 15px',
+    },
+    onclick: () => {
+      offen = !offen;
+      const frisch = Gerät.lies('ichKlappen', {});
+      frisch[schluessel] = offen;
+      Gerät.schreib('ichKlappen', frisch);
+      inhalt.classList.toggle('offen', offen);
+      pfeil.style.transform = offen ? 'rotate(90deg)' : 'none';
+      tonSpielen('tick');
+    },
+  },
+    el('div', { style: { minWidth: '0' } },
+      el('div', { class: 'zier', style: { fontSize: '16.5px' } }, titel),
+      el('div', { class: 'still klein', style: { marginTop: '1px' } }, unter)
+    ),
+    pfeil
+  );
+
+  return el('div', {}, kopf, inhalt);
+}
+
 function zeile(titel, unter, tat, warnend) {
   return el('button', {
     class: 'karte',
@@ -154,7 +207,9 @@ function pushAbschnittBauen(platz) {
 
   const an = pushErlaubnisErteilt() && Push.erlaubt;
 
-  platz.append(
+  /* anfuegen statt append: das rohe append macht aus einem null den
+     sichtbaren TEXT „null" — genau so stand er hier unter der Zeile. */
+  anfuegen(platz,
     zeile(an ? 'Hinweise sind an' : 'Hinweise einschalten',
       an ? 'Der Knopf erreicht dich auch, wenn die App zu ist' : 'Sonst nur, solange die App offen ist',
       async () => {
@@ -182,7 +237,7 @@ function boteEintragen() {
         onclick: async () => {
           if (!url.value.trim() || !schluessel.value.trim()) return meldung('Adresse und Schlüssel fehlen.');
           Push.bote = {
-            url: url.value.trim().replace(/\/+$/, ''),
+            url: boteAdresse(url.value),
             oeffentlich: schluessel.value.trim(),
             geheim: geheim.value.trim(),
           };

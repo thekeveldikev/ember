@@ -116,7 +116,7 @@ function treffZeichnen(platz, liste) {
       style: { marginTop: '9px', animation: 'einblenden .35s ease ' + (i * 0.07) + 's both' },
     },
       el('div', { style: { display: 'flex', gap: '12px', alignItems: 'flex-start' } },
-        el('div', { style: { fontSize: '21px', lineHeight: '1.1' } }, '🔥'),
+        el('div', { style: { color: 'var(--glut-hell)', lineHeight: '1' } }, sinnbild('flamme', 21)),
         el('div', { style: { flex: '1' } },
           el('div', { class: 'zier', style: { fontSize: '18px' } }, t.meins.text),
           t.seins.text.trim().toLowerCase() !== t.meins.text.trim().toLowerCase()
@@ -233,7 +233,7 @@ function wunschlisteZeichnen(platz, eintraege) {
         el('div', { style: { display: 'flex', justifyContent: 'space-between', gap: '12px', alignItems: 'flex-start' } },
           el('div', { style: { flex: '1' } }, e.text),
           e.stand === 'erledigt' && e.flammen
-            ? el('span', { style: { fontSize: '11px', letterSpacing: '.1em', flex: 'none' } }, '🔥'.repeat(e.flammen))
+            ? el('span', { style: { flex: 'none' } }, glutPunkte(e.flammen))
             : null
         )
       );
@@ -275,7 +275,7 @@ function listeAbhaken(e) {
       reihe.append(el('button', {
         style: { fontSize: '26px', padding: '5px', opacity: i <= flammen ? '1' : '.22' },
         onclick: () => { flammen = i; zeichne(); puls('hinweis'); },
-      }, '🔥'));
+      }, el('span', { style: { color: 'var(--glut-hell)' } }, sinnbild('flamme', 24))));
     }
   };
   zeichne();

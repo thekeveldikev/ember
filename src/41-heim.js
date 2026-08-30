@@ -5,6 +5,26 @@
    Beide Rollen sehen dieselbe Seite, aber nicht dasselbe.
    ========================================================================== */
 
+/* Die Plätze des Heims, solange es offen ist. Damit kann jede Ecke für
+   sich frisch werden, ohne dass die ganze Seite neu entsteht und dabei
+   sichtbar zuckt. */
+let _heim = null;
+
+/* Nur den betroffenen Teil neu zeichnen — oder zur Seite wechseln, wenn
+   wir gar nicht auf dem Heim stehen. DAS ersetzt die alten
+   zeigeSeite('heim')-Rundumschläge nach jedem Knopfdruck. */
+function heimAuffrischen(teil) {
+  if (D.seite !== 'heim' || !_heim || !_heim.knopf.isConnected) {
+    if (D.seite !== 'heim') zeigeSeite('heim');
+    return;
+  }
+  const ruhig = true;
+  if (!teil || teil === 'knopf') { _heim.knopf.innerHTML = ''; knopfBuehneBauen(_heim.knopf); }
+  if (!teil || teil === 'sperre') { _heim.sperre.innerHTML = ''; sperreKarte(_heim.sperre, ruhig); }
+  if (!teil || teil === 'foto') { _heim.foto.innerHTML = ''; fotoAuftragKarte(_heim.foto, ruhig); }
+  if (!teil || teil === 'aufgaben') { tagesaufgabeKarte(_heim.aufgaben, ruhig); }
+}
+
 SEITEN.heim = function (seite) {
   seite.append(
     el('div', { style: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '4px' } },
@@ -38,6 +58,8 @@ SEITEN.heim = function (seite) {
   const untenplatz = el('div');
   seite.append(sperrplatz, fotoplatz, tagesplatz, aufgabenplatz, frageplatz, knopfplatz, untenplatz);
 
+  _heim = { sperre: sperrplatz, foto: fotoplatz, aufgaben: aufgabenplatz, knopf: knopfplatz };
+
   knopfBuehneBauen(knopfplatz);
   sperreKarte(sperrplatz);
   fotoAuftragKarte(fotoplatz);
@@ -51,10 +73,10 @@ SEITEN.heim = function (seite) {
    Knopf ruckartig nach unten zu schieben. Der Kniff: ein Gitter, dessen
    einzige Zeile von 0fr auf 1fr wächst — Höhe wird animierbar, ohne dass
    jemand messen muss. */
-function sanftEinfuegen(platz, knoten) {
+function sanftEinfuegen(platz, knoten, ruhig = false) {
   /* Beim stillen Auffrischen derselben Seite stünde die Karte schon da —
      dann darf sie nicht noch einmal aufklappen, sonst hüpft alles. */
-  if (platz.closest && platz.closest('.seite.still-wechsel')) {
+  if (ruhig || (platz.closest && platz.closest('.seite.still-wechsel'))) {
     const ruhig = el('div', { class: 'aufklapp offen' },
       el('div', { style: { minHeight: '0' } }, knoten));
     platz.append(ruhig);

@@ -163,6 +163,30 @@ harmlosen Keks-Pool, „Überrasch mich" im Spiel. Wir-Stimme jetzt
 wirklich im Build (der Generator war vor der Regel gelaufen), inklusive
 kuratierter Verb-Fälle.
 
+**0.7.0 — die Feinschliff-Runde:** Das Heim zeichnet sich nicht mehr als
+Ganzes neu — `heimAuffrischen('knopf'|'sperre'|'foto'|'aufgaben')`
+erneuert nur die betroffene Ecke (der Keks daneben bleibt dasselbe
+DOM-Element; das war das sichtbare „Zucken" nach jedem Knopfdruck).
+Eigene Symbolsprache statt Emojis: 16 neue Strich-Sinnbilder (Decks,
+Mikro, Sanduhr, Flamme …), glutPunkte() für Intensität, Stimmungs-
+WÖRTER im Buch. Der 405-Push-Fehler war eine Boten-Adresse ohne
+https:// (relativer fetch → GitHub Pages antwortet 405) — boteAdresse()
+normalisiert überall, plus Selbstheilung beim Start in Gerät UND
+Ablage. Ich-Seite in vier merkende Klappen (klappGruppe). Aufträge mit
+Rhythmus-Auswahl (einmalig/täglich/wöchentlich — Abhaken legt sie
+schlafen bis 5 Uhr des nächsten Tags bzw. +7 Tage) und Glimm-Punkt am
+Auftrag-Reiter für das, was auf MICH wartet. Wisch-zurück von der
+linken Kante (Seite folgt dem Finger). Herz-Doppeltipp schaltet um
+(setzen/wegnehmen). Tagesaufgaben mit App-Bezug bekommen einen
+„Dorthin"-Knopf (_aufgabeZiel, Stichwort-Erkennung). Keks-Beschnitt
+behoben (SVG overflow: visible — die gebrochenen Hälften ragen über den
+Zeichenrahmen). Chat-Schnellwahl ohne Emojis („good boy", „Komm her.",
+„Jetzt."). Das nackte append(null) unter „Hinweise einschalten" zeigte
+wörtlich „null" — anfuegen() ist Pflicht für bedingte Kinder.
+Ton-Entsperrung beim allerersten Tipp (iOS-Autoplay); steht der
+Klingelschalter auf lautlos, bleibt Web-Audio auf dem iPhone stumm —
+Apples Regel. „Schokolade"-Karte (oral-012) auf Wunsch entfernt.
+
 ---
 
 ## Was in der Bugjagd zutage kam

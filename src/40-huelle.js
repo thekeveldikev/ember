@@ -51,6 +51,12 @@ function leisteAuffrischen() {
   const wir = $('.reiter[data-reiter=plausch]');
   const farbe = D.ampel[andereRolle()];
   if (wir && farbe) wir.append(el('span', { class: 'punkt ' + farbe }));
+
+  /* Offene Aufträge glimmen am Reiter — er soll sie nicht suchen müssen. */
+  const auftragReiter = $('.reiter[data-reiter=auftrag]');
+  if (auftragReiter && D.offeneAuftraege > 0) {
+    auftragReiter.append(el('span', { class: 'punkt glut-punkt' }));
+  }
 }
 
 function zeigeSeite(id) {
@@ -80,6 +86,74 @@ function zeigeSeite(id) {
 
   leisteAuffrischen();
   Gerät.schreib('letzteSeite', id);
+}
+
+/* --- Wisch zurück ---------------------------------------------------------
+   Von der linken Kante nach rechts ziehen heißt „Zurück" — die Seite
+   folgt dem Finger und gleitet dann ganz hinaus. Wohin zurück führt,
+   weiß die Karte unten; die fünf Hauptseiten haben kein Zurück. */
+
+const ZURUECK_ZIEL = {
+  rad: 'spiel', szenario: 'spiel', wahrheit: 'spiel', rubbeln: 'spiel',
+  quiz: 'spiel', regie: 'spiel', timer: 'spiel',
+  wachsen: 'ich', pfade: 'ich', spannung: 'ich', signale: 'ich',
+  wuensche: 'ich', grenzen: 'ich', koerper: 'ich', tresor: 'ich',
+  rituale: 'ich', vertrag: 'ich', nachher: 'ich', reparatur: 'ich',
+  glossar: 'ich', toys: 'ich', maschine: 'ich', eigenes: 'ich',
+  buch: 'ich', verwaltung: 'ich',
+};
+
+function wischZurueckAnbringen() {
+  const b = $('#buehne');
+  if (!b || b._wischt) return;
+  b._wischt = true;
+  let start = null;
+
+  b.addEventListener('touchstart', (e) => {
+    const t = e.touches[0];
+    start = (t.clientX <= 30 && ZURUECK_ZIEL[D.seite]) ? { x: t.clientX, y: t.clientY } : null;
+  }, { passive: true });
+
+  b.addEventListener('touchmove', (e) => {
+    if (!start) return;
+    const t = e.touches[0];
+    const dx = t.clientX - start.x;
+    const dy = Math.abs(t.clientY - start.y);
+    const seite = $('#buehne .seite');
+    if (!seite) { start = null; return; }
+    if (dy > 70 && dy > dx) {
+      start = null;
+      seite.style.transition = 'transform .2s ease';
+      seite.style.transform = '';
+      seite.style.opacity = '';
+      return;
+    }
+    if (dx > 0) {
+      seite.style.transition = 'none';
+      seite.style.transform = 'translateX(' + dx + 'px)';
+      seite.style.opacity = String(Math.max(.35, 1 - dx / window.innerWidth * 0.7));
+    }
+  }, { passive: true });
+
+  b.addEventListener('touchend', (e) => {
+    if (!start) return;
+    const dx = e.changedTouches[0].clientX - start.x;
+    const ziel = ZURUECK_ZIEL[D.seite];
+    start = null;
+    const seite = $('#buehne .seite');
+    if (!seite) return;
+    if (ziel && dx > Math.min(110, window.innerWidth * 0.28)) {
+      seite.style.transition = 'transform .22s ease-out, opacity .22s ease-out';
+      seite.style.transform = 'translateX(105%)';
+      seite.style.opacity = '0';
+      tonSpielen('tick');
+      setTimeout(() => zeigeSeite(ziel), 190);
+    } else {
+      seite.style.transition = 'transform .28s cubic-bezier(.2,.7,.3,1), opacity .2s ease';
+      seite.style.transform = '';
+      seite.style.opacity = '';
+    }
+  });
 }
 
 /* --- Langer Druck --------------------------------------------------------- */

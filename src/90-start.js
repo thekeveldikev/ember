@@ -51,6 +51,18 @@ async function appStarten() {
     }
   }
 
+  /* Selbstheilung: Eine krumme Boten-Adresse (ohne https, mit Anhang)
+     wird einmal geradegezogen und zurückgeschrieben — auf dem Gerät
+     UND in der Ablage, damit auch das andere Gerät gesund wird. */
+  if (Push.bote && Push.bote.url) {
+    const sauber = boteAdresse(Push.bote.url);
+    if (sauber !== Push.bote.url) {
+      Push.bote = { ...Push.bote, url: sauber };
+      Gerät.schreib('bote', Push.bote);
+      datenSchreib('einst/bote', Push.bote).catch(() => {});
+    }
+  }
+
   await ampelLaden().catch(() => {});
   stimmungSetzen();
 
@@ -58,6 +70,16 @@ async function appStarten() {
   await vorratLaden().catch(() => {});
   tagesaufgabenStart().catch(() => {});
   datenListe('toys').then((l) => { D.toysVorhanden = l.some((t) => t.aktiv !== false); }).catch(() => {});
+
+  /* Der Glimm-Punkt am Auftrag-Reiter: zählt, was auf MICH wartet —
+     bei ihm das Unerledigte, bei ihr das Gemeldete zum Abhaken. */
+  datenHorch('auftraege', (liste) => {
+    const wach = liste.filter((a) => !(a.ruhtBis && a.ruhtBis > jetzt()) && !a.bestaetigt);
+    D.offeneAuftraege = istDomme()
+      ? wach.filter((a) => a.erledigt).length
+      : wach.filter((a) => !a.erledigt).length;
+    leisteAuffrischen();
+  });
 
   knopfHorcherStarten();
   ampelHorcherStarten();
@@ -68,8 +90,9 @@ async function appStarten() {
   regelWachePruefen();
   leisteAuffrischen();
 
-  /* Jetzt, wo die Leitung steht, den ersten Stand nachziehen. */
-  if (D.seite === 'heim') zeigeSeite('heim');
+  /* Jetzt, wo die Leitung steht, den ersten Stand nachziehen — Teil für
+     Teil, ohne die ganze Seite sichtbar neu entstehen zu lassen. */
+  if (D.seite === 'heim') heimAuffrischen();
 
   warteschlangeLeeren();
 
@@ -120,6 +143,7 @@ function regelWachePruefen() {
 
   stimmungSetzen();
   dienstAnmelden();
+  wischZurueckAnbringen();
 
   /* Ein leiser Satz unter dem Schriftzug, solange der Vorhang steht —
      aus dem harmlosesten Teil des Keks-Vorrats. Nie etwas, das auf einem

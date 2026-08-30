@@ -43,7 +43,8 @@ async function tagesaufgabenStart() {
 
 /* --- Die Karte auf dem Heim ------------------------------------------------ */
 
-async function tagesaufgabeKarte(platz) {
+async function tagesaufgabeKarte(platz, ruhig = false) {
+  if (!platz) return;
   platz.innerHTML = '';
   if (!vorratAn()) return;
 
@@ -55,8 +56,8 @@ async function tagesaufgabeKarte(platz) {
     : null;
   const serie = await datenLies('aufgabenSerie', { zahl: 0, letzterTag: '' }).catch(() => ({ zahl: 0 }));
 
-  if (eigene) sanftEinfuegen(platz, _aufgabeKarte(eigene, D.rolle, serie, platz));
-  if (seine && istDomme()) sanftEinfuegen(platz, _aufgabeKarte(seine, 'sub', serie, platz));
+  if (eigene) sanftEinfuegen(platz, _aufgabeKarte(eigene, D.rolle, serie, platz), ruhig);
+  if (seine && istDomme()) sanftEinfuegen(platz, _aufgabeKarte(seine, 'sub', serie, platz), ruhig);
 }
 
 /* Bewusst nur eine schmale Zeile: Das Heim gehört dem Knopf. Was die
@@ -74,22 +75,42 @@ function _aufgabeKarte(aufgabe, fuerRolle, serie, platz) {
       (meine ? 'Deine Aufgabe heute' : nameVon('sub') + 's Aufgabe') +
       (erledigt ? ' — erledigt' : '')),
     fuerRolle === 'sub' && serie && serie.zahl > 1
-      ? el('span', { class: 'winzig', style: { color: 'var(--glut-hell)', flex: 'none' } }, '🔥 ' + serie.zahl)
+      ? el('span', {
+          class: 'winzig',
+          style: { color: 'var(--glut-hell)', flex: 'none', display: 'inline-flex', alignItems: 'center', gap: '3px' },
+        }, sinnbild('flamme', 12), String(serie.zahl))
       : null,
     el('span', { class: 'still', style: { flex: 'none', fontSize: '15px' } }, '›')
   );
   return zeile;
 }
 
+/* Viele Aufgaben zeigen auf einen Bereich der App — dann führt ein
+   Knopf direkt dorthin, statt dass jemand suchen muss. */
+function _aufgabeZiel(aufgabe) {
+  const t = (aufgabe.text || '').toLowerCase();
+  if (/countdown|geheimen auftrag|verborgen/.test(t)) return { seite: 'spannung', wort: 'Zur Spannung' };
+  if (/regel/.test(t)) return { seite: 'auftrag', wort: 'Zu den Regeln' };
+  if (/foto|bild/.test(t)) return { seite: 'plausch', wort: 'Zum Chat' };
+  if (/nachricht|schreib|schick|sprachnachricht/.test(t)) return { seite: 'plausch', wort: 'Zum Chat' };
+  if (/rad\b|glücksrad/.test(t)) return { seite: 'rad', wort: 'Zum Rad' };
+  if (/karte|deck/.test(t)) return { seite: 'spiel', wort: 'Zum Spiel' };
+  if (/belohn|los\b/.test(t)) return { seite: 'rubbeln', wort: 'Zu den Losen' };
+  if (/bucket|wunsch/.test(t)) return { seite: 'wuensche', wort: 'Zu den Wünschen' };
+  if (/ziel|training/.test(t)) return { seite: 'wachsen', wort: 'Zum Wachsen' };
+  return null;
+}
+
 function _aufgabeBlatt(aufgabe, fuerRolle, platz) {
   const meine = fuerRolle === D.rolle;
   const erledigt = aufgabe.status === 'erledigt';
   const pfad = 'tag/' + tagstempel() + '/aufgabe_' + fuerRolle;
+  const ziel = meine && !erledigt ? _aufgabeZiel(aufgabe) : null;
 
   const b = blatt(
-    el('p', { class: 'winzig still mitte' },
-      (meine ? 'Deine Aufgabe heute' : nameVon('sub') + 's Aufgabe heute') +
-      (aufgabe.intensitaet ? ' · ' + '🔥'.repeat(aufgabe.intensitaet) : '')),
+    el('p', { class: 'winzig still mitte', style: { display: 'flex', justifyContent: 'center', gap: '8px', alignItems: 'center' } },
+      (meine ? 'Deine Aufgabe heute' : nameVon('sub') + 's Aufgabe heute'),
+      aufgabe.intensitaet ? glutPunkte(aufgabe.intensitaet) : null),
     el('p', {
       class: 'zier mitte',
       style: {
@@ -103,7 +124,11 @@ function _aufgabeBlatt(aufgabe, fuerRolle, platz) {
     erledigt
       ? el('p', { class: 'winzig mitte', style: { marginTop: '10px', color: 'var(--gruen)' } }, 'Erledigt.')
       : null,
-    el('div', { class: 'knopfreihe', style: { marginTop: '18px' } },
+    ziel ? el('button', {
+      class: 'knopf breit', style: { marginTop: '14px' },
+      onclick: () => { b.schliessen(); zeigeSeite(ziel.seite); },
+    }, ziel.wort) : null,
+    el('div', { class: 'knopfreihe', style: { marginTop: ziel ? '9px' : '18px' } },
       !erledigt && meine ? el('button', {
         class: 'knopf glut',
         onclick: async () => {
@@ -120,7 +145,7 @@ function _aufgabeBlatt(aufgabe, fuerRolle, platz) {
           puls('antwortJa');
           meldung('Zählt.');
           if (typeof maschineEreignis === 'function') maschineEreignis('aufgabe');
-          tagesaufgabeKarte(platz);
+          tagesaufgabeKarte(platz, true);
         },
       }, 'Erledigt') : null,
       !erledigt && istDomme() && fuerRolle === 'sub' ? el('button', {
@@ -137,7 +162,7 @@ function _aufgabeBlatt(aufgabe, fuerRolle, platz) {
             beweis: !!neu.braucht_beweis, status: 'offen',
           });
           meldung('Getauscht.');
-          tagesaufgabeKarte(platz);
+          tagesaufgabeKarte(platz, true);
         },
       }, 'Tauschen') : null,
       erledigt || (!meine && !istDomme()) ? el('button', {
@@ -149,7 +174,7 @@ function _aufgabeBlatt(aufgabe, fuerRolle, platz) {
       onclick: async () => {
         b.schliessen();
         const weg = await frage('Aufgabe für heute wegnehmen?', aufgabe.text, 'Wegnehmen', true);
-        if (weg) { await datenLoesch(pfad); tagesaufgabeKarte(platz); }
+        if (weg) { await datenLoesch(pfad); tagesaufgabeKarte(platz, true); }
       },
     }, 'Für heute wegnehmen') : null
   );

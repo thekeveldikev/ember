@@ -276,7 +276,7 @@ function signaleZeichnen(platz, liste) {
 
 function signalAnlegen() {
   const zeichen = el('input', {
-    class: 'feld', maxlength: '4', placeholder: '🖤',
+    class: 'feld', maxlength: '4', placeholder: '· · ·',
     style: { textAlign: 'center', fontSize: '30px' },
   });
   const bedeutung = el('input', { class: 'feld', placeholder: 'Was heißt es?', style: { marginTop: '9px' } });

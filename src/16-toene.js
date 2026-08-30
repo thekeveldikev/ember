@@ -35,6 +35,15 @@ function _klang() {
 
 function toeneAn() { return Gerät.lies('toene', true); }
 
+/* iOS gibt WebAudio erst nach einer Berührung frei — der allererste
+   Tipp in der App entsperrt den Klangraum, damit schon der erste Keks
+   knackt und nicht erst der zweite. (Steht der Klingelschalter des
+   iPhones auf lautlos, bleibt Web-Audio dort trotzdem stumm — das ist
+   Apples Regel, keine Einstellung der App.) */
+document.addEventListener('pointerdown', () => {
+  try { if (toeneAn()) _klang(); } catch { /* still */ }
+}, { once: true, capture: true });
+
 /* Ein Rauschpuffer, einmal gebaut und wiederverwendet. */
 let _rauschPuffer = null;
 function _rauschQuelle(raum, schleife = false) {

@@ -56,6 +56,22 @@ function sinnbild(name, groesse = 23) {
     schloss: '<rect x="4.8" y="10.5" width="14.4" height="10" rx="2.4"/><path d="M8.2 10.5V7.6a3.8 3.8 0 0 1 7.6 0v2.9"/>',
     glocke: '<path d="M6.5 16.5v-5a5.5 5.5 0 0 1 11 0v5l1.6 2.4H4.9z"/><path d="M10 21.2a2.3 2.3 0 0 0 4 0"/>',
     auge: '<path d="M2.6 12S6.3 5.8 12 5.8 21.4 12 21.4 12 17.7 18.2 12 18.2 2.6 12 2.6 12z"/><circle cx="12" cy="12" r="2.7"/>',
+    mikro: '<rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3M9 21h6"/>',
+    sanduhr: '<path d="M6.5 3.5h11M6.5 20.5h11M7.5 3.5v3.2c0 2.4 3 3.4 3 5.3 0 1.9-3 2.9-3 5.3v3.2M16.5 3.5v3.2c0 2.4-3 3.4-3 5.3 0 1.9 3 2.9 3 5.3v3.2"/>',
+    kerze: '<path d="M9.5 11.5h5V20h-5zM12 11.5V9"/><path d="M12 3.5c1.2 1.5 2 2.4 2 3.4a2 2 0 1 1-4 0c0-1 .8-1.9 2-3.4z"/>',
+    kette: '<rect x="3.5" y="9.5" width="9" height="5" rx="2.5"/><rect x="11.5" y="9.5" width="9" height="5" rx="2.5"/>',
+    mund: '<path d="M3.5 12c2.5-3.2 5-4.4 8.5-4.4s6 1.2 8.5 4.4c-2.5 3.2-5 4.6-8.5 4.6S6 15.2 3.5 12z"/><path d="M3.5 12h17"/>',
+    hand: '<path d="M7.5 11.5V6.4a1.4 1.4 0 0 1 2.8 0v4.1M10.3 10.2V4.9a1.4 1.4 0 0 1 2.8 0v5.3M13.1 10.2V6.4a1.4 1.4 0 0 1 2.8 0v6.1"/><path d="M15.9 12.5c0 4-1.6 8-5.4 8-3.2 0-4.7-2.6-5.5-5l-1.2-2.9a1.4 1.4 0 0 1 2.4-1.3l1.3 2.2"/>',
+    zauber: '<path d="M4.5 19.5 15 9"/><path d="M17.5 3.5v3.4M15.8 5.2h3.4M19.5 9.2l1.6 1.6M20.3 8.4l-1.6 1.6"/>',
+    mond: '<path d="M19.5 14.2A8.2 8.2 0 1 1 9.8 4.5a6.6 6.6 0 0 0 9.7 9.7z"/>',
+    waage: '<path d="M12 4.5V19M8.5 19.5h7M12 6.5 6.5 8.2M12 6.5l5.5 1.7"/><path d="M4 13.5a2.5 2.5 0 0 0 5 0L6.5 8.6 4 13.5zM15 13.5a2.5 2.5 0 0 0 5 0l-2.5-4.9-2.5 4.9z"/>',
+    geschenk: '<rect x="4.5" y="10" width="15" height="9.5" rx="1.5"/><path d="M12 10v9.5M4.5 13.5h15"/><path d="M12 10C9.5 10 8 9 8 7.5S9.4 5.2 10.4 6c1 .8 1.6 2.5 1.6 4 0-1.5.6-3.2 1.6-4 1-.8 2.4.1 2.4 1.5S14.5 10 12 10z"/>',
+    herz: '<path d="M12 19.5s-7.5-4.5-7.5-9.7A4.1 4.1 0 0 1 12 7.2a4.1 4.1 0 0 1 7.5 2.6c0 5.2-7.5 9.7-7.5 9.7z"/>',
+    pfeilauf: '<path d="M4 17l5-5 3.5 3.5L20 8"/><path d="M15.5 8H20v4.5"/>',
+    brief: '<rect x="3.5" y="6" width="17" height="12.5" rx="2"/><path d="m4.5 7.5 7.5 6 7.5-6"/>',
+    feder: '<path d="M6.5 19.5c-.5-7.5 4-13 12-15.5-.7 8-5 13-11 14"/><path d="M6.5 19.5C9 15 12.5 10.5 16 7"/>',
+    wuerfel: '<rect x="4.5" y="4.5" width="15" height="15" rx="3.5"/><circle cx="9" cy="9" r="1.1"/><circle cx="15" cy="9" r="1.1"/><circle cx="9" cy="15" r="1.1"/><circle cx="15" cy="15" r="1.1"/>',
+    funke: '<path d="M12 3.5c.8 3.9 2.6 5.7 6.5 6.5-3.9.8-5.7 2.6-6.5 6.5-.8-3.9-2.6-5.7-6.5-6.5 3.9-.8 5.7-2.6 6.5-6.5z"/>',
   };
   const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   s.setAttribute('viewBox', '0 0 24 24');
@@ -68,6 +84,23 @@ function sinnbild(name, groesse = 23) {
   s.setAttribute('stroke-linejoin', 'round');
   s.innerHTML = wege[name] || wege.flamme;
   return s;
+}
+
+/* Intensität als Reihe glimmender Punkte — die App spricht in eigenen
+   Zeichen, nicht in Emojis. */
+function glutPunkte(n, max = 5) {
+  const halter = el('span', {
+    style: { display: 'inline-flex', gap: '3px', alignItems: 'center', verticalAlign: 'middle' },
+  });
+  for (let i = 0; i < Math.min(n || 0, max); i++) {
+    halter.append(el('span', {
+      style: {
+        width: '5px', height: '5px', borderRadius: '50%',
+        background: 'var(--glut-hell)', boxShadow: '0 0 5px var(--schein)',
+      },
+    }));
+  }
+  return halter;
 }
 
 /* --- Zeit ----------------------------------------------------------------- */

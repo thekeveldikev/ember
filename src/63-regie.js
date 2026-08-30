@@ -57,14 +57,12 @@ SEITEN.regie = function (seite) {
         style: { width: '100%', textAlign: 'left', marginTop: '9px' },
         onclick: () => regieVorschau(skript),
       },
-        el('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '10px' } },
-          el('div', { class: 'zier', style: { fontSize: '17px' } }, skript.name),
-          el('span', { class: 'winzig still', style: { flex: 'none' } },
-            (skript.gesamtdauer_min || Math.round(skript.schritte.reduce((s, x) => s + x.dauer_sek, 0) / 60)) + ' Min' +
-            (skript.intensitaet ? ' · ' + '🔥'.repeat(skript.intensitaet) : ''))
-        ),
+        el('div', { class: 'zier', style: { fontSize: '17px' } }, skript.name),
+        el('div', { class: 'winzig still', style: { marginTop: '3px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' } },
+          (skript.gesamtdauer_min || Math.round(skript.schritte.reduce((s, x) => s + x.dauer_sek, 0) / 60)) + ' Min · ' + skript.schritte.length + ' Schritte',
+          skript.intensitaet ? glutPunkte(skript.intensitaet) : null),
         skript.beschreibung ? el('div', { class: 'still klein', style: { marginTop: '3px' } }, skript.beschreibung) : null,
-        skript.anzeige === 'nur_domme' ? el('div', { class: 'winzig', style: { marginTop: '5px', color: 'var(--glut-hell)' } }, 'Nur sie sieht die Schritte — er folgt ihrer Stimme.') : null
+        skript.anzeige === 'nur_domme' ? el('div', { class: 'winzig', style: { marginTop: '5px', color: 'var(--glut-hell)' } }, 'Nur ' + nameVon('domme') + ' sieht die Anweisungen und sagt sie an.') : null
       );
       if (skript.eigen && istDomme()) {
         langerDruck(karte, async () => {
@@ -96,13 +94,13 @@ function regieVorschau(skript) {
     el('h2', {}, skript.name),
     el('p', { class: 'leise klein', style: { margin: '7px 0 4px' } },
       dauer + ' Minuten · ' + skript.schritte.length + ' Schritte' +
-      (skript.anzeige === 'nur_domme' ? ' · nur sie sieht die Schritte' : '')),
+      (skript.anzeige === 'nur_domme' ? ' · nur ' + nameVon('domme') + ' sieht die Anweisungen' : '')),
     skript.beschreibung ? el('p', { class: 'still klein', style: { marginBottom: '10px' } }, skript.beschreibung) : null,
     istDomme()
       ? el('div', { style: { maxHeight: '30vh', overflowY: 'auto', margin: '8px 0' } },
           ...skript.schritte.map((s, i) => el('p', { class: 'klein', style: { padding: '5px 0', borderTop: i ? '1px solid var(--kante)' : 'none' } },
             el('span', { class: 'still' }, Math.round(s.dauer_sek / 60 * 10) / 10 + ' Min · '), s.text_domme || s.text || '')))
-      : el('p', { class: 'still klein', style: { margin: '10px 0' } }, 'Was kommt, siehst du erst, wenn es kommt. Genau darum geht es.'),
+      : el('p', { class: 'still klein', style: { margin: '10px 0' } }, 'Die Schritte siehst du erst, wenn sie dran sind — das ist der Sinn der Sache.'),
     istDomme() ? el('button', {
       class: 'knopf glut breit', style: { marginTop: '10px' },
       onclick: async () => {
@@ -219,7 +217,7 @@ async function regieRunnerOeffnen() {
       letzterSchritt = stand.i;
       zaehler.textContent = 'SCHRITT ' + (stand.i + 1) + ' / ' + skript.schritte.length;
       schrittText.textContent = blind
-        ? (istDomme() ? 'Er führt. Lass dich fallen.' : 'Folge ihrer Stimme.')
+        ? (istDomme() ? nameVon('sub') + ' übernimmt. Du musst nichts tun.' : nameVon('domme') + ' sagt dir, was zu tun ist.')
         : (istDomme() ? (schritt.text_domme || schritt.text || '') : (schritt.text_sub || schritt.text || ''));
       schrittText.style.animation = 'none';
       requestAnimationFrame(() => { schrittText.style.animation = 'einblenden .45s ease'; });
@@ -270,7 +268,7 @@ async function regieBeenden(lauf) {
       reihe.append(el('button', {
         style: { fontSize: '26px', opacity: i <= flammen ? '1' : '.25', padding: '4px' },
         onclick: () => { flammen = i; zeichne(); },
-      }, '🔥'));
+      }, el('span', { style: { color: 'var(--glut-hell)' } }, sinnbild('flamme', 26))));
     }
   };
   zeichne();
@@ -282,7 +280,7 @@ async function regieBeenden(lauf) {
       onclick: async () => {
         b.schliessen();
         await datenAnhaengen('log', {
-          tag: tagstempel(), flammen, stimmung: '🎬',
+          tag: tagstempel(), flammen, stimmung: 'Regie',
           satz: 'Regie: ' + (lauf.skript.name || '') + ' — zu Ende geführt.',
         }).catch(() => {});
         if (typeof paarXp === 'function') paarXp(15);

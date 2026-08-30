@@ -56,6 +56,7 @@ function wirStimme(s) {
     .replace(/Egal wo ihr seid/g, 'Egal wo wir sind')
     .replace(/Der erste von euch\b/g, 'Der erste von uns')
     .replace(/über euch als eure Freunde/g, 'über uns als unsere Freunde')
+    .replace(/Wenn ihr getrennt seid/g, 'Wenn wir getrennt sind')
     .replace(/\bIhr beide\b/g, 'Wir beide')
     .replace(/\bihr beide\b/g, 'wir beide')
     .replace(/\bIhr zwei\b/g, 'Wir zwei')

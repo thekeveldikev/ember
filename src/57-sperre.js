@@ -60,7 +60,7 @@ function sperreSetzen(vorhandene) {
           pushSenden('sub', 'befehl', 'Etwas gilt ab jetzt.');
           puls('befehl');
           meldung('Sie gilt.');
-          zeigeSeite('heim');
+          heimAuffrischen('sperre');
         },
       }, 'Verhängen')
     )
@@ -70,7 +70,7 @@ function sperreSetzen(vorhandene) {
 
 /* --- Das Siegel auf dem Heim ---------------------------------------------- */
 
-async function sperreKarte(platz) {
+async function sperreKarte(platz, ruhig = false) {
   const sperre = await datenLies('sperre');
   if (!sperre || !sperre.aktiv) return;
 
@@ -134,7 +134,7 @@ async function sperreKarte(platz) {
               await datenSchreib('sperrebitte', { ...bitte, antwort: { ok: true, wann: jetzt() } });
               pushSenden('sub', 'antwort', 'Ja.');
               meldung('Gewährt. Die Sperre steht weiter — heb sie auf, wenn sie fallen soll.');
-              zeigeSeite('heim');
+              heimAuffrischen('sperre');
             },
           }, 'Erlauben')
         )
@@ -153,7 +153,7 @@ async function sperreKarte(platz) {
           pushSenden('sub', 'antwort', 'Aufgehoben.');
           paarXp(5);
           meldung('Aufgehoben.');
-          zeigeSeite('heim');
+          heimAuffrischen('sperre');
         },
       }, 'Aufheben')
     ));
@@ -165,7 +165,7 @@ async function sperreKarte(platz) {
       }, bitte.antwort.ok ? 'Erlaubt.' : (bitte.antwort.verlaengert ? 'Nein. Und jetzt dauert es länger.' : 'Nein.')));
       anfuegen(karte, el('button', {
         class: 'winzig still', style: { marginTop: '8px' },
-        onclick: async () => { await datenLoesch('sperrebitte'); zeigeSeite('heim'); },
+        onclick: async () => { await datenLoesch('sperrebitte'); heimAuffrischen('sperre'); },
       }, 'Verstanden'));
     } else if (bitte) {
       anfuegen(karte, el('p', { class: 'still klein', style: { marginTop: '11px' } }, 'Gefragt. Sie hat es gesehen — oder auch nicht.'));
@@ -177,7 +177,7 @@ async function sperreKarte(platz) {
     }
   }
 
-  sanftEinfuegen(platz, karte);
+  sanftEinfuegen(platz, karte, ruhig);
 }
 
 function sperreBitten() {
@@ -196,7 +196,7 @@ function sperreBitten() {
     pushSenden('domme', 'bitte', 'Er bittet.');
     puls('bitte');
     meldung('Gefragt.');
-    zeigeSeite('heim');
+    heimAuffrischen('sperre');
   });
 }
 
@@ -212,7 +212,7 @@ function sperreAblehnen(sperre, bitte) {
         await datenSchreib('sperrebitte', { ...bitte, antwort: { ok: false, wann: jetzt() } });
         pushSenden('sub', 'antwort', 'Nein.');
         meldung('Nein.');
-        zeigeSeite('heim');
+        heimAuffrischen('sperre');
       },
     }, 'Nur nein'),
     el('div', { class: 'knopfreihe', style: { marginTop: '9px' } },
@@ -228,7 +228,7 @@ function sperreAblehnen(sperre, bitte) {
           pushSenden('sub', 'antwort', 'Nein. Und länger.');
           puls('antwortNein');
           meldung(sperre.bis ? 'Nein — und +' + std + ' Std.' : 'Nein. (Ohne Ende bleibt ohne Ende.)');
-          zeigeSeite('heim');
+          heimAuffrischen('sperre');
         },
       }, 'Nein, +' + std + ' Std'))
     )
@@ -250,11 +250,11 @@ function sperreHorcherStarten() {
     }
     if (!istDomme() && bitte.antwort) {
       puls(bitte.antwort.ok ? 'antwortJa' : 'antwortNein');
-      if (D.seite === 'heim') zeigeSeite('heim');
+      if (D.seite === 'heim') heimAuffrischen('sperre');
     }
   }).catch(() => {});
 
   ablageHorch('sperre', async () => {
-    if (D.seite === 'heim') zeigeSeite('heim');
+    if (D.seite === 'heim') heimAuffrischen('sperre');
   }).catch(() => {});
 }

@@ -126,7 +126,7 @@ function bossZeichnen(platz, bosse) {
           padding: '7px 12px', borderRadius: '9px', color: 'var(--glut-hell)',
           background: 'var(--flaeche)', border: '1px solid rgba(196,120,90,.3)',
         },
-      }, '⚔ ' + x.titel))
+      }, el('span', { style: { display: 'inline-flex', alignItems: 'center', gap: '6px' } }, sinnbild('funke', 12), x.titel)))
     ));
   }
 }
@@ -139,7 +139,7 @@ async function bossEntscheiden(boss, bestanden) {
     const stand = await datenLies('wachsen/stand', {});
     await datenSchreib('wachsen/stand', { ...stand, xp: (stand.xp || 0) + 100 });
     await datenAnhaengen('log', {
-      tag: tagstempel(), flammen: 4, stimmung: '⚔',
+      tag: tagstempel(), flammen: 4, stimmung: 'Sieg',
       satz: 'Boss besiegt: ' + boss.titel + (boss.belohnung ? ' — ' + boss.belohnung : ''),
     });
     paarXp(50);
@@ -148,7 +148,7 @@ async function bossEntscheiden(boss, bestanden) {
 
     blatt(
       el('div', { class: 'mitte', style: { padding: '12px 0 6px' } },
-        el('div', { style: { fontSize: '46px' } }, '⚔'),
+        el('div', { style: { color: 'var(--glut-hell)', display: 'grid', placeItems: 'center' } }, sinnbild('funke', 44)),
         el('div', { class: 'zier glutschrift', style: { fontSize: '27px', margin: '10px 0 4px' } }, 'Bestanden'),
         el('p', { class: 'leise' }, boss.titel),
         boss.belohnung

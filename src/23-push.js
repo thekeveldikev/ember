@@ -16,6 +16,16 @@ const Push = {
   bote: null,      // { url, geheim, oeffentlich }
 };
 
+/* Eine Boten-Adresse ohne https:// wäre für fetch ein RELATIVER Pfad —
+   der POST landete dann bei GitHub Pages, und die antwortet mit 405.
+   Genau so sah ein von Hand eingetippter Bote ohne Vorspann aus.
+   Deshalb wird jede Adresse hier geradegezogen, egal woher sie kommt. */
+function boteAdresse(url) {
+  let sauber = String(url || '').trim().replace(/\/+$/, '').replace(/\/senden$/, '');
+  if (sauber && !/^https?:\/\//i.test(sauber)) sauber = 'https://' + sauber;
+  return sauber;
+}
+
 function pushMoeglich() {
   return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
 }
@@ -145,7 +155,7 @@ async function pushSenden(anRolle, art = 'hinweis', eigenerText) {
     if (!ziel || !ziel.anmeldung) { Push.letzterStand = 'kein Briefkasten für ' + anRolle; return false; }
 
     const huelle = PUSH_HUELLEN[art] || PUSH_HUELLEN.hinweis;
-    const antwort = await fetch(Push.bote.url.replace(/\/+$/, '') + '/senden', {
+    const antwort = await fetch(boteAdresse(Push.bote.url) + '/senden', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

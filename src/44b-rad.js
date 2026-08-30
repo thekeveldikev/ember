@@ -75,7 +75,7 @@ function raederZeichnen(platz, raeder) {
         class: 'knopf leer',
         style: { minHeight: '40px', padding: '8px 13px', fontSize: '13.5px' },
         onclick: () => radDrehen([_vorratRadFuerDrehung(rad)]),
-      }, (rad.icon ? rad.icon + ' ' : '') + rad.name));
+      }, rad.name));
     });
     platz.append(gitter);
   }

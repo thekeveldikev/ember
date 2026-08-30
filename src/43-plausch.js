@@ -67,7 +67,7 @@ SEITEN.plausch = function (seite) {
       ablaufKnopf.className = 'knopf' + (ms === null ? ' leer' : ' glut');
       if (ms !== null) meldung('Die nächste Nachricht zieht sich zurück.');
     }),
-  }, '⏱');
+  }, sinnbild('sanduhr', 19));
 
   const eingabe = el('div', {
     style: { flex: 'none', display: 'flex', gap: '7px', alignItems: 'flex-end', paddingTop: '8px', borderTop: '1px solid var(--kante)' },
@@ -79,7 +79,7 @@ SEITEN.plausch = function (seite) {
     el('button', {
       class: 'knopf leer', style: { minWidth: '44px', padding: '12px 10px' },
       onclick: stimmeAufnehmen,
-    }, '🎙'),
+    }, sinnbild('mikro', 19)),
     ablaufKnopf,
     feld,
     el('button', { class: 'knopf glut', style: { minWidth: '44px', padding: '12px 13px' }, onclick: senden }, '↑'),
@@ -224,8 +224,14 @@ function plauschZeichnen(liste, alleNachrichten) {
         const nun = Date.now();
         if (nun - letzterTipp < 340) {
           letzterTipp = 0;
-          herzAufsteigen(blase);
-          if (n.reaktion !== '❤️') datenAendern('plausch', n.id, { reaktion: '❤️' });
+          /* Doppeltipp schaltet um: Herz drauf, Herz wieder weg. */
+          if (n.reaktion === '❤️') {
+            datenAendern('plausch', n.id, { reaktion: null });
+            tonSpielen('tick');
+          } else {
+            herzAufsteigen(blase);
+            datenAendern('plausch', n.id, { reaktion: '❤️' });
+          }
         } else {
           letzterTipp = nun;
         }
@@ -310,9 +316,11 @@ function eigeneReaktionAnlegen() {
 
 /* Nicht jede Nachricht braucht Worte. Ein Tippen statt Tippen. */
 function schnellReaktionenBauen(platz) {
+  /* Nur Worte, keine Emojis — die wirken hier billig. Zeichen setzt
+     man per langem Druck auf eine Nachricht. */
   const eigene = Gerät.lies('eigeneReaktionen', []);
-  const worte = istDomme() ? ['Braver Junge', 'Nein.', 'Warte.'] : ['Ja', 'Jawohl', 'Bitte'];
-  const alle = [...REAKTIONEN_FEST, ...worte, ...eigene];
+  const worte = istDomme() ? ['good boy', 'Komm her.', 'Jetzt.'] : ['Ja', 'Jawohl', 'Bitte'];
+  const alle = [...worte, ...eigene];
 
   alle.forEach((z) => {
     platz.append(el('button', {
