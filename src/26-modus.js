@@ -73,7 +73,10 @@ async function modusLaden() {
       _modusMerken();
       if (vorher !== _modus) {
         /* Ein Moduswechsel ändert fast jede Seite — hier ist ein
-           vollständiger Neuaufbau ausnahmsweise das Richtige. */
+           vollständiger Neuaufbau ausnahmsweise das Richtige.
+           Ein noch offener Vollbild-Befehl stammt aus der alten Ordnung
+           und klebte sonst über der neuen Oberfläche. */
+        if (typeof befehlSchliessen === 'function') befehlSchliessen();
         baueFussleiste();
         zeigeSeite(D.seite || 'heim');
         meldung('Ihr spielt jetzt: ' + modusInfo().name + '.', 4000);
@@ -215,6 +218,7 @@ async function modusWunschKarte(platz, ruhig = false) {
           pushSenden(andereRolle(), 'antwort', 'Einverstanden.');
           tonSpielen('schimmer');
           if (typeof konfetti === 'function') konfetti();
+          if (typeof befehlSchliessen === 'function') befehlSchliessen();
           baueFussleiste();
           zeigeSeite('heim');
           meldung('Ab jetzt: ' + m.name + '.', 4000);

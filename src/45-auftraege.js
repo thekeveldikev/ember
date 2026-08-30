@@ -254,7 +254,7 @@ function strafKarte(s, fuerSie) {
         class: 'knopf leer', style: { minHeight: '38px', fontSize: '13px' },
         onclick: async () => {
           await datenAendern('strafen', s.id, { enthuellt: true });
-          pushSenden('sub', 'auftrag', 'Sie hat etwas geöffnet.');
+          pushSenden(andereRolle(), 'auftrag', nameVon(D.rolle) + ' hat etwas geöffnet.');
         },
       }, 'Öffnen') : null,
       el('button', {
@@ -269,7 +269,7 @@ function strafKarte(s, fuerSie) {
 function strafeAnlegen() {
   eingabeBlatt({
     titel: 'Etwas Ausstehendes',
-    hinweis: 'Er sieht nur, dass etwas wartet. Nicht was.',
+    hinweis: nameVon(andereRolle()) + ' sieht nur, dass etwas wartet. Nicht was.',
     platzhalter: '…',
     mehrzeilig: true,
     jaText: 'Eintragen',

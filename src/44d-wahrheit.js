@@ -18,7 +18,7 @@ const STUFEN_NAMEN = ['Warm', 'Wärmer', 'Heiß'];
 
 const WUP_MODI = [
   { key: 'klassisch', name: 'Klassisch', hinweis: 'Wer dran ist, wählt selbst.' },
-  { key: 'ihreWahl', name: 'Ihre Wahl', hinweis: 'Sie entscheidet auch für ihn.' },
+  { key: 'ihreWahl', name: 'Fremdwahl', hinweis: 'Wer führt, entscheidet auch für den anderen.' },
   { key: 'zufall', name: 'Zufall', hinweis: 'Die App entscheidet für beide.' },
   { key: 'nurWahrheit', name: 'Nur Wahrheit', hinweis: 'Zum Reden.' },
   { key: 'nurPflicht', name: 'Nur Pflicht', hinweis: 'Ohne Worte.' },

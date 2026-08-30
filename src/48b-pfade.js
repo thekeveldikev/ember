@@ -15,7 +15,7 @@ SEITEN.pfade = function (seite) {
 
   seite.append(el('p', { class: 'leise klein', style: { marginBottom: '14px' } },
     istDomme()
-      ? 'Ein Pfad ist ein Stufenplan, den du baust. Er sieht immer nur die nächste Stufe — nie das Ziel.'
+      ? 'Ein Pfad ist ein Stufenplan, den du baust. ' + nameVon(andereRolle()) + ' sieht immer nur die nächste Stufe — nie das Ziel.'
       : 'Stufenpläne, die sie für dich baut. Du siehst immer nur die nächste Stufe — das Ziel kennt nur sie.'));
 
   const platz = el('div');
@@ -30,8 +30,8 @@ function pfadeZeichnen(platz, pfade) {
 
   if (!pfade.length) {
     platz.append(leerlauf('Noch keine Pfade',
-      istDomme() ? 'Ein Pfad ist eine Folge von Stufen. Er sieht immer nur die nächste.'
-        : 'Sie hat noch keinen angelegt.'));
+      istDomme() ? 'Ein Pfad ist eine Folge von Stufen. Sichtbar ist immer nur die nächste.'
+        : nameVon(andereRolle()) + ' hat noch keinen angelegt.'));
   }
 
   pfade.forEach((pfad) => platz.append(pfadKarte(pfad)));
@@ -163,7 +163,7 @@ function pfadAnlegen(vorhandener) {
   const b = blatt(
     el('h2', {}, vorhandener ? 'Pfad ändern' : 'Neuer Pfad'),
     el('p', { class: 'leise klein', style: { margin: '7px 0 14px' } },
-      'Er sieht immer nur bis zur nächsten Stufe. Was danach kommt, bleibt verborgen.'),
+      nameVon(andereRolle()) + ' sieht immer nur bis zur nächsten Stufe. Was danach kommt, bleibt verborgen.'),
     name, stufen,
     el('div', { class: 'knopfreihe', style: { marginTop: '16px' } },
       el('button', { class: 'knopf leer', onclick: () => b.schliessen() }, 'Abbrechen'),

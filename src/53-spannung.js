@@ -55,7 +55,7 @@ function uhrZeichnen(platz, uhr) {
 
   if (!uhr || !uhr.bis) {
     platz.append(leerlauf('Keine Uhr läuft',
-      istDomme() ? 'Stell eine. Er sieht nur, wie sie abläuft.' : 'Gerade läuft nichts.'));
+      istDomme() ? 'Stell eine. Sichtbar ist nur, wie sie abläuft.' : 'Gerade läuft nichts.'));
     if (istDomme()) {
       platz.append(el('button', {
         class: 'knopf leer breit', style: { marginTop: '11px' }, onclick: uhrStellen,
@@ -149,7 +149,7 @@ function uhrStellen() {
   const b = blatt(
     el('h2', {}, 'Die Uhr stellen'),
     el('p', { class: 'leise klein', style: { margin: '7px 0 0' } },
-      'Er sieht die Ziffern ablaufen — mehr nicht.'),
+      nameVon(andereRolle()) + ' sieht die Ziffern ablaufen — mehr nicht.'),
     el('p', { class: 'winzig still', style: { margin: '15px 0 0' } }, 'Wie lange'),
     reihe,
     el('p', { class: 'winzig still', style: { margin: '15px 0 0' } }, 'Beschriftung'),

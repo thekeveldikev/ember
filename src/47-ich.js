@@ -528,7 +528,7 @@ SEITEN.verwaltung = function (seite) {
       klappGruppe('vAuftrag', 'auftrag', 'Aufträge & Regeln', 'Was er tun, lassen oder erbitten muss',
         zeile('Auftrag', 'Mit Frist, wenn du willst', () => auftragAnlegen()),
         zeile('Regel', 'Steht, bis du sie wegnimmst', () => regelAnlegen()),
-        zeile('Etwas Ausstehendes', 'Er sieht nur die Zahl', () => strafeAnlegen()),
+        zeile('Etwas Ausstehendes', nameVon(andereRolle()) + ' sieht nur die Zahl', () => strafeAnlegen()),
         zeile('Sperre', 'Nichts ohne deine Erlaubnis', () => sperreSetzen()),
         zeile('Foto-Auftrag', 'Mit laufender Uhr', () => fotoAuftragGeben())
       ),

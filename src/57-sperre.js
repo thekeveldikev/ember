@@ -169,7 +169,7 @@ async function sperreKarte(platz, ruhig = false) {
         onclick: async () => { await datenLoesch('sperrebitte'); heimAuffrischen('sperre'); },
       }, 'Verstanden'));
     } else if (bitte) {
-      anfuegen(karte, el('p', { class: 'still klein', style: { marginTop: '11px' } }, 'Gefragt. Sie hat es gesehen — oder auch nicht.'));
+      anfuegen(karte, el('p', { class: 'still klein', style: { marginTop: '11px' } }, 'Gefragt. ' + nameVon(andereRolle()) + ' hat es gesehen — oder auch nicht.'));
     } else {
       anfuegen(karte, el('button', {
         class: 'knopf leer breit', style: { marginTop: '13px', minHeight: '40px', fontSize: '13.5px' },

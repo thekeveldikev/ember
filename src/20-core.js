@@ -292,6 +292,45 @@ function blatt(...inhalt) {
     if (e.key === 'Escape' && !fest) schliessen();
   };
   document.addEventListener('keydown', beiTaste);
+
+  /* Nach unten wischen schließt — der Griff oben ist genau dafür da, und
+     auf dem Handy ist es die natürlichste Geste überhaupt. Das Blatt
+     folgt dem Finger; wer weit genug zieht, lässt es gehen, sonst federt
+     es zurück. Feste Blätter machen nicht mit. */
+  if (!fest) {
+    let start = null;
+    let zieht = false;
+    b.addEventListener('touchstart', (e) => {
+      /* Nur, wenn das Blatt oben steht — sonst kollidierte die Geste mit
+         dem Scrollen im Blatt selbst. */
+      if (b.scrollTop > 2) { start = null; return; }
+      start = e.touches[0].clientY;
+      zieht = false;
+    }, { passive: true });
+
+    b.addEventListener('touchmove', (e) => {
+      if (start === null) return;
+      const weg = e.touches[0].clientY - start;
+      if (weg <= 0) return;
+      zieht = true;
+      b.style.transition = 'none';
+      b.style.transform = 'translateY(' + weg + 'px)';
+      b.style.opacity = String(Math.max(0.35, 1 - weg / 420));
+    }, { passive: true });
+
+    const loslassen = (e) => {
+      if (start === null || !zieht) { start = null; return; }
+      const weg = (e.changedTouches ? e.changedTouches[0].clientY : start) - start;
+      start = null;
+      b.style.transition = '';
+      b.style.transform = '';
+      b.style.opacity = '';
+      if (weg > 110) schliessen();
+    };
+    b.addEventListener('touchend', loslassen);
+    b.addEventListener('touchcancel', loslassen);
+  }
+
   document.body.append(deckel);
   if (typeof tonSpielen === 'function') tonSpielen('wusch');
   return { deckel, schliessen };

@@ -56,6 +56,47 @@ const HANDBUCH = [
   },
 
   {
+    gruppe: 'Kleine Kniffe',
+    bild: 'hand',
+    wort: 'Gesten und Abkürzungen, die man sonst nie entdeckt.',
+    eintraege: [
+      {
+        t: 'Lange drücken',
+        s: 'Fast jede Karte in dieser App kann mehr, wenn du sie gedrückt hältst: Ein Deck-Fach öffnet die Verwaltung, ein Laden-Artikel Preis und Angebot, ein Los die Wegnehmen-Frage, eine Regel die Bearbeitung.',
+        e: 'Halte Dinge gedrückt — oft steckt mehr dahinter. Im Laden startest du damit ein Sparziel.',
+        bs: 'Halt einen Artikel im Laden gedrückt: Preis ändern, ausverkauft stellen, 24-Stunden-Angebot.',
+        be: 'Halt einen Artikel im Laden gedrückt und wähl „Sparen" — der Balken auf dem Heim gehört dann diesem Ziel.',
+      },
+      {
+        t: 'Von links nach rechts wischen',
+        s: 'Auf jeder Unterseite bringt dich ein Wisch von der linken Kante nach rechts zurück — die Seite folgt dem Finger. Die fünf Hauptseiten haben bewusst kein Zurück.',
+        b: 'Schneller als jeder Knopf, und man muss nicht hinsehen.',
+      },
+      {
+        t: 'Dreimal tippen',
+        s: 'Drei schnelle Tipps auf eine freie Stelle tarnen die App — von überall, auch am PIN-Schloss. Drei Tipps auf die Notizliste holen sie zurück. Knöpfe und Schreibfelder zählen nicht mit, damit nichts versehentlich zuschnappt.',
+        b: 'Üb das einmal in Ruhe. Im Ernstfall willst du nicht überlegen müssen.',
+      },
+      {
+        t: 'Halten statt tippen beim Knopf',
+        s: 'Den großen Knopf antippen öffnet das Blatt mit Worten und Frist. Ihn zu HALTEN schickt sofort — ohne ein einziges Wort, dafür mit einem Ring, der sich füllt.',
+        e: 'Deinen Bitte-Knopf tippst du an. Was daraus wird, entscheidet sie.',
+        b: 'Der stille Weg ist oft der wirksamere.',
+      },
+      {
+        t: 'Doppelt tippen im Chat',
+        s: 'Auf eine Nachricht doppelt tippen setzt ein Herz — und nimmt es beim nächsten Doppeltipp wieder weg.',
+        b: 'Antworten, ohne zu schreiben.',
+      },
+      {
+        t: 'Der Schnellzugriff',
+        s: 'Ganz oben auf der Ich-Seite liegen vier runde Knöpfe: Aktualisieren, Tarnen, Abschließen und Farbwelt. Kein Scrollen nötig.',
+        b: 'Nach jeder neuen Fassung: einmal auf Aktualisieren, fertig.',
+      },
+    ],
+  },
+
+  {
     gruppe: 'Jeden Tag',
     bild: 'sanduhr',
     wort: 'Was die App von selbst tut — und was ihr täglich habt.',
@@ -82,6 +123,12 @@ const HANDBUCH = [
         t: 'Der Glückskeks',
         s: 'Unten auf dem Heim liegt ein Keks. Einmal am Tag lässt er sich knacken — mit Bruch, Krümeln und einem Zettel darin. Eigene Sprüche legst du unter Verwaltung → Anlegen ins Glas.',
         b: 'Leg ihm zehn eigene Zettel hinein — er weiß nie, ob heute deiner kommt oder einer aus dem Vorrat.',
+      },
+      {
+        t: 'Die Serie',
+        s: 'Was ihr täglich schafft, zählt die App mit. Serien gibt es für Tagesaufgaben und für jedes Ritual — sichtbar für beide, und sie bringen ihm Boni ab drei, sieben, vierzehn und dreißig Tagen.',
+        e: 'Dranbleiben zahlt sich aus: drei Tage, sieben, vierzehn, dreißig — jede Marke bringt etwas, die letzte ein Siegel.',
+        b: 'Ein ausgefallener Tag reißt sie ab. Im Laden gibt es dafür einen „Streak-Schutz".',
       },
       {
         t: 'Der große Knopf',
@@ -168,6 +215,11 @@ const HANDBUCH = [
         s: 'Ein Skript führt euch Schritt für Schritt durch eine Szene, mit Uhr und Ton beim Wechsel. Du siehst alle Schritte, er bekommt immer nur den nächsten. Es gibt auch den Modus „nur du siehst die Anweisungen" — dann sagst du sie an.',
         e: 'Sie startet ein Skript, und das Handy führt euch durch den Abend. Du siehst immer nur den nächsten Schritt.',
         b: 'Zwanzig Minuten, acht Schritte, und niemand muss zwischendurch überlegen.',
+      },
+      {
+        t: 'Überrasch mich',
+        s: 'Unten im Spiel: Die App entscheidet selbst, was jetzt dran ist — eine Karte, ein Rad, ein Szenario, ein Timer oder ein Münzwurf. Der halbe Reiz liegt darin, den Daumen einmal nicht entscheiden zu lassen.',
+        b: 'Wenn ihr beide keine Lust habt zu wählen: einmal tippen, und es steht.',
       },
       {
         t: 'Der Timer',
@@ -384,6 +436,86 @@ const HANDBUCH = [
   },
 
   {
+    gruppe: 'Wenn es schwierig wird',
+    bild: 'waage',
+    wort: 'Bremsen, Pausen, Nein sagen — und was danach kommt.',
+    eintraege: [
+      {
+        t: 'Anhalten, sofort',
+        s: 'Der Notausgang oben rechts liegt über allem — auch über einem Vollbild-Befehl und einer laufenden Regie. Ein Griff, und alles hält an: keine Uhren, kein Pochen, kein Ton.',
+        e: 'Der Punkt oben rechts gehört dir. Du musst ihn nicht begründen, nicht ankündigen und niemanden fragen.',
+        b: 'Er ist immer da, auf jeder Seite, in jedem Modus. Auch mitten im Vollbild.',
+      },
+      {
+        t: 'Was Rot wirklich bewirkt',
+        s: 'Rot ist kein Stimmungssymbol, sondern greift technisch durch: keine Bußgelder, keine Zinsen, keine harten Vorschläge, kein Pulsieren. Und es bleibt, bis ihr es zurücknehmt.',
+        e: 'Rot heißt: Die App hört auf, etwas von dir zu wollen. Es kostet nichts, es zählt nichts, es bricht keine Serie.',
+        b: 'Ampel umstellen dauert zwei Sekunden. Ein schlechter Abend dauert länger.',
+      },
+      {
+        t: 'Nein sagen ist eingebaut',
+        s: 'Er kann jede Bitte zurückziehen, jede Aufgabe unerledigt lassen und jederzeit die Ampel stellen. Die App bestraft nichts davon von selbst — nur du könntest das, und auch das ist eine Entscheidung.',
+        e: 'Du darfst Nein sagen. Immer. Die App rechnet dir daraus keinen Nachteil.',
+        b: 'Im Laden gibt es sogar ein „aufgespartes Nein" zu kaufen — aber gebraucht wird es nicht.',
+      },
+      {
+        t: 'Eine Pause einlegen',
+        s: 'Muss nichts Großes sein: Bausteine abschalten (Verwaltung → Bausteine), den Laden schließen oder in den Modus „Auf Augenhöhe" gehen. Alles bleibt liegen, wo es ist, und wartet.',
+        e: 'Wenn dir alles zu viel wird, sag es. Die App kann fast vollständig ruhen, ohne dass etwas verloren geht.',
+        b: 'Zwei Wochen Pause, dann alles wieder an — es ist exakt so, wie ihr es verlassen habt.',
+      },
+      {
+        t: 'Nach einem Streit',
+        s: 'Die Reparatur (Ich → Für uns) führt euch durch drei ruhige Schritte, die beide freigeben müssen. Dort zählt nichts, wird nichts berechnet, geht keine Serie kaputt.',
+        b: 'Kein Spiel, keine Punkte. Nur der Weg zurück zueinander.',
+      },
+      {
+        t: 'Grenzen verschieben sich',
+        s: 'Was ihr in Grenzen und Körperkarte eintragt, ist kein Vertrag für die Ewigkeit. Änderungen bleiben als Verlauf sichtbar — man sieht, wie sich etwas entwickelt hat, ohne darüber reden zu müssen.',
+        b: 'Ein „bitte nicht" darf später ein „vielleicht" werden. Und umgekehrt.',
+      },
+    ],
+  },
+
+  {
+    gruppe: 'Sicherheit und Vertrauen',
+    bild: 'auge',
+    wort: 'Wer was sehen kann — und wer ganz sicher nicht.',
+    eintraege: [
+      {
+        t: 'Was verschlüsselt ist',
+        s: 'Alles, was ihr schreibt, wird auf eurem Gerät verschlüsselt und erst dann gespeichert. Wer die Datenbank öffnete, sähe Buchstabensalat. Der Schlüssel liegt nur auf euren beiden Geräten.',
+        b: 'Auch Bilder, Sprachnachrichten und Tagebucheinträge — nichts liegt offen.',
+      },
+      {
+        t: 'Was auf dem Gerät bleibt',
+        s: '„Nur für dich" verlässt dieses Handy nie. Ebenso die Tarn-Notizen, deine Farbwelt, dein App-Symbol und die Klapp-Zustände. Diese Dinge kennt nicht einmal die Ablage.',
+        b: 'Auf zwei Geräten können also verschiedene Farbwelten laufen — das ist Absicht.',
+      },
+      {
+        t: 'Die PIN',
+        s: 'Mit PIN liegt der Schlüssel nur verschlossen auf dem Gerät: Wer das Handy findet, kommt an nichts. Ohne PIN liegt er offen — dann reicht ein Griff. Die Schließzeit sperrt zusätzlich nach Pausen.',
+        b: 'Ab dem fünften Fehlversuch wartet die App immer länger. Raten lohnt sich nicht.',
+      },
+      {
+        t: 'Der Kopplungscode',
+        s: 'Er enthält euren Schlüssel — er ist der Hausschlüssel. Nur direkt von Gerät zu Gerät geben (AirDrop), niemals per Chat, Mail oder Cloud. Ein Code, der einmal durch einen Chat lief, ist verbrannt.',
+        b: 'Ein neues Gerät kommt damit in euren Raum. Genau deshalb darf ihn sonst niemand haben.',
+      },
+      {
+        t: 'Wer sonst noch mitliest',
+        s: 'Niemand. Es gibt kein Nutzerkonto, keine Werbung, keine Auswertung. Die Hinweise laufen über einen kleinen eigenen Boten, der nur ein verschlüsseltes Päckchen weiterreicht und nichts davon lesen kann.',
+        b: 'Auch der Bote sieht nur: „Für dieses Gerät, dieses Päckchen." Mehr nicht.',
+      },
+      {
+        t: 'Wenn ein Gerät verloren geht',
+        s: 'Mit PIN: Der Finder sieht nichts. Eure Inhalte sind nicht weg — sie liegen in eurer Ablage, und ein neues Gerät kommt mit dem Kopplungscode wieder hinein. Über „Diesen Raum vom Gerät nehmen" räumt ihr ein Gerät ab, ohne dem anderen etwas zu nehmen.',
+        b: 'Vorsorge in zwei Sekunden: eine PIN setzen.',
+      },
+    ],
+  },
+
+  {
     gruppe: 'Einstellen',
     bild: 'schloss',
     wort: 'Modus, Bausteine, Aussehen, Sicherheit, Räume.',
@@ -511,6 +643,31 @@ const FAQ = [
     ],
   },
   {
+    gruppe: 'Für den Anfang',
+    fragen: [
+      {
+        f: 'Womit fangen wir am besten an?',
+        a: 'Mit dreien: Schreibt euch im Chat. Drückt einmal den großen Knopf. Und macht die Tagesaufgabe. Alles andere darf wochenlang unentdeckt bleiben — die App wird nicht ungeduldig.',
+      },
+      {
+        f: 'Wie viel Zeit kostet das am Tag?',
+        a: 'So viel ihr wollt. Zwei Minuten reichen: Aufgabe ansehen, Frage des Tages beantworten, Keks knacken. Mehr geht immer, muss aber nie.',
+      },
+      {
+        f: 'Was, wenn wir etwas kaputt machen?',
+        a: 'Könnt ihr praktisch nicht. Gelöschtes ist gelöscht, aber alles andere lässt sich ändern, abschalten oder zurücksetzen. Und „Alles auf Anfang" räumt notfalls den ganzen gemeinsamen Bestand weg, ohne die Einrichtung anzufassen.',
+      },
+      {
+        f: 'Müssen wir uns an das halten, was die App sagt?',
+        a: 'Nein. Die App macht Vorschläge und führt Buch — sie hat keine Macht, die ihr ihr nicht gebt. Jede Karte darf weggelegt, jeder Auftrag zurückgezogen, jede Regel gestrichen werden.',
+      },
+      {
+        f: 'Kann Gioia sehen, wenn Kevin die App öffnet?',
+        a: 'Nicht direkt. Sie sieht, was er tut: erledigte Aufgaben, gesendete Nachrichten, gestellte Bitten. Es gibt keine „zuletzt online"-Anzeige und keinen Lesestatus — das war Absicht.',
+      },
+    ],
+  },
+  {
     gruppe: 'Genauer nachgefragt',
     fragen: [
       {
@@ -536,6 +693,22 @@ const FAQ = [
       {
         f: 'Was heißt „der Wächter" und warum brauche ich das nicht zu wissen?',
         a: 'Manches muss genau einmal passieren — der Zahltag etwa. Damit das nicht auf beiden Geräten doppelt läuft, rechnet immer dasselbe Gerät. Ihr merkt davon nichts; es steht hier nur der Vollständigkeit halber.',
+      },
+      {
+        f: 'Was passiert, wenn wir den Modus wechseln — verlieren wir etwas?',
+        a: 'Nichts. Aufträge, Regeln, Buch, Münzen, Pfade, Auszeichnungen: alles bleibt liegen. Im Modus „Auf Augenhöhe" ruhen nur die Bereiche, die ohne Gefälle sinnlos wären — sie sind nach einem Rückwechsel unverändert da.',
+      },
+      {
+        f: 'Warum sehen wir manchmal unterschiedliche Zeiten?',
+        a: 'Alle Uhren rechnen aus derselben Startzeit in der Ablage, damit beide Geräte im Takt bleiben. Weicht die Uhrzeit eines Handys stark ab, kann es um ein paar Sekunden verschoben wirken — die Reihenfolge stimmt trotzdem immer.',
+      },
+      {
+        f: 'Funktioniert die App ohne Internet?',
+        a: 'Fast vollständig. Sie speichert, was ihr tut, und schickt es beim nächsten Netz von selbst nach. Nur Echtzeit — sehen, was der andere gerade tut — braucht eine Verbindung. Sehr Altes aus der Warteschlange (über einen Tag) wird verworfen, damit nichts Längst-Gelöschtes zurückkehrt.',
+      },
+      {
+        f: 'Warum steht mein Name manchmal als „Sie" oder „Er" da?',
+        a: 'Dann kennt das Gerät die Namen noch nicht — meist kurz nach der Einrichtung oder bei einem Raumwechsel. Unter Verwaltung → Namen lässt sich das jederzeit setzen.',
       },
     ],
   },

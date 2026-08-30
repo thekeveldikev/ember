@@ -578,10 +578,10 @@ function kaufBlatt(a, preis, zeichnen) {
           if (_konto && _konto.spar === a.id) {
             await datenSchreib('konto', { ...(await datenLies('konto')), spar: null });
           }
-          pushSenden('domme', 'hinweis', 'Er hat sich etwas gegönnt.');
+          pushSenden(andereRolle(), 'hinweis', nameVon(D.rolle) + ' hat sich etwas gegönnt.');
           puls('belohnung');
           await gluecksWirkung(a);
-          meldung('Gekauft. ' + (a.kategorie === 'gluecksspiel' ? '' : 'Sie weiß Bescheid.'));
+          meldung('Gekauft. ' + (a.kategorie === 'gluecksspiel' ? '' : nameVon(andereRolle()) + ' weiß Bescheid.'));
           zeichnen();
         },
       }, 'Kaufen')
@@ -637,7 +637,7 @@ function kaufKarte(k, zeichnen) {
       onclick: async () => {
         await datenAendern('kaeufe', k.id, { einloeseWunsch: true });
         pushSenden('domme', 'bitte', 'Er löst etwas ein.');
-        meldung('Vorgelegt. Sie entscheidet den Moment.');
+        meldung('Vorgelegt. ' + nameVon(andereRolle()) + ' entscheidet den Moment.');
         zeichnen();
       },
     }, 'Einlösen'));
@@ -732,7 +732,7 @@ function ladenErklaerung() {
       'Versiegeln: Münzen hinter Glas — er sieht sie, erreicht sie nicht.'),
     absatz('Je Artikel',
       'Halt einen Artikel gedrückt: Preis ändern, ausverkauft stellen oder ein 24-Stunden-Angebot starten. ' +
-      'Er sieht immer nur das Ergebnis, nie den Grund.'),
+      nameVon(andereRolle()) + ' sieht immer nur das Ergebnis, nie den Grund.'),
     absatz('Was von selbst läuft',
       'Sonntags 20 Uhr: Gehalt, und auf Schulden zehn Prozent Zinsen. ' +
       'Am Monatsersten: fünf Prozent Schwund auf ungenutzte Münzen ab 20 (Erspartes ist sicher) und die Abo-Abbuchung — ' +
@@ -866,7 +866,7 @@ function ladenVerwaltung(konto, zeichnen) {
     reihe('Geben oder nehmen', 'Münzen und Siegel, frei — mit oder ohne Grund', () => gebenBlatt(zeichnen)),
     reihe('Ein Bußgeld verhängen', 'Aus dem Katalog, zum festen Preis', () => bussgeldBlatt(zeichnen)),
     reihe('Sonderabgabe', 'Ein Betrag deiner Wahl, ohne Begründung', () => {
-      eingabeBlatt({ titel: 'Sonderabgabe', hinweis: 'Er sieht nur die Zahl.', platzhalter: 'z. B. 5' }, async (text) => {
+      eingabeBlatt({ titel: 'Sonderabgabe', hinweis: nameVon(andereRolle()) + ' sieht nur die Zahl.', platzhalter: 'z. B. 5' }, async (text) => {
         const betrag = Math.abs(parseInt(text, 10) || 0);
         if (!betrag) return meldung('Eine Zahl.');
         await kontoBuchen(-betrag, 'karma', 'Sonderabgabe');
@@ -885,7 +885,7 @@ function ladenVerwaltung(konto, zeichnen) {
     }),
     reihe('Versiegeln / freigeben', (konto.sperr || 0) + ' ● liegen versiegelt', () => sperrBlatt(zeichnen)),
     reihe('Den Laden schließen', 'Alles bleibt gespeichert — es ruht nur', async () => {
-      const sicher = await frage('Den Laden schließen?', 'Stände und Buch bleiben. Er sieht nur: zu.', 'Schließen', true);
+      const sicher = await frage('Den Laden schließen?', 'Stände und Buch bleiben. Sichtbar ist nur: zu.', 'Schließen', true);
       if (sicher) {
         await datenSchreib('konto', { ...(await datenLies('konto')), an: false });
         zeichnen();

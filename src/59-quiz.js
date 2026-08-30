@@ -135,7 +135,14 @@ function quizRunde(fragen) {
               el('button', {
                 class: 'knopf glut breit', style: { marginTop: '16px' },
                 onclick: () => { rueck.schliessen(); stelle++; naechsteFrage(); },
-              }, 'Weiter')
+              }, 'Weiter'),
+              /* Ein Ausstieg gehört auch hierher: Das Blatt ist fest, damit
+                 niemand die Antwort versehentlich wegtippt — aber wer jetzt
+                 aufhören will, soll nicht bis zum Ende klicken müssen. */
+              el('button', {
+                class: 'winzig still', style: { marginTop: '12px' },
+                onclick: () => { rueck.schliessen(); zeigeSeite('spiel'); },
+              }, 'Für heute genug')
             )
           );
         },
@@ -174,7 +181,7 @@ function quizRunde(fragen) {
           quote >= 0.8 ? 'Beeindruckend.' : quote >= 0.5 ? 'Ganz ordentlich.' : 'Das war nichts.'),
         verloren
           ? el('p', { class: 'zier', style: { fontSize: '17px', marginTop: '14px', color: 'var(--glut-hell)' } },
-              istDomme() ? 'Er hat jetzt einen Wunsch gut.' : 'Das kostet. Es liegt in der Warteschlange.')
+              istDomme() ? nameVon(andereRolle()) + ' hat jetzt einen Wunsch gut.' : 'Das kostet. Es liegt in der Warteschlange.')
           : null
       )
     );

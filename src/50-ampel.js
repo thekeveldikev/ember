@@ -44,7 +44,7 @@ function ampelBlatt() {
 
   const b = blatt(
     el('h2', {}, 'Wie geht\'s dir?'),
-    el('p', { class: 'leise klein', style: { margin: '7px 0 4px' } }, 'Ohne Worte. Er sieht es sofort.'),
+    el('p', { class: 'leise klein', style: { margin: '7px 0 4px' } }, 'Ohne Worte. ' + nameVon(andereRolle()) + ' sieht es sofort.'),
     knopfFuer('gruen', 'Grün', 'Los.'),
     knopfFuer('gelb', 'Gelb', 'Vielleicht. Frag mich.'),
     knopfFuer('rot', 'Rot', 'Nicht jetzt. Alles hält an.'),

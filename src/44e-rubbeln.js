@@ -94,7 +94,7 @@ async function blindlosKarte(platz) {
       uhr
     ),
     el('p', { class: 'leise klein', style: { margin: '6px 0 10px' } },
-      'Er hat ein Blindlos gerubbelt. Was du jetzt schreibst, steht darunter.'),
+      nameVon(andereRolle()) + ' hat ein Blindlos gerubbelt. Was du jetzt schreibst, steht darunter.'),
     feld,
     el('button', {
       class: 'knopf glut breit', style: { marginTop: '11px' },
@@ -191,14 +191,14 @@ function loseZeichnen(platz, lose) {
                     },
                   }, 'Einlösen')
                 )
-              : el('p', { class: 'still klein', style: { marginTop: '8px' } }, 'Zum Einlösen vorgelegt. Sie entscheidet.'))
+              : el('p', { class: 'still klein', style: { marginTop: '8px' } }, 'Zum Einlösen vorgelegt. ' + nameVon(andereRolle()) + ' entscheidet.'))
           : (!istDomme()
               ? el('button', {
                   class: 'knopf leer breit', style: { marginTop: '11px', minHeight: '38px', fontSize: '13px' },
                   onclick: async () => {
                     await datenAendern('lose', los.id, { einloeseWunsch: true, einloeseWann: jetzt() });
                     pushSenden('domme', 'bitte', 'Er will einen Gutschein einlösen.');
-                    meldung('Vorgelegt. Sie entscheidet.');
+                    meldung('Vorgelegt. ' + nameVon(andereRolle()) + ' entscheidet.');
                   },
                 }, 'Einlösen')
               : null)
@@ -333,9 +333,17 @@ function losOeffnen(los) {
   const hinweis = el('p', { class: 'still klein mitte', style: { marginTop: '14px' } }, 'Rubbel es frei.');
   const nachspiel = el('div');
 
+  /* Ein sichtbarer Rückweg: Wer gerade nicht rubbeln mag, soll nicht raten
+     müssen, dass ein Tipp neben das Blatt es schließt. Das Los bleibt
+     liegen und wartet. */
+  const spaeter = el('button', {
+    class: 'winzig still', style: { display: 'block', margin: '10px auto 0' },
+    onclick: () => b.schliessen(),
+  }, 'Später');
+
   const b = blatt(
     el('p', { class: 'winzig still mitte', style: { marginBottom: '4px' } }, los.titel || 'Ein Los'),
-    rahmen, hinweis, nachspiel
+    rahmen, hinweis, nachspiel, spaeter
   );
 
   /* Die Deckschicht: warmes Metall mit ein wenig Unruhe. */
@@ -438,6 +446,8 @@ function losOeffnen(los) {
     tafel.style.transition = 'opacity .5s ease';
     tafel.style.opacity = '0';
     hinweis.textContent = '';
+    /* Ab jetzt heißt der Ausweg nicht mehr „Später" — es ist ja aufgedeckt. */
+    spaeter.textContent = 'Schließen';
     setTimeout(() => tafel.remove(), 520);
 
     /* Ein kurzer Lichtblitz aus der Mitte und ein Glanz, der über den
@@ -460,7 +470,7 @@ function losOeffnen(los) {
     setTimeout(() => { blitz.remove(); streich.remove(); }, 950);
 
     await datenAendern('lose', los.id, { aufgedeckt: true, aufgedecktWann: jetzt(), blindWartet: blind });
-    if (!istDomme() && !blind) pushSenden('domme', 'hinweis', 'Er hat gerubbelt.');
+    if (!istDomme() && !blind) pushSenden(andereRolle(), 'hinweis', nameVon(D.rolle) + ' hat gerubbelt.');
 
     /* Jetzt zeigt sich, was für ein Los es war. */
     const s = los.seltenheit || 1;
@@ -508,7 +518,7 @@ function losOeffnen(los) {
       await datenSchreib('blindlos', { losId: los.id, wann: jetzt() });
       pushSenden('domme', 'befehl', 'Blindlos! 60 Sekunden — schreib.');
       nachspiel.append(el('p', { class: 'still klein mitte', style: { marginTop: '10px' } },
-        'Sie hat 60 Sekunden. Lass das Blatt offen — es füllt sich von selbst.'));
+        nameVon(andereRolle()) + ' hat 60 Sekunden. Lass das Blatt offen — es füllt sich von selbst.'));
       /* Und wirklich live: sobald ihr Text da ist, erscheint er hier. */
       const horch = ablageHorch('lose/' + los.id, async () => {
         const frisch = await datenLies('lose/' + los.id).catch(() => null);
@@ -578,7 +588,7 @@ function losAnlegen() {
   const b = blatt(
     el('h2', {}, 'Neues Los'),
     el('p', { class: 'leise klein', style: { margin: '7px 0 14px' } },
-      'Er sieht nur den Titel — bis er rubbelt.'),
+      nameVon(andereRolle()) + ' sieht nur den Titel — bis gerubbelt wird.'),
     titel, text, vorschau, dateiwahl,
     el('button', { class: 'knopf leer breit', style: { marginTop: '11px' }, onclick: () => dateiwahl.click() },
       'Ein Bild darunter'),

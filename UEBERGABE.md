@@ -524,6 +524,49 @@ frühere Regel zurück. pushSenden-Ziele sind überall andereRolle()
 statt fester Rollen. test/modus.mjs hält alles fest (7 Prüfungen,
 inklusive „der Wächter bleibt in jedem Modus derselbe").
 
+**0.10.1 — die Rollen im Text, die Rückwege, das größere Handbuch (115):**
+DER Fund dieser Runde, gefunden von einer neuen Statik-Wache: **zwanzig
+Oberflächentexte hatten die Rolle fest verdrahtet** („Sie hat
+geantwortet", „Er sieht nur die Zahl"). Im getauschten Modus war das
+schlicht falsch, im Modus „gleich" sinnlos. Alle ersetzt durch
+nameVon(andereRolle()) — modus-sicher UND persönlicher („Gioia hat
+geantwortet"). Die Wache in test/statik.mjs verbietet die Muster
+„Sie hat/sieht/weiß/entscheidet" und „Er hat/sieht/weiß" in allen
+Dateien außer Handbuch, Hilfe, Modus und Vorrat (dort ist das
+Benennen Absicht). Sie fand die Fälle in sechs Wellen — jedes Mal
+einen weiteren.
+
+Rückwege, auf Bitte hin systematisch geprüft: Alle 32 Seiten haben
+einen Ausgang (Zurück-Knopf, Wischziel oder Hauptreiter). Alle 20
+erreichbaren Blätter schließen per Deckel-Tipp. Vollbilder haben
+Knöpfe, und der Notausgang liegt beweisbar über dem Vollbild-Befehl.
+Zwei echte Sackgassen behoben: (1) Das Quiz-Zwischenblatt ist
+BLATT_FEST und hatte nur „Weiter" — jetzt auch „Für heute genug".
+(2) Das Rubbel-Los hatte KEINEN einzigen Knopf; wer nicht wusste,
+dass ein Tipp daneben schließt, musste rubbeln. Jetzt „Später"
+(nach dem Aufdecken „Schließen"). Neue Statik-Wache: Ein
+BLATT_FEST-Block ohne ein einziges onclick fällt durch.
+
+Bonus: Blätter schließen jetzt auch durch **Wischen nach unten** —
+das Blatt folgt dem Finger, ab 110px lässt es los, darunter federt
+es zurück. Nur wenn das Blatt oben steht (sonst kollidierte es mit
+dem Scrollen), und nie bei BLATT_FEST. Im Browser mit echten
+TouchEvents bewiesen.
+
+Handbuch erweitert auf 14 Kapitel (105 Einträge): neu „Kleine
+Kniffe" (langer Druck, Wischen, Dreimal-Tipp, Halten statt Tippen,
+Doppeltipp, Schnellzugriff), „Wenn es schwierig wird" (Anhalten,
+was Rot bewirkt, Nein sagen, Pause, Reparatur, Grenzen) und
+„Sicherheit und Vertrauen" (was verschlüsselt ist, was auf dem
+Gerät bleibt, PIN, Kopplungscode, wer mitliest, Geräteverlust).
+Dazu der FAQ-Block „Für den Anfang" und fünf weitere Fragen.
+
+Nachtrag zu 0.9.1: Der „Sweep-Hänger" ist KEIN App-Problem. Alle
+Seiten bauen in unter 40ms (Handbuch 39ms als schwerste), die
+Horcher werden sauber abgebaut (11 Interessenten vorher wie
+nachher), und datenLies antwortet in 31ms. Es ist das
+45-Sekunden-Limit des Prüfwerkzeugs.
+
 ## Was in der Bugjagd zutage kam
 
 Sieben Fehler, alle vor der Veröffentlichung gefunden. Sie stehen hier,

@@ -94,7 +94,7 @@ async function befehlSofort() {
     art: 'befehl', text: '', bis: null, wann: jetzt(), quittiert: false, wer: D.rolle,
   });
   pushSenden(andereRolle(), 'befehl');
-  meldung('Er weiß Bescheid.');
+  meldung(nameVon(andereRolle()) + ' weiß Bescheid.');
 }
 
 function befehlBlatt() {
@@ -107,12 +107,11 @@ function befehlBlatt() {
   const b = blatt(
     el('h2', {}, 'SEX'),
     el('p', { class: 'leise klein', style: { margin: '7px 0 14px' } },
-      gefaelleAn() ? 'Sein Bildschirm gehört dir, sobald du drückst.'
-        : 'Der Bildschirm von ' + nameVon(andereRolle()) + ' füllt sich damit, sofort.'),
+      'Der Bildschirm von ' + nameVon(andereRolle()) + ' gehört dir, sobald du drückst.'),
     feld,
     el('div', {},
       el('p', { class: 'winzig still', style: { marginTop: '15px' } },
-        (gefaelleAn() ? 'Er hat' : nameVon(andereRolle()) + ' hat') + ' … (leer = keine Frist)'),
+        nameVon(andereRolle()) + ' hat … (leer = keine Frist)'),
       minuten
     ),
     el('div', { class: 'knopfreihe', style: { marginTop: '18px' } },
@@ -191,7 +190,7 @@ async function offeneBitteZeigen(platz) {
 function bitteBlatt() {
   eingabeBlatt({
     titel: 'Bitte',
-    hinweis: 'Sie sieht, dass du gefragt hast. Wann sie antwortet, entscheidet sie.',
+    hinweis: nameVon(andereRolle()) + ' sieht, dass du gefragt hast. Wann die Antwort kommt, ist nicht deine Entscheidung.',
     platzhalter: 'Etwas dazu? Muss nicht.',
     mehrzeilig: true,
     leerErlaubt: true,
@@ -297,7 +296,7 @@ function knopfHorcherStarten() {
 
     if (aktuell.art === 'bitte' && _fuerMich(aktuell) && aktuell.antwort && !ersterDurchlauf) {
       puls(aktuell.antwort.ok ? 'antwortJa' : 'antwortNein');
-      meldungMitTat('Sie hat geantwortet.', 'Ansehen', () => zeigeSeite('heim'), 10000);
+      meldungMitTat(nameVon(andereRolle()) + ' hat geantwortet.', 'Ansehen', () => zeigeSeite('heim'), 10000);
     }
 
     if (!_befehlOffen) heimAuffrischen('knopf', true);

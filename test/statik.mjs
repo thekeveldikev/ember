@@ -171,6 +171,36 @@ test('jede Seite hat ihren Hilfe-Eintrag — niemand bleibt unerklärt', () => {
   }
 });
 
+test('jedes feste Blatt hat einen sichtbaren Ausweg', () => {
+  /* BLATT_FEST schaltet Deckel-Tipp, Escape und Wischen ab. Ohne einen
+     eigenen Knopf säße man dann fest — im Quiz war das eine Runde lang so. */
+  for (const { name, text } of quellen) {
+    const stellen = [...text.matchAll(/BLATT_FEST,([\s\S]{0,2600}?)\n  \);/g)];
+    for (const [, block] of stellen) {
+      assert.ok(/onclick:/.test(block),
+        name + ': ein festes Blatt ohne einen einzigen Knopf — daraus käme niemand heraus');
+    }
+  }
+});
+
+test('keine fest verdrahtete Rolle in Oberflächentexten', () => {
+  /* „Sie hat geantwortet" war im getauschten Modus schlicht falsch und im
+     Modus „gleich" sinnlos. Wo von der anderen Person die Rede ist, gehört
+     ihr Name hin — nameVon(andereRolle()). Erklärtexte (Handbuch, Hilfe,
+     Modus-Beschreibungen) dürfen die Rollen benennen, dort ist es Absicht. */
+  const ausgenommen = new Set(['47c-handbuch.js', '39-hilfe.js', '26-modus.js', '15-vorrat.js']);
+  const muster = /'[^']*\b(Sie hat|Sie sieht|Sie weiß|Sie entscheidet|Er hat|Er sieht|Er weiß)\b[^']*'/;
+
+  for (const { name, text } of quellen) {
+    if (ausgenommen.has(name)) continue;
+    text.split('\n').forEach((zeile, i) => {
+      if (zeile.trim().startsWith('*') || zeile.trim().startsWith('/*')) return;   // Kommentare
+      const treffer = zeile.match(muster);
+      assert.ok(!treffer, `${name}:${i + 1} verdrahtet eine Rolle fest: ${treffer && treffer[0].slice(0, 60)}`);
+    });
+  }
+});
+
 test('das Handbuch ist vollständig: jede Gruppe, jeder Eintrag, jedes Beispiel', () => {
   const quelle = readFileSync(join(wurzel, 'src', '47c-handbuch.js'), 'utf8');
 

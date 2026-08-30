@@ -219,15 +219,15 @@ async function karmaAendern(_alterStand, richtung) {
 function wunschAeussern(stand) {
   eingabeBlatt({
     titel: 'Ein Wunsch',
-    hinweis: 'Sie sieht ihn. Ob sie ihn erfüllt, steht auf einem anderen Blatt.',
+    hinweis: nameVon(andereRolle()) + ' sieht ihn. Ob er erfüllt wird, steht auf einem anderen Blatt.',
     platzhalter: 'Ich wünsche mir …',
     mehrzeilig: true,
     jaText: 'Äußern',
   }, async (text) => {
     await datenAnhaengen('wuensche', { text, art: 'token', erfuellt: false });
     await datenSchreib('wachsen/stand', { ...stand, marken: Math.max(0, (stand.marken || 0) - 1) });
-    pushSenden('domme', 'hinweis', 'Er hat sich etwas gewünscht.');
-    meldung('Sie weiß es.');
+    pushSenden(andereRolle(), 'hinweis', nameVon(D.rolle) + ' hat sich etwas gewünscht.');
+    meldung(nameVon(andereRolle()) + ' weiß es.');
   });
 }
 
@@ -462,7 +462,8 @@ function raengeBenennen(stand) {
   const b = blatt(
     el('h2', {}, 'Ränge'),
     el('p', { class: 'leise klein', style: { margin: '7px 0 10px' } },
-      'Wie heißt er auf welcher Stufe? Leere Zeilen bleiben namenlos. Er sieht nur den Namen seiner eigenen Stufe.'),
+      'Welcher Name gilt auf welcher Stufe? Leere Zeilen bleiben namenlos. ' +
+      nameVon(andereRolle()) + ' sieht nur den Namen der eigenen Stufe.'),
     ...felder.map((f) => el('div', {},
       el('span', { class: 'winzig still' }, 'Stufe ' + f.stufe + (f.stufe === jetztStufe ? ' · jetzt' : '')),
       f.feld

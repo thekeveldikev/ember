@@ -31,7 +31,7 @@ function fotoAuftragGeben() {
     el('p', { class: 'leise klein', style: { margin: '7px 0 14px' } },
       'Die Uhr läuft, sobald du sendest. Verpasst er sie, landet es bei den ausstehenden Dingen — von selbst.'),
     text,
-    el('p', { class: 'winzig still', style: { margin: '15px 0 0' } }, 'Er hat …'),
+    el('p', { class: 'winzig still', style: { margin: '15px 0 0' } }, nameVon(andereRolle()) + ' hat …'),
     reihe,
     el('div', { class: 'knopfreihe', style: { marginTop: '18px' } },
       el('button', { class: 'knopf leer', onclick: () => b.schliessen() }, 'Abbrechen'),

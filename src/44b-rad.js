@@ -42,7 +42,7 @@ function raederZeichnen(platz, raeder) {
   if (!raeder.length && !vorrat.length) {
     platz.append(leerlauf('Noch kein Rad',
       istDomme() ? 'Ein Rad ist eine Handvoll Felder. Beschrifte sie, wie du magst.'
-        : 'Sie hat noch keins gebaut.'));
+        : nameVon(andereRolle()) + ' hat noch keins gebaut.'));
   }
 
   /* Die Kombinationen zuerst — sie sind der schnellste Weg zu etwas Gutem. */
