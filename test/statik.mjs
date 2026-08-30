@@ -160,6 +160,25 @@ test('jedes gerufene Sinnbild ist gezeichnet', () => {
   }
 });
 
+test('jede Seite hat ihren Hilfe-Eintrag — niemand bleibt unerklärt', () => {
+  const hilfe = alles.match(/const HILFE = \{([\s\S]*?)\n\};/)[1];
+  const erklaert = new Set(sammle(/^\s{2}(\w+): \{/gm, hilfe));
+  for (const id of sammle(/SEITEN\.(\w+)\s*=/g)) {
+    assert.ok(erklaert.has(id), `Seite '${id}' hat keinen Hilfe-Eintrag`);
+  }
+});
+
+test('jeder Laden-Artikel hat seinen Was-ist-das-Satz', () => {
+  const vorrat = JSON.parse(
+    readFileSync(join(wurzel, 'src', '15-vorrat.js'), 'utf8')
+      .replace(/^[\s\S]*?const VORRAT = /, '').replace(/;\s*$/, ''));
+  const karte = alles.match(/const LADEN_WAS = \{([\s\S]*?)\n\};/)[1];
+  const erklaert = new Set(sammle(/'([\w-]+)':/g, karte));
+  for (const a of vorrat.laden) {
+    assert.ok(erklaert.has(a.id), `Artikel '${a.id}' (${a.artikel}) hat keinen Satz`);
+  }
+});
+
 test('kein console.log, kein debugger, kein TODO im Ausgelieferten', () => {
   for (const { name, text } of quellen) {
     assert.ok(!/console\.log\(/.test(text), name + ': console.log vergessen');
@@ -170,7 +189,9 @@ test('kein console.log, kein debugger, kein TODO im Ausgelieferten', () => {
 
 test('alle versprochenen Dateien liegen wirklich da', () => {
   for (const pfad of ['schrift/inter.woff2', 'schrift/playfair.woff2',
-    'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png', 'manifest.json', 'sw.js']) {
+    'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png',
+    'icons/tarn-notiz-180.png', 'icons/tarn-rechner-180.png', 'icons/tarn-wetter-180.png',
+    'manifest.json', 'sw.js']) {
     assert.ok(readFileSync(join(wurzel, pfad)).length > 100, pfad + ' fehlt oder ist leer');
   }
 });

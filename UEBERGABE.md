@@ -377,6 +377,39 @@ Regressionstest test/rennen.mjs stellt das Rennen nach (zwei
 gleichzeitige Läufe → genau eine Karte); im Browser mit sechs
 parallelen Läufen bewiesen — null Duplikate.
 
+**0.9.0 — der Hilfe-Knopf, die Masken, die Schieber (102):**
+Große Bedienbarkeits-Runde. (1) HILFE (src/39-hilfe.js, NEU — auch in
+werkzeug/build-web.mjs eingetragen): Auf jeder der 31 Seiten schwebt
+ein ?-Knopf (hilfeKnopfAnbringen in zeigeSeite, CSS .hilfeknopf), der
+die Seite je Rolle in einfachen Sätzen erklärt — was ist das, was
+kann ich tun, wie hängt es zusammen. Abschaltbar (Gerät 'hilfeKnopf',
+Schalter unter Die App); Statik-Wache erzwingt einen Eintrag je
+Seite. (2) LADEN_WAS in 66-laden: jeder der 48 Artikel trägt einen
+konkreten Was-passiert-Satz auf der Karte; Statik-Wache erzwingt
+Vollständigkeit. (3) Schiebeschalter (.schieber + schalterZeile in
+47-ich): Bausteine, Hilfe-Knopf und Zögern zeigen ihren Zustand als
+echten An/Aus-Schieber. (4) Ich-Seite: Schnellzugriff-Reihe ganz oben
+(Aktualisieren, Tarnen, Abschließen/PIN, Farbwelt) als runde
+Symbol-Knöpfe; offene Klappen atmen unten (14px). (5) Farbwelten:
+html[data-thema] rose/gold/jade/mitternacht überschreiben NUR die
+Glut-Familie und stapeln sich mit der Stimmung; Gerät 'farbwelt',
+Blatt mit Live-Wechsel. (6) App-Symbol wählbar (Gerät 'appSymbol'):
+werkzeug/tarnicons-bauen.mjs zeichnet drei harmlose Tarn-PNGs
+(Notiz/Rechner/Wetter — eigene, schlichte Zeichnungen) ohne
+Abhängigkeiten (eigener PNG-Schreiber über zlib); appSymbolAnwenden
+biegt den apple-touch-icon-Link um. iOS friert das Symbol beim
+Hinzufügen ein — das Blatt sagt das ehrlich (entfernen, neu
+hinzufügen). (7) Tarnung komplett neu: eine ECHTE Notizen-App im
+System-Look (#f2f2f7, Systemschrift — h1 braucht ausdrücklich
+fontFamily inherit, sonst verrät die Zierschrift die Maske!) mit
+Suche, tippbaren Notizen, funktionierendem Editor (Gerät
+'tarnNotizen', {text,wann}, erste Zeile = Titel, leere Notizen
+verschwinden), Neu-Anlegen, Löschen, Anzahl-Fußzeile. Hinein: drei
+schnelle Tipps auf freier Fläche IRGENDWO in der App (globaler
+pointerdown-Horcher in 52-tarnung; Knöpfe/Felder/Blätter sind
+ausgenommen, ~52px-Radius, 650ms-Fenster). Hinaus: drei Tipps auf
+der Notizliste (nicht im Editor).
+
 ## Was in der Bugjagd zutage kam
 
 Sieben Fehler, alle vor der Veröffentlichung gefunden. Sie stehen hier,

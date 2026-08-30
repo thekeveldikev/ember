@@ -6,7 +6,7 @@
    src/sw-vorlage.js -> sw.js (npm run build). Der Platzhalter unten wird
    beim Bau durch die Fassung aus package.json ersetzt. */
 
-const VERSION = '0.8.3';
+const VERSION = '0.9.0';
 const LAGER = 'ember-v1-' + VERSION;
 const KERN = [
   './',

@@ -29,6 +29,60 @@ const LADEN_ABTEILUNGEN = [
 
 const SIEGEL_KURS = 50;
 
+/* Zu jedem Artikel ein Satz in einfacher Sprache: was das konkret ist
+   und was nach dem Kauf passiert. Die Namen verkaufen — diese Zeilen
+   erklären. Die Statik-Wache prüft, dass KEIN Artikel ohne Satz bleibt. */
+const LADEN_WAS = {
+  'shop-k01': 'Einlösen — und sie küsst dich. Sofort, wo immer ihr seid.',
+  'shop-k02': 'Eine Umarmung ohne Zeitlimit. Du entscheidest, wann sie endet.',
+  'shop-k03': 'Zehn Minuten Kuscheln, eingelöst wann sie es erlaubt.',
+  'shop-k04': 'Stell eine Frage — sie antwortet ehrlich, ohne Ausweichen.',
+  'shop-k05': 'Du nennst das Thema, sie sagt dir etwas Schönes darüber.',
+  'shop-k06': 'Sie schickt dir ein Foto. Welches, entscheidet sie.',
+  'shop-k07': 'Eine Sprachnachricht von ihr — nur für dich aufgenommen.',
+  'shop-k08': 'Sie sagt dir unzensiert, was ihr gerade durch den Kopf geht.',
+  'shop-k09': 'Kopf in ihren Schoß, sie streichelt. So lange sie mag.',
+  'shop-k10': 'Einen Abend lang darfst du ihr ungefragt in die Augen sehen.',
+  'shop-b01': 'Zwanzig Minuten Massage von ihr. Termin bestimmt sie.',
+  'shop-b02': 'Die große Ausgabe: 45 Minuten, ganzer Körper, mit Öl.',
+  'shop-b03': 'Zehn Minuten lang sind ihre Grenzen offen für deine Hände.',
+  'shop-b04': 'Du wünschst dir, was sie trägt — sie zieht es an.',
+  'shop-b05': 'Sie lässt dir ein Bad ein und kümmert sich, solange du drin liegst.',
+  'shop-b06': 'Haare waschen, von ihr. Langsam.',
+  'shop-b07': 'Eine Nacht ohne Regeln: einfach neben ihr einschlafen.',
+  'shop-b08': 'Sie verwöhnt dich oral — und du schuldest ihr dafür nichts.',
+  'shop-p01': 'Beim nächsten Mal ist ein Wunsch von dir fest eingeplant.',
+  'shop-p02': 'Beim nächsten Mal wählst du die Position.',
+  'shop-p03': 'Einmal kommen ohne zu fragen. Gilt genau einmal.',
+  'shop-p04': 'Du wählst eine Regel — sie schweigt 24 Stunden lang.',
+  'shop-p05': 'Ein ganzer Abend, an dem nichts gilt: keine Anrede, kein Protokoll.',
+  'shop-p06': 'Eine Bitte, direkt gestellt — ohne das übliche Drumherum.',
+  'shop-p07': 'Ein Extra-Veto: einmal mehr Nein sagen dürfen diesen Monat.',
+  'shop-p08': 'Beim nächsten Kartenziehen suchst du das Deck aus.',
+  'shop-p09': 'Die Rollen ruhen: einen Abend lang führst du.',
+  'shop-p10': 'Ein aufgespartes Nein — einsetzbar ohne jede Folge.',
+  'shop-e01': 'Ein Bußgeld deiner Wahl wird zurückgebucht, als wäre nichts gewesen.',
+  'shop-e02': 'Eine wartende Strafe verschwindet — du wählst nicht, welche.',
+  'shop-e03': 'Der große Freikauf: ALLE wartenden Strafen verfallen.',
+  'shop-e04': 'Eine verpasste Aufgabe darf nachgeholt werden und zählt dann voll.',
+  'shop-e05': 'Deine Serie überlebt einen ausgefallenen Tag.',
+  'shop-e06': 'Ein Tag weniger warten — die laufende Frist schrumpft.',
+  'shop-g01': 'Zwei Tage lang gelten deine Regeln. Sie spielt mit.',
+  'shop-g02': 'Ihr setzt eine Fantasie von deiner Wunschliste wirklich um.',
+  'shop-g03': 'Ein Punkt von deiner Löffelliste — eingelöst binnen 30 Tagen.',
+  'shop-g04': 'Volle 24 Stunden Rollentausch. Alles dreht sich um.',
+  'shop-g05': 'Zwei Nächte weg, nur ihr zwei. Planung übernimmt sie.',
+  'shop-g06': 'Du schreibst eine Regel, die einen Monat lang für sie gilt.',
+  'shop-g07': 'Eine bestehende Regel wird ersatzlos gestrichen — für immer.',
+  'shop-x01': 'Ein Los landet bei deinen Losen — freirubbeln und sehen.',
+  'shop-x02': 'Wie das normale Los, aber mindestens Silber ist sicher.',
+  'shop-x03': 'Du zahlst — sie entscheidet, was du dafür bekommst.',
+  'shop-x04': 'Blindkauf mit mehr Einsatz. Was kommt, weiß nur sie.',
+  'shop-x05': 'Der große Blindkauf. Mutig — oder sehr mutig.',
+  'shop-x06': 'Münzwurf sofort: Kopf verdoppelt auf 40, Zahl nimmt alles.',
+  'shop-x07': 'Das Rad dreht sofort: Gewinn, Verlust, ein Los — oder gar nichts.',
+};
+
 /* --- Der Rechenkern (pur, prüfbar) ----------------------------------------- */
 
 function schuldenStufe(karma) {
@@ -437,7 +491,10 @@ function artikelKarte(a, konto, kaeufe, stufe, zeichnen) {
     style: { marginTop: '8px', padding: '12px 14px', opacity: ausverkauft ? '.5' : '1' },
   },
     el('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '12px' } },
-      el('div', { style: { flex: '1', minWidth: '0', fontSize: '14.5px' } }, a.artikel),
+      el('div', { style: { flex: '1', minWidth: '0' } },
+        el('div', { style: { fontSize: '14.5px' } }, a.artikel),
+        LADEN_WAS[a.id] ? el('div', { class: 'still klein', style: { marginTop: '2px', lineHeight: '1.4' } }, LADEN_WAS[a.id]) : null
+      ),
       el('div', { style: { flex: 'none', textAlign: 'right' } },
         rabattiert ? el('span', { class: 'winzig', style: { color: 'var(--gelb)', marginRight: '7px' } },
           'nur ' + Math.ceil((angebot.bis - Date.now()) / 3600000) + ' Std') : null,

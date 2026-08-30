@@ -21,6 +21,23 @@ SEITEN.ich = function (seite) {
     )
   );
 
+  /* --- Der Schnellzugriff: das Wichtigste ohne Scrollen ------------------- */
+  seite.append(
+    el('div', {
+      style: {
+        display: 'flex', justifyContent: 'center', gap: '6px',
+        flexWrap: 'wrap', marginBottom: '18px',
+      },
+    },
+      schnellKnopf('funke', 'Aktualisieren', () => sucheAppUpdate(true)),
+      schnellKnopf('auge', 'Tarnen', () => tarnungAn()),
+      Gerät.lies('schrank')
+        ? schnellKnopf('schloss', 'Abschließen', () => abschliessen())
+        : schnellKnopf('schloss', 'PIN setzen', () => pinNachtraeglich()),
+      schnellKnopf('kerze', 'Farbwelt', () => farbweltBlatt())
+    )
+  );
+
   /* --- Wege, in vier Klappen ---------------------------------------------
      Achtzehn gleiche Zeilen untereinander erschlagen jeden. In Gruppen
      mit Gedächtnis (auf/zu bleibt gemerkt) findet man stattdessen. */
@@ -88,8 +105,14 @@ SEITEN.ich = function (seite) {
         zeile('Schließt sich nach', schliessNachText() + ' im Hintergrund — dann braucht es die PIN', () => schliessNachSetzen())
       ),
 
-      klappGruppe('app', 'funke', 'Die App', 'Fassung ' + APP_VERSION + ', Töne, Sichtwechsel',
+      klappGruppe('app', 'funke', 'Die App', 'Fassung ' + APP_VERSION + ', Aussehen, Töne, Symbol',
         zeile('Nach einer neuen Fassung sehen', 'Du hast ' + APP_VERSION + ' — hier holst du dir Neues sofort', () => sucheAppUpdate(true)),
+        zeile('Die Farbwelt', 'Zurzeit: ' + farbweltName() + ' — in welcher Farbe die App glüht', () => farbweltBlatt()),
+        zeile('Das App-Symbol', 'Zurzeit: ' + appSymbolName() + ' — auch harmlose Tarn-Symbole', () => appSymbolBlatt()),
+        schalterZeile('Der Hilfe-Knopf', 'Das kleine ? unten rechts erklärt jede Seite', hilfeAn(), (neu) => {
+          Gerät.schreib('hilfeKnopf', neu);
+          zeigeSeite('ich');
+        }),
         zeile('Sichtwechsel', 'Dieses Gerät zeigt dann die Sicht von ' + nameVon(andereRolle()) + ' — zum Ausprobieren', () => sichtWechseln()),
         zeile('Nachts leiser ab', 'Ab ' + Gerät.lies('spaetAb', 22) + ':00 Uhr wird die App wärmer und dunkler', () => spaetSetzen()),
         zeile('Töne',
@@ -145,7 +168,7 @@ function klappGruppe(schluessel, bild, titel, unter, ...zeilen) {
     el('div', { style: { minHeight: '0' } },
       el('div', {
         style: {
-          marginLeft: '13px', paddingLeft: '10px', paddingBottom: '2px',
+          marginLeft: '13px', paddingLeft: '10px', paddingBottom: '14px',
           borderLeft: '2px solid var(--kante)',
         },
       }, ...drin)));
@@ -181,6 +204,40 @@ function klappGruppe(schluessel, bild, titel, unter, ...zeilen) {
   );
 
   return el('div', {}, kopf, inhalt);
+}
+
+/* Eine Zeile mit Schiebeschalter: Der Zustand steht rechts sichtbar da,
+   Antippen schiebt ihn um — eindeutiger als eine Zeile, die „irgendwas"
+   tut. `tat(neu)` bekommt den Zielzustand; neu zeichnen macht der Rufer. */
+function schalterZeile(titel, unter, an, tat) {
+  const schieber = el('span', { class: 'schieber' + (an ? ' an' : '') });
+  return el('button', {
+    class: 'karte',
+    style: {
+      width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center',
+      justifyContent: 'space-between', gap: '12px', marginTop: '9px',
+      padding: '13px 15px',
+    },
+    onclick: async () => {
+      schieber.classList.toggle('an', !an);   /* sofort sichtbar, nicht erst nach dem Netz */
+      tonSpielen('tick');
+      await tat(!an);
+    },
+  },
+    el('div', { style: { minWidth: '0', flex: '1' } },
+      el('div', { style: { fontWeight: '500' } }, titel),
+      unter ? el('div', { class: 'still klein', style: { marginTop: '1px' } }, unter) : null
+    ),
+    schieber
+  );
+}
+
+/* Ein runder Symbol-Knopf für den Schnellzugriff ganz oben. */
+function schnellKnopf(bild, marke, tat) {
+  return el('button', { class: 'schnellknopf', onclick: tat },
+    el('span', { class: 'rund' }, sinnbild(bild, 21)),
+    el('span', { class: 'winzig' }, marke)
+  );
 }
 
 function zeile(titel, unter, tat, warnend) {
@@ -452,10 +509,10 @@ SEITEN.verwaltung = function (seite) {
     zoegernplatz.innerHTML = '';
     zoegernplatz.append(
       el('p', { class: 'winzig still', style: { margin: '0 0 9px 2px' } }, 'Sein Warten'),
-      zeile(an ? 'Zögern ist an' : 'Zögern ist aus',
-        an ? 'Er sieht nicht, ob du seine Bitte gelesen hast.' : 'Er sieht, seit wann er wartet.',
-        async () => {
-          await datenSchreib('einst/zoegern', !an);
+      schalterZeile('Das Zögern',
+        an ? 'An — er sieht nicht, ob du seine Bitte gelesen hast' : 'Aus — er sieht, seit wann er wartet',
+        an, async (neu) => {
+          await datenSchreib('einst/zoegern', neu);
           zeigeSeite('verwaltung');
         })
     );
@@ -525,10 +582,9 @@ async function bausteineBauen(platz) {
   const aufgabenAn = await datenLies('einst/aufgaben', true).catch(() => true);
 
   const schalter = (titel, an, unterAn, unterAus, tat) =>
-    zeile(titel, (an ? 'An — ' + unterAn : 'Aus — ' + unterAus) + '. Antippen schaltet um.', async () => {
-      await tat(!an);
+    schalterZeile(titel, an ? 'An — ' + unterAn : 'Aus — ' + unterAus, an, async (neu) => {
+      await tat(neu);
       bausteineBauen(platz);
-      tonSpielen('tick');
     });
 
   platz.append(
@@ -573,5 +629,126 @@ function namenAendern() {
         zeigeSeite('verwaltung');
       },
     }, 'Übernehmen')
+  );
+}
+
+/* --- Aussehen: Farbwelt und App-Symbol -------------------------------------
+
+   Die Farbwelt regelt, in welcher Farbe die App glüht — die Stimmung
+   (Tag/Nacht) bleibt davon unberührt, beides stapelt sich.
+
+   Das App-Symbol ist eine iOS-Eigenheit: Es wird beim „Zum Home-
+   Bildschirm hinzufügen" eingefroren. Die Wahl hier setzt das Symbol,
+   das die NÄCHSTE Installation bekommt — inklusive dreier bewusst
+   harmloser Tarn-Symbole, die nach Notizen, Rechner oder Wetter
+   aussehen und nichts verraten.                                        */
+
+const FARBWELTEN = [
+  { key: '', name: 'Glut', wort: 'Warmes Kupfer — der Anfang von allem', farbe: '#c4785a' },
+  { key: 'rose', name: 'Rosé', wort: 'Dunkles Rosé, samtig', farbe: '#c45a72' },
+  { key: 'gold', name: 'Gold', wort: 'Kerzenlicht auf Messing', farbe: '#c2a14e' },
+  { key: 'jade', name: 'Jade', wort: 'Kühles Grün, sehr ruhig', farbe: '#6f9b8f' },
+  { key: 'mitternacht', name: 'Mitternacht', wort: 'Blaue Stunde', farbe: '#7286c4' },
+];
+
+function farbweltAnwenden() {
+  const k = Gerät.lies('farbwelt', '');
+  if (k) document.documentElement.setAttribute('data-thema', k);
+  else document.documentElement.removeAttribute('data-thema');
+}
+
+function farbweltName() {
+  const k = Gerät.lies('farbwelt', '');
+  return (FARBWELTEN.find((f) => f.key === k) || FARBWELTEN[0]).name;
+}
+
+function farbweltBlatt() {
+  const gewaehlt = Gerät.lies('farbwelt', '');
+  const b = blatt(
+    el('h2', {}, 'Die Farbwelt'),
+    el('p', { class: 'leise klein', style: { margin: '7px 0 12px' } },
+      'Nur für dieses Gerät. Antippen wechselt sofort — anschauen kostet nichts.'),
+    ...FARBWELTEN.map((f) => el('button', {
+      class: 'karte',
+      style: {
+        width: '100%', textAlign: 'left', marginTop: '8px', padding: '12px 15px',
+        display: 'flex', alignItems: 'center', gap: '13px',
+        borderColor: f.key === gewaehlt ? 'var(--glut)' : 'var(--kante)',
+      },
+      onclick: () => {
+        Gerät.schreib('farbwelt', f.key);
+        farbweltAnwenden();
+        tonSpielen('schimmer');
+        b.schliessen();
+        zeigeSeite('ich');
+      },
+    },
+      el('span', {
+        style: {
+          width: '26px', height: '26px', borderRadius: '50%', flex: 'none',
+          background: 'linear-gradient(135deg, ' + f.farbe + ', ' + f.farbe + 'cc)',
+          boxShadow: '0 0 10px ' + f.farbe + '55',
+        },
+      }),
+      el('div', {},
+        el('div', { style: { fontWeight: '500' } }, f.name),
+        el('div', { class: 'still klein' }, f.wort)
+      )
+    ))
+  );
+}
+
+const APP_SYMBOLE = [
+  { key: 'ember', name: 'Ember', wort: 'Die Glut — das eigentliche Gesicht', datei: 'icons/icon-180.png' },
+  { key: 'notiz', name: 'Notizen', wort: 'Tarnung: sieht aus wie eine Notiz-App', datei: 'icons/tarn-notiz-180.png' },
+  { key: 'rechner', name: 'Rechner', wort: 'Tarnung: sieht aus wie ein Taschenrechner', datei: 'icons/tarn-rechner-180.png' },
+  { key: 'wetter', name: 'Wetter', wort: 'Tarnung: sieht aus wie eine Wetter-App', datei: 'icons/tarn-wetter-180.png' },
+];
+
+function appSymbolAnwenden() {
+  const wahl = Gerät.lies('appSymbol', 'ember');
+  const eintrag = APP_SYMBOLE.find((s) => s.key === wahl) || APP_SYMBOLE[0];
+  const link = document.querySelector('link[rel="apple-touch-icon"]');
+  if (link) link.href = eintrag.datei;
+}
+
+function appSymbolName() {
+  const wahl = Gerät.lies('appSymbol', 'ember');
+  return (APP_SYMBOLE.find((s) => s.key === wahl) || APP_SYMBOLE[0]).name;
+}
+
+function appSymbolBlatt() {
+  const gewaehlt = Gerät.lies('appSymbol', 'ember');
+  const b = blatt(
+    el('h2', {}, 'Das App-Symbol'),
+    el('p', { class: 'leise klein', style: { margin: '7px 0 12px', lineHeight: '1.55' } },
+      'Das Symbol auf dem Home-Bildschirm. iOS friert es beim Hinzufügen ein — ' +
+      'nach der Wahl also: App einmal vom Home-Bildschirm entfernen und über Safari neu hinzufügen. ' +
+      'Drinnen bleibt alles, wie es ist.'),
+    ...APP_SYMBOLE.map((s) => el('button', {
+      class: 'karte',
+      style: {
+        width: '100%', textAlign: 'left', marginTop: '8px', padding: '12px 15px',
+        display: 'flex', alignItems: 'center', gap: '13px',
+        borderColor: s.key === gewaehlt ? 'var(--glut)' : 'var(--kante)',
+      },
+      onclick: () => {
+        Gerät.schreib('appSymbol', s.key);
+        appSymbolAnwenden();
+        tonSpielen('tick');
+        b.schliessen();
+        meldung(s.key === 'ember' ? 'Gewählt.' : 'Gewählt. Beim nächsten Hinzufügen trägt die App diese Maske.');
+        zeigeSeite('ich');
+      },
+    },
+      el('img', {
+        src: s.datei, alt: '',
+        style: { width: '44px', height: '44px', borderRadius: '10px', flex: 'none', display: 'block' },
+      }),
+      el('div', {},
+        el('div', { style: { fontWeight: '500' } }, s.name),
+        el('div', { class: 'still klein' }, s.wort)
+      )
+    ))
   );
 }

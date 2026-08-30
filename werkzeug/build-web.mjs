@@ -31,6 +31,7 @@ const jsDateien = [
   'src/25-raeume.js',
   'src/30-setup.js',
   'src/31-schloss.js',
+  'src/39-hilfe.js',
   'src/40-huelle.js',
   'src/41-heim.js',
   'src/42-knopf.js',

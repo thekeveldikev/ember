@@ -87,6 +87,8 @@ function zeigeSeite(id) {
   SEITEN[id](seite);
   b.scrollTop = merkScroll;
 
+  if (typeof hilfeKnopfAnbringen === 'function') hilfeKnopfAnbringen(b, id);
+
   leisteAuffrischen();
   Gerät.schreib('letzteSeite', id);
 }

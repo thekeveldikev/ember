@@ -23,6 +23,8 @@ async function appStarten() {
      sofort da; alles Weitere trägt der Horcher nach, sobald er steht.
      Umgekehrt wäre jede zähe Verbindung ein leerer Bildschirm. */
   stimmungSetzen();
+  farbweltAnwenden();
+  appSymbolAnwenden();
   baueFussleiste();
   notausAnbringen();
   zeigeSeite('heim');

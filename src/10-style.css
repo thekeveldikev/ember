@@ -960,3 +960,129 @@ textarea.feld { resize: none; line-height: 1.5; }
     transition-duration: .01ms !important;
   }
 }
+
+/* --- Der Hilfe-Knopf -------------------------------------------------------
+   Ein stilles Fragezeichen über der Fußleiste. Es erklärt die Seite,
+   auf der man steht — und verschwindet mit der Bühne beim Wechsel. */
+
+.hilfeknopf {
+  position: fixed;
+  right: calc(env(safe-area-inset-right) + 14px);
+  bottom: calc(env(safe-area-inset-bottom) + 76px);
+  z-index: 640;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--kante-stark);
+  background: color-mix(in srgb, var(--flaeche) 82%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: var(--schrift-still);
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 17px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  animation: einblenden .5s ease .25s backwards;
+  transition: color .25s ease, border-color .25s ease, transform .15s ease;
+}
+.hilfeknopf:active { transform: scale(.88); color: var(--glut-hell); border-color: var(--glut); }
+
+/* --- Die Karten unter dem Daumen ------------------------------------------ */
+
+button.karte { transition: transform .16s ease, border-color .3s ease, background .3s ease; }
+button.karte:active { transform: scale(.985); }
+
+/* --- Die Farbwelten --------------------------------------------------------
+   Die Stimmung (nacht/spaet/ruhe) regelt, wie dunkel es ist. Die Farbwelt
+   regelt, in welcher Farbe die App glüht. Beides stapelt sich: Diese
+   Blöcke stehen NACH den Stimmungen und gewinnen deshalb den Akzent. */
+
+html[data-thema='rose'] {
+  --glut: #c45a72;
+  --glut-hell: #e88ca4;
+  --glut-tief: #8f3650;
+  --verlauf: linear-gradient(135deg, #c45a72 0%, #e88ca4 100%);
+  --verlauf-tief: linear-gradient(135deg, #8f3650 0%, #c45a72 100%);
+  --schein: rgba(196, 90, 114, .28);
+}
+
+html[data-thema='gold'] {
+  --glut: #c2a14e;
+  --glut-hell: #e6cb85;
+  --glut-tief: #8f7330;
+  --verlauf: linear-gradient(135deg, #c2a14e 0%, #e6cb85 100%);
+  --verlauf-tief: linear-gradient(135deg, #8f7330 0%, #c2a14e 100%);
+  --schein: rgba(194, 161, 78, .26);
+}
+
+html[data-thema='jade'] {
+  --glut: #6f9b8f;
+  --glut-hell: #9cc7b9;
+  --glut-tief: #46705f;
+  --verlauf: linear-gradient(135deg, #6f9b8f 0%, #9cc7b9 100%);
+  --verlauf-tief: linear-gradient(135deg, #46705f 0%, #6f9b8f 100%);
+  --schein: rgba(111, 155, 143, .25);
+}
+
+html[data-thema='mitternacht'] {
+  --glut: #7286c4;
+  --glut-hell: #a2b4e8;
+  --glut-tief: #4a598f;
+  --verlauf: linear-gradient(135deg, #7286c4 0%, #a2b4e8 100%);
+  --verlauf-tief: linear-gradient(135deg, #4a598f 0%, #7286c4 100%);
+  --schein: rgba(114, 134, 196, .26);
+}
+
+/* --- Der Schiebeschalter ---------------------------------------------------
+   An/Aus braucht einen Zustand, den man SIEHT — eine Zeile, die nur auf
+   Antippen reagiert, ist zu uneindeutig. */
+
+.schieber {
+  width: 46px;
+  height: 27px;
+  border-radius: 14px;
+  background: var(--grund2);
+  border: 1px solid var(--kante-stark);
+  position: relative;
+  flex: none;
+  transition: background .28s ease, border-color .28s ease;
+}
+.schieber::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  background: var(--schrift-leise);
+  transition: transform .28s cubic-bezier(.3, .9, .4, 1.08), background .28s ease;
+}
+.schieber.an { background: var(--verlauf); border-color: transparent; box-shadow: 0 0 10px var(--schein); }
+.schieber.an::after { transform: translateX(19px); background: #1b0f09; }
+
+/* --- Der Schnellzugriff ---------------------------------------------------- */
+
+.schnellknopf {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  padding: 4px 2px;
+  border: none;
+  background: transparent;
+  color: var(--schrift-leise);
+  min-width: 62px;
+}
+.schnellknopf .rund {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--flaeche);
+  border: 1px solid var(--kante);
+  color: var(--glut-hell);
+  transition: transform .16s ease, border-color .3s ease;
+}
+.schnellknopf:active .rund { transform: scale(.9); border-color: var(--glut); }
