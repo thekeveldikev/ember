@@ -53,10 +53,36 @@ async function stimmeAufnehmen() {
 
   const punkt = el('div', {
     style: {
-      width: '12px', height: '12px', borderRadius: '50%', background: 'var(--rot)',
-      margin: '0 auto 14px', animation: 'funkeln 1.2s ease-in-out infinite',
+      width: '14px', height: '14px', borderRadius: '50%', background: 'var(--rot)',
+      margin: '0 auto 14px', boxShadow: '0 0 10px rgba(178,69,60,.6)',
+      transition: 'transform .08s ease-out, box-shadow .08s ease-out',
     },
   });
+
+  /* Der Punkt atmet mit der Stimme: ein Analyser lauscht am Strom (ohne
+     ihn an die Lautsprecher zu legen!) und skaliert den Punkt mit der
+     Lautstärke. Man SIEHT, dass die Aufnahme einen hört. */
+  let pegelRaf = null;
+  try {
+    const ac = _klang();
+    if (ac) {
+      const quelle = ac.createMediaStreamSource(strom);
+      const lauscher = ac.createAnalyser();
+      lauscher.fftSize = 256;
+      quelle.connect(lauscher);
+      const daten = new Uint8Array(lauscher.fftSize);
+      const lauschen = () => {
+        lauscher.getByteTimeDomainData(daten);
+        let summe = 0;
+        for (let i = 0; i < daten.length; i++) { const d = (daten[i] - 128) / 128; summe += d * d; }
+        const pegel = Math.min(1, Math.sqrt(summe / daten.length) * 3.4);
+        punkt.style.transform = 'scale(' + (1 + pegel * 1.9) + ')';
+        punkt.style.boxShadow = '0 0 ' + (10 + pegel * 26) + 'px rgba(178,69,60,' + (0.4 + pegel * 0.5) + ')';
+        pegelRaf = requestAnimationFrame(lauschen);
+      };
+      lauschen();
+    }
+  } catch { punkt.style.animation = 'funkeln 1.2s ease-in-out infinite'; }
 
   let sekunden = 0;
   const takt = setInterval(() => {
@@ -78,20 +104,34 @@ async function stimmeAufnehmen() {
 
   geraet.start();
   puls('hinweis');
+  tonSpielen('tick');
+
+  let abgeschlossen = false;
 
   async function beenden(senden) {
+    /* Ein zweiter Tipp auf „Senden" darf die Aufnahme nicht doppelt
+       verschicken — der erste Durchlauf gewinnt. */
+    if (abgeschlossen) return;
+    abgeschlossen = true;
+
     clearInterval(takt);
+    if (pegelRaf) cancelAnimationFrame(pegelRaf);
+
+    /* Erst das Ohr an das Stop-Ereignis legen, DANN anhalten — sonst
+       kann das Ereignis verpuffen, bevor jemand zuhört. */
+    const gestoppt = new Promise((fertig) => {
+      geraet.addEventListener('stop', fertig, { once: true });
+      setTimeout(fertig, 700);
+    });
     if (geraet.state !== 'inactive') geraet.stop();
     strom.getTracks().forEach((s) => s.stop());
     b.schliessen();
 
-    if (!senden || !sekunden) return;
+    if (!senden) return;
+    if (!sekunden) return meldung('Zu kurz — sprich einen Moment länger.');
 
     /* Der Rekorder liefert die letzten Daten erst nach dem Anhalten. */
-    await new Promise((fertig) => {
-      geraet.addEventListener('stop', fertig, { once: true });
-      setTimeout(fertig, 700);
-    });
+    await gestoppt;
 
     if (!stuecke.length) return meldung('Es ist nichts angekommen.');
 

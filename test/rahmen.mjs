@@ -221,6 +221,7 @@ export function ladeApp({ rolle = 'domme', dateien, ablage = baueAblage() } = {}
         ? { istGetarnt, __tarnung: (an) => { _getarnt = an; } } : {}),
       ...(typeof mischen === 'function' ? { mischen } : {}),
       ...(typeof zeigeSeite === 'function' ? { SEITEN, zeigeSeite } : {}),
+      ...(typeof maschineFeuern === 'function' ? { maschineFeuern } : {}),
     };
   `;
 

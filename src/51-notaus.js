@@ -91,4 +91,9 @@ function notausBlatt() {
     el('p', { class: 'still klein', style: { marginTop: '16px', lineHeight: '1.5' } },
       'Rot löscht nichts und beschuldigt niemanden. Es hält nur an.')
   );
+
+  /* Über ALLEM: Das Blatt läge sonst mit seinen 700 hinter dem
+     Vollbild-Befehl (800) und dem Regie-Läufer (750) — unsichtbar genau
+     dann, wenn es gebraucht wird. Der Notausgang kennt keine Schichten. */
+  b.deckel.style.zIndex = '890';
 }

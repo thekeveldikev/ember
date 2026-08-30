@@ -13,32 +13,54 @@
    Geheimnisse: VAPID_PRIVAT (JWK), VAPID_OEFFENTLICH, GEHEIMNIS, ABSENDER
    ========================================================================== */
 
+/* Wer aus dem Browser mit dem Boten sprechen darf. Alles andere bekommt
+   zwar Antworten (das Geheimnis schützt ohnehin), aber der Browser
+   verweigert fremden Seiten das Lesen — Verteidigung in der Tiefe. */
+const ERLAUBTE_HERKUENFTE = [
+  'https://thekeveldikev.github.io',
+  'http://localhost:5173',
+];
+
+function herkunftFuer(anfrage, umgebung) {
+  const her = anfrage.headers.get('Origin') || '';
+  if (umgebung.HERKUNFT && her === umgebung.HERKUNFT) return her;
+  if (ERLAUBTE_HERKUENFTE.includes(her)) return her;
+  return ERLAUBTE_HERKUENFTE[0];
+}
+
 export default {
   async fetch(anfrage, umgebung) {
     const url = new URL(anfrage.url);
+    const herkunft = herkunftFuer(anfrage, umgebung);
 
-    if (anfrage.method === 'OPTIONS') return neueAntwort(null, 204, umgebung);
+    if (anfrage.method === 'OPTIONS') return neueAntwort(null, 204, herkunft);
     if (url.pathname === '/' || url.pathname === '/gesund') {
-      return neueAntwort({ da: true }, 200, umgebung);
+      return neueAntwort({ da: true }, 200, herkunft);
     }
     if (url.pathname !== '/senden' || anfrage.method !== 'POST') {
-      return neueAntwort({ fehler: 'unbekannt' }, 404, umgebung);
+      return neueAntwort({ fehler: 'unbekannt' }, 404, herkunft);
     }
 
     /* Ohne das gemeinsame Geheimnis darf hier niemand etwas losschicken.
        Sonst könnte jeder, der die Adresse kennt, euch zuklingeln. */
     const ausweis = (anfrage.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '');
     if (!umgebung.GEHEIMNIS || !zeitgleich(ausweis, umgebung.GEHEIMNIS)) {
-      return neueAntwort({ fehler: 'abgelehnt' }, 401, umgebung);
+      return neueAntwort({ fehler: 'abgelehnt' }, 401, herkunft);
     }
 
     let auftrag;
     try { auftrag = await anfrage.json(); }
-    catch { return neueAntwort({ fehler: 'unlesbar' }, 400, umgebung); }
+    catch { return neueAntwort({ fehler: 'unlesbar' }, 400, herkunft); }
 
     const ziel = auftrag && auftrag.an;
     if (!ziel || !ziel.endpoint || !ziel.keys || !ziel.keys.p256dh || !ziel.keys.auth) {
-      return neueAntwort({ fehler: 'kein Ziel' }, 400, umgebung);
+      return neueAntwort({ fehler: 'kein Ziel' }, 400, herkunft);
+    }
+
+    /* Die Hülle ist klein — alles über ~3,5 KB würde der Zustelldienst
+       ohnehin ablehnen. Lieber hier sauber Bescheid geben. */
+    if (JSON.stringify(auftrag.last || {}).length > 3500) {
+      return neueAntwort({ fehler: 'zu gross' }, 413, herkunft);
     }
 
     try {
@@ -51,10 +73,10 @@ export default {
       return neueAntwort(
         { ok: antwort.ok, stand: antwort.status, grund },
         antwort.ok ? 200 : antwort.status,
-        umgebung
+        herkunft
       );
     } catch (f) {
-      return neueAntwort({ fehler: String(f && f.message || f).slice(0, 200) }, 500, umgebung);
+      return neueAntwort({ fehler: String(f && f.message || f).slice(0, 200) }, 500, herkunft);
     }
   },
 };
@@ -211,12 +233,12 @@ function zeitgleich(a, b) {
   return unterschied === 0;
 }
 
-function neueAntwort(koerper, stand, umgebung) {
+function neueAntwort(koerper, stand, herkunft) {
   return new Response(koerper == null ? null : JSON.stringify(koerper), {
     status: stand,
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
-      'Access-Control-Allow-Origin': umgebung.HERKUNFT || '*',
+      'Access-Control-Allow-Origin': herkunft,
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Max-Age': '86400',

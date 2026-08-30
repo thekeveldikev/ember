@@ -139,6 +139,39 @@ test('jeder gelesene Ablage-Pfad hat irgendwo einen Schreiber — Tippfehler-Wac
   }
 });
 
+test('der Kopf der Seite trägt seine Schutzschichten', () => {
+  const kopf = readFileSync(join(wurzel, 'src', '00-head.html'), 'utf8');
+  assert.ok(kopf.includes('Content-Security-Policy'), 'die CSP-Haustür steht');
+  assert.ok(kopf.includes('noindex'), 'Suchmaschinen bleiben draußen');
+  assert.ok(kopf.includes('no-referrer'), 'kein Verweis verrät die Herkunft');
+  assert.ok(kopf.includes("frame-src 'none'"), 'keine fremden Rahmen');
+  assert.ok(!kopf.includes('http://'), 'nichts Unverschlüsseltes im Kopf');
+});
+
+test('jedes gerufene Sinnbild ist gezeichnet', () => {
+  const kern = readFileSync(join(wurzel, 'src', '20-core.js'), 'utf8');
+  const block = kern.match(/const wege = \{([\s\S]*?)\n  \};/)[1];
+  const gezeichnet = new Set(sammle(/(\w+):\s*'</g, block));
+  for (const name of sammle(/sinnbild\('(\w+)'/g)) {
+    assert.ok(gezeichnet.has(name), `sinnbild('${name}') gibt es nicht im Zeichensatz`);
+  }
+});
+
+test('kein console.log, kein debugger, kein TODO im Ausgelieferten', () => {
+  for (const { name, text } of quellen) {
+    assert.ok(!/console\.log\(/.test(text), name + ': console.log vergessen');
+    assert.ok(!/\bdebugger\b/.test(text), name + ': debugger vergessen');
+    assert.ok(!/\b(TODO|FIXME|XXX)\b/.test(text), name + ': offene Baustelle im Code');
+  }
+});
+
+test('alle versprochenen Dateien liegen wirklich da', () => {
+  for (const pfad of ['schrift/inter.woff2', 'schrift/playfair.woff2',
+    'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png', 'manifest.json', 'sw.js']) {
+    assert.ok(readFileSync(join(wurzel, pfad)).length > 100, pfad + ' fehlt oder ist leer');
+  }
+});
+
 test('kein nacktes append mit bedingtem null-Kind', () => {
   /* Das rohe append(null) schreibt den TEXT „null" auf den Schirm —
      genau so stand er einmal unter „Hinweise einschalten". */

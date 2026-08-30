@@ -194,6 +194,55 @@ test('die Übersetzung nimmt nur, was die App wirklich kann', () => {
   assert.ok(echteBrauchbare.length >= 10, echteBrauchbare.length + ' übernehmbare Regeln');
 });
 
+/* --- Die Sicherungen der Maschine -------------------------------------------- */
+
+test('die Maschine respektiert Rot, den Hauptschalter und die Tagesgrenze', async (t) => {
+  const { ladeApp: lade, anmelden } = await import('./rahmen.mjs');
+  const { raum } = lade({ dateien: DATEIEN });
+  await anmelden(raum);
+
+  const stunde = new Date().getHours();
+  if (stunde >= 23 || stunde < 7) {
+    /* Nachts feuert grundsätzlich nichts — dann ist genau DAS der Test. */
+    await raum.datenSchreib('maschine/an', true);
+    raum.D.ampel = { domme: 'gruen', sub: 'gruen' };
+    await raum.maschineFeuern({ name: 'nachts', bedingung: 'keine', aktionen: [] });
+    const protokoll = await raum.datenListe('maschine/protokoll');
+    assert.equal(protokoll.length, 0, 'Nachtruhe ist Nachtruhe');
+    return;
+  }
+
+  raum.D.ampel = { domme: 'gruen', sub: 'gruen' };
+
+  /* Ohne Hauptschalter: still. */
+  await raum.maschineFeuern({ name: 'aus', bedingung: 'keine', aktionen: [] });
+  assert.equal((await raum.datenListe('maschine/protokoll')).length, 0, 'aus heißt aus');
+
+  await raum.datenSchreib('maschine/an', true);
+
+  /* Bei Rot: still, fest verdrahtet. */
+  raum.D.ampel = { domme: 'gruen', sub: 'rot' };
+  await raum.maschineFeuern({ name: 'rot', bedingung: 'keine', aktionen: [] });
+  assert.equal((await raum.datenListe('maschine/protokoll')).length, 0, 'Rot stoppt alles');
+
+  /* Bei Grün: höchstens fünf am Tag. */
+  raum.D.ampel = { domme: 'gruen', sub: 'gruen' };
+  for (let i = 0; i < 7; i++) {
+    await raum.maschineFeuern({ name: 'r' + i, bedingung: 'keine', aktionen: [] });
+  }
+  const protokoll = await raum.datenListe('maschine/protokoll');
+  assert.equal(protokoll.length, 5, 'die sechste und siebte verpuffen');
+});
+
+test('Regie-Schritte mit Dauer null werden übersprungen statt zu klemmen', () => {
+  const raum = app();
+  const skript = { schritte: [{ dauer_sek: 0 }, { dauer_sek: 60 }, { dauer_sek: 0 }, { dauer_sek: 30 }] };
+  const stand = raum._regieStand({ skript, start: Date.now(), versatz: 0, pausiertAb: null });
+  assert.equal(stand.i, 1, 'der Lauf beginnt im ersten echten Schritt');
+  const ende = raum._regieStand({ skript, start: Date.now() - 91000, versatz: 0, pausiertAb: null });
+  assert.equal(ende.fertig, true);
+});
+
 /* --- Töne stürzen nie ------------------------------------------------------- */
 
 test('tonSpielen ohne Klangraum und in der Ruhe bleibt einfach still', () => {

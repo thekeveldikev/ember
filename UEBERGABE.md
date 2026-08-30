@@ -254,6 +254,28 @@ neu: die Pfad-Tippfehler-Wache (jeder gelesene Ablage-Pfad hat einen
 Schreiber). Audio: eingehende Chat-Nachrichten ploppen AUFwärts,
 gesendete abwärts. Wir-Stimme-Nachzügler in Grenzen und Ritualen.
 
+**0.7.4 — Notausgang, Stimme, Bote (83 Prüfungen):** Der Fund mit
+Gewicht: Das NOTAUSGANG-Blatt (Deckel z 700) öffnete sich HINTER dem
+Vollbild-Befehl (800) und dem Regie-Läufer (750) — unsichtbar genau in
+den Momenten, für die es existiert. Jetzt liegt es mit 890 über allem
+außer den Meldungen; im Browser per elementFromPoint bewiesen. Die
+Sprachaufnahme konnte bei Doppeltipp auf „Senden" DOPPELT verschicken
+(abgeschlossen-Riegel), das Stop-Ereignis wurde erst nach dem Stop
+abonniert (Ohr zuerst), zu kurze Aufnahmen verschwanden wortlos — und
+sie hat jetzt eine LIVE-PEGELANZEIGE: ein AnalyserNode lauscht am
+Strom (ohne ihn an die Lautsprecher zu legen), der rote Punkt atmet
+mit der Stimme. Der BOTE wurde gehärtet und neu deployt: CORS nur noch
+für thekeveldikev.github.io und localhost (statt *), Hüllen über
+3,5 KB werden mit 413 abgewiesen; live verifiziert (fremde Origin
+bekommt nicht ihre eigene zurück, ohne Geheimnis 401, echte Zustellung
+danach ok). Neue Prüfungen: Maschinen-Sicherungen (aus/Rot/5-am-Tag,
+nachts prüft der Test die Nachtruhe selbst), Regie-Schritte mit Dauer
+null, Kopf-Wache (CSP/noindex/no-referrer/kein http://), jedes
+gerufene Sinnbild ist gezeichnet, kein console.log/debugger/TODO,
+alle versprochenen Dateien (Schriften, Icons, sw) liegen wirklich da.
+Quiz-Antwort-Blatt ist BLATT_FEST (kein Deckel-Tipp verschluckt den
+Weiter-Knopf mitten in der Runde).
+
 ## Was in der Bugjagd zutage kam
 
 Sieben Fehler, alle vor der Veröffentlichung gefunden. Sie stehen hier,
