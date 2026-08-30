@@ -30,14 +30,14 @@ SEITEN.ich = function (seite) {
       zeile('Wie geht\'s dir?', 'Deine Ampel steht auf ' + ampelWort(D.ampel[D.rolle]) + ' — antippen zum Ändern', () => ampelBlatt()),
       istDomme() ? zeile('Verwaltung', 'Dein Werkzeugkasten: anlegen, steuern, aufräumen', () => zeigeSeite('verwaltung')) : null,
 
-      klappGruppe('spiel', 'Wachsen & Spannung', 'Stufen, Pläne, Überraschungen, Regeln',
+      klappGruppe('spiel', 'pfeilauf', 'Wachsen & Spannung', 'Stufen, Pläne, Überraschungen, Regeln',
         zeile('Wachsen', sie ? 'Seine Stufe, seine Punkte — du vergibst Auszeichnungen' : 'Deine Stufe und Punkte. Erledigtes zahlt hier ein', () => zeigeSeite('wachsen')),
         zeile('Pfade', sie ? 'Baue ihm Stufenpläne — er sieht nur die nächste' : 'Deine Stufenpläne. Die nächste Stufe siehst du, mehr nicht', () => zeigeSeite('pfade')),
         zeile('Spannung', sie ? 'Countdown stellen, Hinweise streuen, Überraschungen legen' : 'Was heute noch kommt — wenn sie etwas gelegt hat', () => zeigeSeite('spannung')),
         zeile('Wenn — Dann', sie ? 'Regeln bauen, die von selbst feuern' : 'Ob gerade Regeln über dich laufen', () => zeigeSeite('maschine'))
       ),
 
-      klappGruppe('naehe', 'Wissen & Nähe', 'Wünsche, Grenzen, Körper, unsere Sprache',
+      klappGruppe('naehe', 'herz', 'Wissen & Nähe', 'Wünsche, Grenzen, Körper, unsere Sprache',
         zeile('Wünsche', 'Jeder trägt blind ein — die App zeigt nur, was beide wollen', () => zeigeSeite('wuensche')),
         zeile('Grenzen', 'Festhalten, was geht, was nicht und was vielleicht', () => zeigeSeite('grenzen')),
         zeile('Körperkarte', 'Zone für Zone: Liebe ich, mag ich, bitte nicht', () => zeigeSeite('koerper')),
@@ -45,7 +45,7 @@ SEITEN.ich = function (seite) {
         zeile('Unsere Wörter', 'Das Wörterbuch für alles, was nur wir zwei verstehen', () => zeigeSeite('glossar'))
       ),
 
-      klappGruppe('uns', 'Für uns', 'Vertrag, Buch, Rituale, Danach, Reparatur',
+      klappGruppe('uns', 'feder', 'Für uns', 'Vertrag, Buch, Rituale, Danach, Reparatur',
         zeile('Der Vertrag', 'Unsere Abmachung, schwarz auf weiß, von beiden unterschrieben', () => zeigeSeite('vertrag')),
         zeile('Das Buch', 'Unser Tagebuch: Einträge, Flammen, Wärmekarte', () => zeigeSeite('buch')),
         zeile('Rituale', 'Was regelmäßig wiederkehrt — mit Serie fürs Dranbleiben', () => zeigeSeite('rituale')),
@@ -53,7 +53,7 @@ SEITEN.ich = function (seite) {
         zeile('Reparatur', 'Nach einem Streit: drei ruhige Schritte, keine Punkte', () => zeigeSeite('reparatur'))
       ),
 
-      klappGruppe('sammlung', 'Sammlung & Privates', 'Tresor, Regal, eigene Notizen',
+      klappGruppe('sammlung', 'auge', 'Sammlung & Privates', 'Tresor, Regal, eigene Notizen',
         zeile('Tresor', sie ? 'Bilder hochladen und einzeln für ihn freigeben' : 'Bilder, die sie für dich freigegeben hat', () => zeigeSeite('tresor')),
         zeile('Das Regal', 'Was an Spielzeug da ist — die Decks richten sich danach', () => zeigeSeite('toys')),
         zeile('Nur für dich', 'Private Notizen. Verlassen dieses Gerät nie', () => zeigeSeite('eigenes'))
@@ -66,51 +66,46 @@ SEITEN.ich = function (seite) {
   seite.append(pushplatz);
   pushAbschnittBauen(pushplatz);
 
-  /* --- Räume --- */
+  /* --- Einstellungen: drei Klappen statt drei langer Listen --------------- */
   seite.append(
     el('div', { class: 'abschnitt' },
-      el('p', { class: 'winzig still', style: { margin: '0 0 9px 2px' } }, 'Räume'),
-      zeile('Dieser Raum: ' + (raumName() || '—'), 'Ein Raum ist eine eigene Welt — zum Proben oder für uns. Antippen zum Wechseln', () => raumWechslerBlatt()),
-      zeile('Raum umbenennen', 'Nur der Name ändert sich, sonst nichts', () => {
-        eingabeBlatt({ titel: 'Raum umbenennen', wert: raumName(), jaText: 'Umbenennen' }, (name) => {
-          raumUmbenennen(aktiverRaumId(), name);
-          zeigeSeite('ich');
-        });
-      })
-    )
-  );
+      el('p', { class: 'winzig still', style: { margin: '0 0 9px 2px' } }, 'Einstellungen'),
 
-  /* --- Sicherheit --- */
-  seite.append(
-    el('div', { class: 'abschnitt' },
-      el('p', { class: 'winzig still', style: { margin: '0 0 9px 2px' } }, 'Sicherheit'),
-      zeile('Jemand schaut mit', 'Ein Tipp, und die App sieht aus wie eine Notizliste. Dreimal aufs Wort EMBER tippen holt sie zurück', () => tarnungAn()),
-      Gerät.lies('schrank') ? zeile('Jetzt abschließen', 'Sofort zu — beim nächsten Öffnen fragt die App nach der PIN', () => abschliessen())
-        : zeile('Eine PIN setzen', 'Damit niemand die App einfach öffnen kann, der das Handy hat', () => pinNachtraeglich()),
-      zeile('Schließt sich nach', schliessNachText() + ' im Hintergrund — dann braucht es die PIN', () => schliessNachSetzen())
-    )
-  );
+      klappGruppe('raeume', 'mond', 'Räume', 'Dieser Raum: ' + (raumName() || '—'),
+        zeile('Raum wechseln', 'Ein Raum ist eine eigene Welt — zum Proben oder für uns', () => raumWechslerBlatt()),
+        zeile('Raum umbenennen', 'Nur der Name ändert sich, sonst nichts', () => {
+          eingabeBlatt({ titel: 'Raum umbenennen', wert: raumName(), jaText: 'Umbenennen' }, (name) => {
+            raumUmbenennen(aktiverRaumId(), name);
+            zeigeSeite('ich');
+          });
+        })
+      ),
 
-  /* --- Die App --- */
-  seite.append(
-    el('div', { class: 'abschnitt' },
-      el('p', { class: 'winzig still', style: { margin: '0 0 9px 2px' } }, 'Die App'),
-      zeile('Nach einer neuen Fassung sehen', 'Du hast ' + APP_VERSION + ' — hier holst du dir Neues sofort', () => sucheAppUpdate(true)),
-      zeile('Sichtwechsel', 'Dieses Gerät zeigt dann die Sicht von ' + nameVon(andereRolle()) + ' — zum Ausprobieren', () => sichtWechseln()),
-      zeile('Nachts leiser ab', 'Ab ' + Gerät.lies('spaetAb', 22) + ':00 Uhr wird die App wärmer und dunkler', () => spaetSetzen()),
-      zeile('Töne',
-        tonPegel() >= 1 ? 'An — nachts automatisch gedämpft. Antippen: leise'
-          : tonPegel() > 0 ? 'Leise. Antippen: aus'
-            : 'Aus. Antippen: an', () => {
-          const neu = tonPegel() >= 1 ? 0.45 : tonPegel() > 0 ? 0 : 1;
-          Gerät.schreib('tonPegel', neu);
-          Gerät.loesch('toene');
-          if (neu > 0) tonSpielen('weich');
-          zeigeSeite('ich');
-        }),
-      zeile('Letzte Fehler', (Gerät.lies('fehlerlog', []).length || 'Keine') + ' notiert — bei Problemen hier nachsehen', () => fehlerlogZeigen()),
-      istDomme() ? zeile('Kopplungscode zeigen', 'Damit ein weiteres Gerät in diesen Raum kommt', () => kopplungscodeNochmal()) : null,
-      zeile('Diesen Raum vom Gerät nehmen', 'Nur dieses Gerät vergisst ihn — alles Gemeinsame bleibt gespeichert', () => geraetLeeren(), true)
+      klappGruppe('sicherheit', 'schloss', 'Sicherheit', 'Tarnung, PIN, Schließzeit',
+        zeile('Jemand schaut mit', 'Ein Tipp, und die App sieht aus wie eine Notizliste. Dreimal aufs Wort EMBER tippen holt sie zurück', () => tarnungAn()),
+        Gerät.lies('schrank') ? zeile('Jetzt abschließen', 'Sofort zu — beim nächsten Öffnen fragt die App nach der PIN', () => abschliessen())
+          : zeile('Eine PIN setzen', 'Damit niemand die App einfach öffnen kann, der das Handy hat', () => pinNachtraeglich()),
+        zeile('Schließt sich nach', schliessNachText() + ' im Hintergrund — dann braucht es die PIN', () => schliessNachSetzen())
+      ),
+
+      klappGruppe('app', 'funke', 'Die App', 'Fassung ' + APP_VERSION + ', Töne, Sichtwechsel',
+        zeile('Nach einer neuen Fassung sehen', 'Du hast ' + APP_VERSION + ' — hier holst du dir Neues sofort', () => sucheAppUpdate(true)),
+        zeile('Sichtwechsel', 'Dieses Gerät zeigt dann die Sicht von ' + nameVon(andereRolle()) + ' — zum Ausprobieren', () => sichtWechseln()),
+        zeile('Nachts leiser ab', 'Ab ' + Gerät.lies('spaetAb', 22) + ':00 Uhr wird die App wärmer und dunkler', () => spaetSetzen()),
+        zeile('Töne',
+          tonPegel() >= 1 ? 'An — nachts automatisch gedämpft. Antippen: leise'
+            : tonPegel() > 0 ? 'Leise. Antippen: aus'
+              : 'Aus. Antippen: an', () => {
+            const neu = tonPegel() >= 1 ? 0.45 : tonPegel() > 0 ? 0 : 1;
+            Gerät.schreib('tonPegel', neu);
+            Gerät.loesch('toene');
+            if (neu > 0) tonSpielen('weich');
+            zeigeSeite('ich');
+          }),
+        zeile('Letzte Fehler', (Gerät.lies('fehlerlog', []).length || 'Keine') + ' notiert — bei Problemen hier nachsehen', () => fehlerlogZeigen()),
+        istDomme() ? zeile('Kopplungscode zeigen', 'Damit ein weiteres Gerät in diesen Raum kommt', () => kopplungscodeNochmal()) : null,
+        zeile('Diesen Raum vom Gerät nehmen', 'Nur dieses Gerät vergisst ihn — alles Gemeinsame bleibt gespeichert', () => geraetLeeren(), true)
+      )
     )
   );
 
@@ -122,24 +117,45 @@ SEITEN.ich = function (seite) {
 
 /* Eine Gruppe von Zeilen hinter einem Kopf zum Aufklappen. Ob sie offen
    steht, merkt sich das Gerät — wer immer nur „Wünsche" braucht, hat
-   seine Klappe beim nächsten Mal schon offen. */
-function klappGruppe(schluessel, titel, unter, ...zeilen) {
+   seine Klappe beim nächsten Mal schon offen.
+
+   Der Kopf muss auf einen Blick sagen: „Hier ist mehr drin" — sonst
+   sieht er aus wie eine Zeile, die woandershin führt. Deshalb: Sinnbild
+   vorn, die Zahl der Wege und ein Chevron im Kreis rechts, das sich
+   beim Öffnen dreht. Was navigiert, trägt weiter das nackte ›. */
+function klappGruppe(schluessel, bild, titel, unter, ...zeilen) {
   const stand = Gerät.lies('ichKlappen', {});
   let offen = !!stand[schluessel];
+  const drin = zeilen.filter(Boolean);
 
   const pfeil = el('span', {
-    class: 'still',
-    style: { fontSize: '15px', flex: 'none', transition: 'transform .25s ease', transform: offen ? 'rotate(90deg)' : 'none' },
+    style: {
+      width: '26px', height: '26px', flex: 'none', borderRadius: '50%',
+      display: 'grid', placeItems: 'center', fontSize: '15px',
+      border: '1px solid ' + (offen ? 'var(--glut)' : 'var(--kante)'),
+      color: offen ? 'var(--glut-hell)' : 'var(--still)',
+      transition: 'transform .3s cubic-bezier(.2,.7,.3,1), border-color .3s ease, color .3s ease',
+      transform: offen ? 'rotate(90deg)' : 'none',
+    },
   }, '›');
 
-  const inhalt = el('div', { class: 'aufklapp' + (offen ? ' offen' : ''), style: { paddingLeft: '10px' } },
-    el('div', { style: { minHeight: '0' } }, ...zeilen.filter(Boolean)));
+  const zahl = el('span', { class: 'winzig still', style: { flex: 'none' } }, String(drin.length));
+
+  const inhalt = el('div', { class: 'aufklapp' + (offen ? ' offen' : '') },
+    el('div', { style: { minHeight: '0' } },
+      el('div', {
+        style: {
+          marginLeft: '13px', paddingLeft: '10px', paddingBottom: '2px',
+          borderLeft: '2px solid var(--kante)',
+        },
+      }, ...drin)));
 
   const kopf = el('button', {
     class: 'karte',
     style: {
       width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center',
       justifyContent: 'space-between', gap: '12px', marginTop: '9px', padding: '13px 15px',
+      borderColor: offen ? 'rgba(196,120,90,.4)' : '',
     },
     onclick: () => {
       offen = !offen;
@@ -148,13 +164,19 @@ function klappGruppe(schluessel, titel, unter, ...zeilen) {
       Gerät.schreib('ichKlappen', frisch);
       inhalt.classList.toggle('offen', offen);
       pfeil.style.transform = offen ? 'rotate(90deg)' : 'none';
+      pfeil.style.borderColor = offen ? 'var(--glut)' : 'var(--kante)';
+      pfeil.style.color = offen ? 'var(--glut-hell)' : 'var(--still)';
+      kopf.style.borderColor = offen ? 'rgba(196,120,90,.4)' : '';
       tonSpielen('tick');
     },
   },
-    el('div', { style: { minWidth: '0' } },
+    el('span', { style: { flex: 'none', color: 'var(--glut-hell)', display: 'grid', placeItems: 'center' } },
+      sinnbild(bild, 19)),
+    el('div', { style: { minWidth: '0', flex: '1' } },
       el('div', { class: 'zier', style: { fontSize: '16.5px' } }, titel),
       el('div', { class: 'still klein', style: { marginTop: '1px' } }, unter)
     ),
+    zahl,
     pfeil
   );
 
@@ -442,23 +464,35 @@ SEITEN.verwaltung = function (seite) {
   seite.append(
     el('div', { class: 'abschnitt' },
       el('p', { class: 'winzig still', style: { margin: '0 0 9px 2px' } }, 'Anlegen'),
-      zeile('Karte fürs Deck', 'Für das Spiel', () => dareAnlegen()),
-      zeile('Auftrag', 'Mit Frist, wenn du willst', () => auftragAnlegen()),
-      zeile('Regel', 'Steht, bis du sie wegnimmst', () => regelAnlegen()),
-      zeile('Etwas Ausstehendes', 'Er sieht nur die Zahl', () => strafeAnlegen()),
-      zeile('Spruch fürs Glas', 'Einer je Tag', () => keksSchreiben(el('div'))),
-      zeile('Rad', 'Felder beschriften', () => radAnlegen()),
-      zeile('Los zum Rubbeln', 'Er deckt es selbst auf', () => losAnlegen()),
-      zeile('Auszeichnung', 'Anlegen, später verleihen', () => ehreAnlegen()),
-      zeile('Pfad', 'Stufen, die aufeinander liegen', () => pfadAnlegen()),
-      zeile('Verborgenes', 'Mit Enthüllungsdatum', () => verborgenAnlegen()),
-      zeile('Krümel streuen', 'Über den Tag verteilt', () => kruemelAnlegen()),
-      zeile('Foto-Auftrag', 'Mit laufender Uhr', () => fotoAuftragGeben()),
-      zeile('Sperre', 'Nichts ohne deine Erlaubnis', () => sperreSetzen()),
-      zeile('Boss', 'Eine Prüfung mit Belohnung', () => bossAnlegen()),
-      zeile('Impuls', 'Kommt, wann er kommt', () => impulsAnlegen()),
-      zeile('Regie-Skript', 'Aus Bausteinen, für später', () => regieBauen()),
-      zeile('Wenn-Dann-Regel', 'Feuert von selbst', () => zeigeSeite('maschine'))
+
+      klappGruppe('vAuftrag', 'auftrag', 'Aufträge & Regeln', 'Was er tun, lassen oder erbitten muss',
+        zeile('Auftrag', 'Mit Frist, wenn du willst', () => auftragAnlegen()),
+        zeile('Regel', 'Steht, bis du sie wegnimmst', () => regelAnlegen()),
+        zeile('Etwas Ausstehendes', 'Er sieht nur die Zahl', () => strafeAnlegen()),
+        zeile('Sperre', 'Nichts ohne deine Erlaubnis', () => sperreSetzen()),
+        zeile('Foto-Auftrag', 'Mit laufender Uhr', () => fotoAuftragGeben())
+      ),
+
+      klappGruppe('vSpiel', 'wuerfel', 'Spiel & Zufall', 'Decks, Räder, Lose und was von selbst feuert',
+        zeile('Karte fürs Deck', 'Für das Spiel', () => dareAnlegen()),
+        zeile('Rad', 'Felder beschriften', () => radAnlegen()),
+        zeile('Los zum Rubbeln', 'Er deckt es selbst auf', () => losAnlegen()),
+        zeile('Boss', 'Eine Prüfung mit Belohnung', () => bossAnlegen()),
+        zeile('Impuls', 'Kommt, wann er kommt', () => impulsAnlegen()),
+        zeile('Regie-Skript', 'Aus Bausteinen, für später', () => regieBauen()),
+        zeile('Wenn-Dann-Regel', 'Feuert von selbst', () => zeigeSeite('maschine'))
+      ),
+
+      klappGruppe('vWachsen', 'pfeilauf', 'Wachsen & Ehren', 'Was er sich verdienen kann',
+        zeile('Auszeichnung', 'Anlegen, später verleihen', () => ehreAnlegen()),
+        zeile('Pfad', 'Stufen, die aufeinander liegen', () => pfadAnlegen())
+      ),
+
+      klappGruppe('vSpannung', 'sanduhr', 'Spannung & Kleines', 'Was wartet, tickt oder überrascht',
+        zeile('Verborgenes', 'Mit Enthüllungsdatum', () => verborgenAnlegen()),
+        zeile('Krümel streuen', 'Über den Tag verteilt', () => kruemelAnlegen()),
+        zeile('Spruch fürs Glas', 'Einer je Tag', () => keksSchreiben(el('div')))
+      )
     )
   );
 

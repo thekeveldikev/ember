@@ -328,6 +328,31 @@ und bucht Abos ab oder kündigt Unbezahlbares, bei Rot Gehalt ja/Zins
 nein. Statik: doppelt definierte SEITEN fallen jetzt auf. Audio:
 Keks-Knack mit Zufallshöhe (kein Bruch klingt wie der andere).
 
+**0.8.2 — der Laden ruht unsichtbar, die Klappen bekennen Farbe:**
+Die Ökonomie ist jetzt WIRKLICH standardmäßig aus: Die Spiel-Kachel
+„Der Laden" existiert nur, wenn er eröffnet ist — vorher gibt es ihn
+schlicht nicht (der Weg hinein: Verwaltung → Bausteine; die
+Ersteröffnung leitet zur Laden-Seite mit Startguthaben). klappGruppe
+komplett neu: Sinnbild vorn, Zeilen-Zahl und Chevron im Kreis rechts
+(dreht sich beim Öffnen, Rand und Kopf glühen), Inhalt mit
+Einrück-Leitlinie — damit unterscheidet sich „klappt auf" endlich
+sichtbar von „führt weiter" (nacktes ›). Neue Signatur:
+klappGruppe(schluessel, bild, titel, unter, ...zeilen). Ich-Seite:
+Räume/Sicherheit/Die App sind jetzt drei Klappen unter
+„Einstellungen" statt drei langer Listen. Verwaltung: die 17
+„Anlegen"-Zeilen liegen in vier thematischen Klappen (Aufträge &
+Regeln, Spiel & Zufall, Wachsen & Ehren, Spannung & Kleines).
+Einrichtungsweg für den Ernstfall verifiziert: Müll-Startpaket
+explodiert nicht, gültiges füllt alle sechs Felder, leeres
+„Einrichten" meckert freundlich und gibt den Knopf wieder frei,
+Müll-Kopplungscode wird abgewiesen — alles im frischen Wegwerf-Raum
+durchgespielt und restlos aufgeräumt. Takt-Audit: jedes setInterval
+hat isConnected-Wache oder clearInterval-Weg. Doppel-Rollen-Sweep
+über alle 31 Seiten × 2 Rollen ohne einen Fehler. Wichtig fürs
+Debuggen: Der Dev-Server-Eindruck kann täuschen — der Service Worker
+serviert notfalls die alte Fassung aus dem Cache, auch wenn gar kein
+Server läuft.
+
 ## Was in der Bugjagd zutage kam
 
 Sieben Fehler, alle vor der Veröffentlichung gefunden. Sie stehen hier,

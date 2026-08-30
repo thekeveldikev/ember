@@ -31,7 +31,9 @@ SEITEN.spiel = function (seite) {
       spielKachel('Quiz', 'Kennst du mich?', 'quiz'),
       spielKachel('Regie', 'Die App dirigiert', 'regie'),
       spielKachel('Timer', 'Auch mit Zufall', 'timer'),
-      spielKachel('Der Laden', 'Glut verdienen, Glut ausgeben', 'laden')
+      /* Der Laden zeigt sich erst, wenn sie ihn eröffnet hat — vorher
+         gibt es ihn schlicht nicht. Der Weg hinein: Verwaltung → Bausteine. */
+      ladenAn() ? spielKachel('Der Laden', 'Glut verdienen, Glut ausgeben', 'laden') : null
     )
   );
 
