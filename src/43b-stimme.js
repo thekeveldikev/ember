@@ -201,7 +201,7 @@ function ablaufWaehlen(fertig) {
   const b = blatt(
     el('h2', {}, 'Zieht sich zurück'),
     el('p', { class: 'leise klein', style: { margin: '7px 0 4px' } },
-      'Die Nachricht verschwindet danach bei euch beiden.'),
+      'Die Nachricht verschwindet danach bei uns beiden.'),
     ...ABLAUF_WAHL.map((w) => el('button', {
       class: 'karte', style: { width: '100%', textAlign: 'left', marginTop: '9px' },
       onclick: () => { b.schliessen(); fertig(w.ms); },

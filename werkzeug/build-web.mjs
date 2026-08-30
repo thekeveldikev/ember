@@ -62,6 +62,9 @@ const jsDateien = [
   'src/60-funken.js',
   'src/61-keks.js',
   'src/62-tagesaufgabe.js',
+  'src/63-regie.js',
+  'src/64-maschine.js',
+  'src/65-kleinigkeiten.js',
   'src/90-start.js',
 ];
 

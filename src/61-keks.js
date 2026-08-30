@@ -169,8 +169,26 @@ function keksGelesenZeigen(platz, stand, frisch = false) {
   const karte = el('div', { class: 'keksoffen' + (frisch ? ' faltet-auf' : '') },
     el('p', { class: 'winzig', style: { color: 'rgba(90,60,25,.6)', marginBottom: '7px' } }, marke),
     el('p', { class: 'zier', style: { fontSize: '16.5px', fontStyle: 'italic', lineHeight: '1.5', color: '#3a2a16' } },
-      stand.text)
+      stand.text),
+    el('p', { class: 'winzig', style: { marginTop: '8px', color: 'rgba(90,60,25,.4)' } }, 'Tippen für den nächsten')
   );
+
+  /* Gelesen und getippt: der Zettel verweht, ein neuer Keks liegt da. */
+  karte.addEventListener('click', async () => {
+    karte.style.transition = 'opacity .28s ease, transform .28s ease';
+    karte.style.opacity = '0';
+    karte.style.transform = 'rotate(-.6deg) translateY(8px)';
+    tonSpielen('tick');
+    const eigene = await datenListe('keks').catch(() => []);
+    const keks = _keksZiehen(eigene);
+    setTimeout(() => {
+      platz.innerHTML = '';
+      if (!keks) return;
+      const neu = { tag: tagstempel(), text: keks.text, kategorie: keks.kategorie, von: keks.von || null, stand: 'ganz' };
+      Gerät.schreib('keksHeute', neu);
+      keksGanzZeigen(platz, neu);
+    }, 290);
+  });
 
   langerDruck(karte, () => keksSchreiben(platz));
   platz.append(karte);

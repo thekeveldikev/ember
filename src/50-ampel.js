@@ -62,6 +62,7 @@ async function ampelSetzen(farbe) {
   D.ampel[D.rolle] = farbe;
   leisteAuffrischen();
   await datenSchreib('ampel/' + D.rolle, { farbe, wann: jetzt() });
+  if (typeof maschineEreignis === 'function') maschineEreignis('ampel', { rolle: D.rolle, farbe });
 
   if (farbe === 'rot') {
     ruheAn(true);

@@ -79,8 +79,8 @@ async function paarXp(punkte) {
         tag: tagstempel(), flammen: 3, stimmung: '∞',
         satz: 'Zusammen auf Stufe ' + nachher + '.',
       });
-      pushSenden(andereRolle(), 'hinweis', 'Ihr seid weiter.');
-      meldung('Ihr beide: Stufe ' + nachher + '.');
+      pushSenden(andereRolle(), 'hinweis', 'Wir sind weiter.');
+      meldung('Wir beide: Stufe ' + nachher + '.');
       puls('antwortJa');
     }
   } catch { /* Das Level ist Beiwerk — nichts hängt daran. */ }
@@ -106,7 +106,7 @@ function paarKarte(platz, stand) {
           },
         })),
         el('p', { class: 'winzig still', style: { marginTop: '5px' } },
-          'wächst durch alles, was ihr zusammen tut')
+          'wächst durch alles, was wir zusammen tun')
       )
     )
   );

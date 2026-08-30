@@ -19,7 +19,9 @@ SEITEN.spiel = function (seite) {
       spielKachel('Baukasten', 'Würfeln', 'szenario'),
       spielKachel('Wahrheit', 'oder Pflicht', 'wahrheit'),
       spielKachel('Lose', 'Freirubbeln', 'rubbeln'),
-      spielKachel('Quiz', 'Kennst du mich?', 'quiz')
+      spielKachel('Quiz', 'Kennst du mich?', 'quiz'),
+      spielKachel('Regie', 'Die App dirigiert', 'regie'),
+      spielKachel('Timer', 'Auch mit Zufall', 'timer')
     )
   );
 

@@ -90,6 +90,7 @@ function spiegelSammlungSetzen(pfad, serverStand) {
   const vorsatz = pfad + '/';
 
   for (const auftrag of Ablage._warteschlange) {
+    if (_auftragVergammelt(auftrag)) continue;
     if (auftrag.art !== 'PUT' || !auftrag.pfad.startsWith(vorsatz)) continue;
     const id = auftrag.pfad.slice(vorsatz.length);
     if (!id || id.includes('/')) continue;
@@ -186,6 +187,15 @@ function datenHorch(pfad, beiListe) {
      bliebe die Seite ohne Netz einfach blank, statt zu sagen, dass hier
      noch nichts ist. */
   senden();
+
+  /* Die eine Stammleitung schickt ihren vollen Schnappschuss nur beim
+     Öffnen. Wer sich SPÄTER anmeldet, bekäme nur noch Änderungen — und
+     schleppte den alten Spiegel ewig mit: Gelöschtes bliebe stehen,
+     Verpasstes fehlte. Deshalb liest jeder Horcher einmal selbst frisch. */
+  ablageLies(pfad).then((wert) => {
+    bestand = wert || {};
+    senden();
+  }).catch(() => { /* ohne Netz trägt der Spiegel */ });
 
   const stopp = ablageHorch(pfad, (weg, wert) => {
     if (weg === '/') {

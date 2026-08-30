@@ -185,12 +185,26 @@ async function ablageAnhaengen(pfad, wert) {
   return k;
 }
 
+/* Wie lange ein liegengebliebener Auftrag noch gelten darf. Danach ist
+   die Welt weitergezogen: Ein tagealter PUT würde längst Gelöschtes
+   wieder auferstehen lassen — genau so kam ein abgeräumter Testauftrag
+   zurück von den Toten. Lieber ehrlich verwerfen und notieren. */
+const WARTESCHLANGE_HALTBARKEIT = 24 * 3600000;
+
+function _auftragVergammelt(auftrag) {
+  return auftrag.wann && Date.now() - auftrag.wann > WARTESCHLANGE_HALTBARKEIT;
+}
+
 async function warteschlangeLeeren() {
   if (!Ablage._warteschlange.length || !navigator.onLine || !Ablage.bereit) return;
   const offen = Ablage._warteschlange.slice();
   Ablage._warteschlange = [];
   Gerät.schreib('warteschlange', []);
   for (const auftrag of offen) {
+    if (_auftragVergammelt(auftrag)) {
+      if (typeof fehlerNotieren === 'function') fehlerNotieren('Warteschlange: zu alt, verworfen: ' + auftrag.art + ' ' + auftrag.pfad);
+      continue;
+    }
     try { await _senden(auftrag.pfad, auftrag.art, auftrag.wert); }
     catch { _merken(auftrag.pfad, auftrag.art, auftrag.wert); }
   }

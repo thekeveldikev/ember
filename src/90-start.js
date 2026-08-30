@@ -57,11 +57,14 @@ async function appStarten() {
   /* Der Vorrat: erst die Einstellung, dann die Tagesaufgabe des Tages. */
   await vorratLaden().catch(() => {});
   tagesaufgabenStart().catch(() => {});
+  datenListe('toys').then((l) => { D.toysVorhanden = l.some((t) => t.aktiv !== false); }).catch(() => {});
 
   knopfHorcherStarten();
   ampelHorcherStarten();
   sperreHorcherStarten();
   fotoHorcherStarten();
+  regieHorcherStarten();
+  maschineStarten();
   regelWachePruefen();
   leisteAuffrischen();
 

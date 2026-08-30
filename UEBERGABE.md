@@ -102,8 +102,38 @@ schickt sofort — mit Ring, der sich in 0,85 s schließt) und das sanfte
 Aufklappen nachgeladener Heim-Karten (`grid-template-rows: 0fr → 1fr`
 — der einzige Weg, Höhe ohne Messen zu animieren).
 
-**Was aus dem ursprünglichen Entwurf noch fehlt:** Seasons, gemeinsames
-Schreiben, Playlist, KI-Anbindung, Voting.
+**V5 (0.6.0) — die zweite Vorrats-Welle plus zwei neue Maschinenräume:**
+Wahrheit oder Pflicht zieht jetzt aus 159 Vorrat-Karten (Modi: Klassisch,
+Ihre Wahl, Zufall, nur W/nur P; Passen kostet Karma und Ausstehendes,
+dreimal beendet die Runde; sie kann Stufen überspringen). Die Lose wurden
+ein echtes Losspiel: Tageslos (nur er), Seltenheiten 40/30/18/10/2 mit
+farbigem Aufdeck-Glühen und Konfetti beim Jackpot, Typen sofort/
+gutschein (Portemonnaie mit Einlöse-Bitte)/niete/falle (schreibt
+Strafe)/zeitschloss/bedingt/wildcard/blind (sie schreibt in 60 s LIVE,
+sein Blatt füllt sich von selbst) — plus Serienwahl und Präparieren.
+NEU: die **Session-Regie** (63) — 10 zeitgesteuerte Skripte laufen
+synchron über die Ablage auf beiden Geräten (Wake Lock, Pause/+30 s/
+Überspringen nur bei ihr, Modus nur_domme lässt sein Gerät nur glühen),
+eigene Skripte aus 18 Bausteinen. NEU: die **Wenn-Dann-Maschine** (64)
+— Regeln WENN/UND/DANN mit 9 Auslösern, 7 Bedingungen, 11 Aktionen,
+14 übersetzte Bibliotheks-Regeln; Zeit-Regeln prüft nur das Domme-Gerät
+(sonst Doppelfeuer), Sicherungen fest verdrahtet (Rot/Notaus stoppt
+alles, Nachtruhe 23–7, max. 5/Tag, Protokoll, er sieht nur die Anzahl).
+Dazu die Kleinigkeiten (65): Timer-Bibliothek + Zufalls-Timer,
+Glossar, Körperkarte (16 Zonen, 4 Stufen, Notizen), Reparatur-Modus
+(3 Schritte, gegenseitig verriegelt), Toy-Regal (filtert das
+Toys-Deck), Frage des Tages auf dem Heim.
+
+Bugfixes derselben Runde: datenHorch liest beim Anmelden einmal frisch
+vom Server (die Stammleitung schickt Schnappschüsse nur beim Öffnen —
+spät registrierte Horcher sahen sonst Gelöschtes ewig weiter; DAS war
+Veras Geister-Plausch). Warteschlangen-Aufträge älter als 24 h werden
+verworfen statt Gelöschtes wiederzubeleben. zeigeSeite auf derselben
+Seite ist jetzt ein stilles Auffrischen (kein Hereinrutschen, Scroll
+bleibt). Tagesaufgabe/Frage des Tages als schmale Zeilen. Keks: Tipp
+auf den gelesenen Zettel bringt den nächsten. „Wir" heißt „Chat".
+Ich-Seite in Klartext erklärt. Vorrat-Texte in Wir-Stimme („wir beide"
+statt „ihr beide" — wirStimme() im Generator).
 
 ---
 

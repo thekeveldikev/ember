@@ -13,7 +13,7 @@ const beimVerlassen = (fn) => _aufraeumen.push(fn);
 
 const REITER = [
   { id: 'heim', sinnbild: 'heim', marke: 'Heim' },
-  { id: 'plausch', sinnbild: 'plausch', marke: 'Wir' },
+  { id: 'plausch', sinnbild: 'plausch', marke: 'Chat' },
   { id: 'spiel', sinnbild: 'spiel', marke: 'Spiel' },
   { id: 'auftrag', sinnbild: 'auftrag', marke: 'Auftrag' },
   { id: 'ich', sinnbild: 'ich', marke: 'Ich' },
@@ -63,14 +63,20 @@ function zeigeSeite(id) {
   _aufraeumen.forEach((f) => { try { f(); } catch {} });
   _aufraeumen = [];
 
-  D.seite = id;
+  /* Dieselbe Seite noch einmal ist ein Auffrischen, kein Umzug: kein
+     Hereinschieben, kein Sprung nach oben — die Stelle bleibt, wo sie
+     war. Nur ein echter Seitenwechsel bekommt den Auftritt. */
+  const gleiche = id === D.seite && $('#buehne .seite');
   const b = $('#buehne');
-  b.innerHTML = '';
-  b.scrollTop = 0;
+  const merkScroll = gleiche ? b.scrollTop : 0;
 
-  const seite = el('div', { class: 'seite' });
+  D.seite = id;
+  b.innerHTML = '';
+
+  const seite = el('div', { class: 'seite' + (gleiche ? ' still-wechsel' : '') });
   b.append(seite);
   SEITEN[id](seite);
+  b.scrollTop = merkScroll;
 
   leisteAuffrischen();
   Gerät.schreib('letzteSeite', id);

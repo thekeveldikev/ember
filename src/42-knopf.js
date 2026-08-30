@@ -189,6 +189,7 @@ function bitteBlatt() {
     pushSenden('domme', 'bitte');
     puls('bitte');
     meldung('Gefragt.');
+    if (typeof maschineEreignis === 'function') maschineEreignis('knopf');
     zeigeSeite('heim');
   });
 }

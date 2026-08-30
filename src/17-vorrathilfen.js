@@ -59,6 +59,9 @@ function vorratDares(deckKey) {
 function vorratDeckListe() {
   if (!vorratAn()) return [];
   return VORRAT.deckMeta
+    /* Das Toys-Deck gibt es nur, wenn im Regal (Ich → Das Regal) auch
+       etwas steht — Karten über Spielzeug, das es nicht gibt, ärgern nur. */
+    .filter((m) => m.key !== 'toys' || D.toysVorhanden)
     .map((m) => ({ ...m, karten: vorratDares(m.key) }))
     .filter((m) => m.karten.length);
 }
@@ -196,6 +199,74 @@ function vorratTagesaufgabe(rolle, level, zuletztIds = []) {
   return wahl.length ? zufall(wahl) : null;
 }
 
+/* --- Wahrheit oder Pflicht ------------------------------------------------- */
+
+/* Gefiltert nach Spielstufe (1–3), Intensitäts-Obergrenze und danach, wer
+   gerade dran ist: Eine Frage „an sie" landet nie bei ihm. */
+function vorratWup(art, spielstufe, dran) {
+  if (!vorratAn()) return [];
+  const max = vorratWirksameStufe();
+  return VORRAT.wup.filter((w) =>
+    w.typ === art &&
+    (w.stufe || 1) <= spielstufe &&
+    (w.intensitaet || 1) <= max &&
+    (w.an === 'beide' || w.an === dran));
+}
+
+/* --- Lose ------------------------------------------------------------------ */
+
+/* Die Seltenheit würfelt das Schicksal: 40/30/18/10/2. Ein Boost schiebt
+   die Gewichte nach oben — Boost 3 garantiert mindestens Silber. */
+const _SELTENHEIT_GEWICHTE = [
+  [40, 30, 18, 10, 2],
+  [25, 30, 25, 15, 5],
+  [10, 25, 30, 25, 10],
+  [0, 0, 45, 40, 15],
+];
+
+function _seltenheitWuerfeln(boost = 0) {
+  const gewichte = _SELTENHEIT_GEWICHTE[Math.max(0, Math.min(3, boost))];
+  const summe = gewichte.reduce((a, b) => a + b, 0);
+  let wurf = Math.random() * summe;
+  for (let i = 0; i < 5; i++) {
+    wurf -= gewichte[i];
+    if (wurf <= 0) return i + 1;
+  }
+  return 1;
+}
+
+function _losSeriePool(serie) {
+  const alle = VORRAT.lose;
+  if (serie === 'belohnung') return alle.filter((l) => l.typ !== 'falle' && l.typ !== 'niete');
+  if (serie === 'grausam') {
+    const boese = alle.filter((l) => l.typ === 'falle' || l.typ === 'niete');
+    return alle.concat(boese, boese);   // doppeltes Gewicht fürs Gemeine
+  }
+  if (serie === 'sanft') return alle.filter((l) => l.typ !== 'falle' && (l.seltenheit || 1) <= 3);
+  return alle;
+}
+
+function vorratLosZiehen(boost = 0, serie = 'basis') {
+  if (!vorratAn()) return null;
+  const pool = _losSeriePool(serie);
+  if (!pool.length) return null;
+  const ziel = _seltenheitWuerfeln(boost);
+  /* Erst die gewürfelte Stufe, dann die nächstniedrigere, dann irgendwas. */
+  for (let s = ziel; s >= 1; s--) {
+    const passend = pool.filter((l) => (l.seltenheit || 1) === s);
+    if (passend.length) return zufall(passend);
+  }
+  return zufall(pool);
+}
+
+const LOS_SELTENHEIT = [
+  { name: 'Standard', farbe: 'rgba(155,144,134,.5)' },
+  { name: 'Gut', farbe: 'rgba(196,140,90,.6)' },
+  { name: 'Selten', farbe: 'rgba(200,200,215,.65)' },
+  { name: 'Sehr selten', farbe: 'rgba(224,180,90,.85)' },
+  { name: 'Jackpot', farbe: 'var(--glut-hell)' },
+];
+
 /* --- Kekse ----------------------------------------------------------------- */
 
 function vorratKekse(rolle, eigene = []) {
@@ -240,7 +311,7 @@ function vorratBlatt() {
   const zeichne = () => {
     anKnopf.textContent = an ? 'Der Vorrat spielt mit' : 'Der Vorrat ist aus';
     anKnopf.className = 'knopf breit' + (an ? ' glut' : ' leer');
-    getrenntKnopf.textContent = getrennt ? 'Ihr seid gerade getrennt' : 'Ihr seid zusammen';
+    getrenntKnopf.textContent = getrennt ? 'Wir sind gerade getrennt' : 'Wir sind zusammen';
     getrenntKnopf.className = 'knopf breit leer';
     stufenreihe.innerHTML = '';
     for (let s = 1; s <= 5; s++) {

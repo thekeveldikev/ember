@@ -22,22 +22,30 @@ SEITEN.ich = function (seite) {
   );
 
   /* --- Wege --- */
+  /* Jede Zeile sagt in einem Alltagssatz, was dahinter passiert — wer
+     hier rät, hat schon verloren. Die Texte kennen die Rolle. */
+  const sie = istDomme();
   seite.append(
     el('div', { class: 'abschnitt' },
-      zeile('Wachsen', 'Stufe, Werte, Karma, Auszeichnungen', () => zeigeSeite('wachsen')),
-      zeile('Pfade', 'Was als Nächstes kommt', () => zeigeSeite('pfade')),
-      zeile('Spannung', 'Uhr, Verborgenes, Krümel, Impulse', () => zeigeSeite('spannung')),
-      zeile('Signale', 'Zeichen, die nur ihr versteht', () => zeigeSeite('signale')),
-      zeile('Wünsche', 'Blind eintragen, gemeinsam finden', () => zeigeSeite('wuensche')),
-      zeile('Grenzen', 'Was geht, was nicht, was vielleicht', () => zeigeSeite('grenzen')),
-      zeile('Tresor', 'Bilder, die sie freigibt', () => zeigeSeite('tresor')),
-      zeile('Rituale', 'Was wiederkehrt, und was bevorsteht', () => zeigeSeite('rituale')),
-      zeile('Der Vertrag', 'Was zwischen euch gilt', () => zeigeSeite('vertrag')),
-      zeile('Danach', 'Getrennt schreiben, zusammen lesen', () => zeigeSeite('nachher')),
-      zeile('Nur für dich', 'Bleibt auf diesem Gerät', () => zeigeSeite('eigenes')),
-      zeile('Das Buch', 'Einträge und Wärmekarte', () => zeigeSeite('buch')),
-      zeile('Wie geht\'s dir?', ampelWort(D.ampel[D.rolle]), () => ampelBlatt()),
-      istDomme() ? zeile('Verwaltung', 'Alles, was nur dich angeht', () => zeigeSeite('verwaltung')) : null
+      zeile('Wachsen', sie ? 'Seine Stufe, seine Punkte — du vergibst Auszeichnungen' : 'Deine Stufe und Punkte. Erledigtes zahlt hier ein', () => zeigeSeite('wachsen')),
+      zeile('Pfade', sie ? 'Baue ihm Stufenpläne — er sieht nur die nächste' : 'Deine Stufenpläne. Die nächste Stufe siehst du, mehr nicht', () => zeigeSeite('pfade')),
+      zeile('Spannung', sie ? 'Countdown stellen, Hinweise streuen, Überraschungen legen' : 'Was heute noch kommt — wenn sie etwas gelegt hat', () => zeigeSeite('spannung')),
+      zeile('Signale', 'Eigene Codewörter mit fester Bedeutung anlegen', () => zeigeSeite('signale')),
+      zeile('Wünsche', 'Jeder trägt blind ein — die App zeigt nur, was beide wollen', () => zeigeSeite('wuensche')),
+      zeile('Grenzen', 'Festhalten, was geht, was nicht und was vielleicht', () => zeigeSeite('grenzen')),
+      zeile('Körperkarte', 'Zone für Zone: Liebe ich, mag ich, bitte nicht', () => zeigeSeite('koerper')),
+      zeile('Tresor', sie ? 'Bilder hochladen und einzeln für ihn freigeben' : 'Bilder, die sie für dich freigegeben hat', () => zeigeSeite('tresor')),
+      zeile('Rituale', 'Was regelmäßig wiederkehrt — mit Serie fürs Dranbleiben', () => zeigeSeite('rituale')),
+      zeile('Der Vertrag', 'Unsere Abmachung, schwarz auf weiß, von beiden unterschrieben', () => zeigeSeite('vertrag')),
+      zeile('Danach', 'Nach einer Session: getrennt schreiben, dann zusammen lesen', () => zeigeSeite('nachher')),
+      zeile('Reparatur', 'Nach einem Streit: drei ruhige Schritte, keine Punkte', () => zeigeSeite('reparatur')),
+      zeile('Unsere Wörter', 'Das Wörterbuch für alles, was nur wir zwei verstehen', () => zeigeSeite('glossar')),
+      zeile('Das Regal', 'Was an Spielzeug da ist — die Decks richten sich danach', () => zeigeSeite('toys')),
+      zeile('Wenn — Dann', sie ? 'Regeln bauen, die von selbst feuern' : 'Ob gerade Regeln über dich laufen', () => zeigeSeite('maschine')),
+      zeile('Nur für dich', 'Private Notizen. Verlassen dieses Gerät nie', () => zeigeSeite('eigenes')),
+      zeile('Das Buch', 'Unser Tagebuch: Einträge, Flammen, Wärmekarte', () => zeigeSeite('buch')),
+      zeile('Wie geht\'s dir?', 'Deine Ampel steht auf ' + ampelWort(D.ampel[D.rolle]) + ' — antippen zum Ändern', () => ampelBlatt()),
+      istDomme() ? zeile('Verwaltung', 'Dein Werkzeugkasten: anlegen, steuern, aufräumen', () => zeigeSeite('verwaltung')) : null
     )
   );
 
@@ -50,8 +58,8 @@ SEITEN.ich = function (seite) {
   seite.append(
     el('div', { class: 'abschnitt' },
       el('p', { class: 'winzig still', style: { margin: '0 0 9px 2px' } }, 'Räume'),
-      zeile('Dieser Raum: ' + (raumName() || '—'), 'Wechseln oder neuen anlegen', () => raumWechslerBlatt()),
-      zeile('Raum umbenennen', '', () => {
+      zeile('Dieser Raum: ' + (raumName() || '—'), 'Ein Raum ist eine eigene Welt — zum Proben oder für uns. Antippen zum Wechseln', () => raumWechslerBlatt()),
+      zeile('Raum umbenennen', 'Nur der Name ändert sich, sonst nichts', () => {
         eingabeBlatt({ titel: 'Raum umbenennen', wert: raumName(), jaText: 'Umbenennen' }, (name) => {
           raumUmbenennen(aktiverRaumId(), name);
           zeigeSeite('ich');
@@ -64,10 +72,10 @@ SEITEN.ich = function (seite) {
   seite.append(
     el('div', { class: 'abschnitt' },
       el('p', { class: 'winzig still', style: { margin: '0 0 9px 2px' } }, 'Sicherheit'),
-      zeile('Jemand schaut mit', 'Wird zur Notizliste', () => tarnungAn()),
-      Gerät.lies('schrank') ? zeile('Jetzt abschließen', 'PIN wird wieder verlangt', () => abschliessen())
-        : zeile('Eine PIN setzen', 'Ohne PIN liegt der Schlüssel offen', () => pinNachtraeglich()),
-      zeile('Schließt sich nach', schliessNachText(), () => schliessNachSetzen())
+      zeile('Jemand schaut mit', 'Ein Tipp, und die App sieht aus wie eine Notizliste. Dreimal aufs Wort EMBER tippen holt sie zurück', () => tarnungAn()),
+      Gerät.lies('schrank') ? zeile('Jetzt abschließen', 'Sofort zu — beim nächsten Öffnen fragt die App nach der PIN', () => abschliessen())
+        : zeile('Eine PIN setzen', 'Damit niemand die App einfach öffnen kann, der das Handy hat', () => pinNachtraeglich()),
+      zeile('Schließt sich nach', schliessNachText() + ' im Hintergrund — dann braucht es die PIN', () => schliessNachSetzen())
     )
   );
 
@@ -75,22 +83,22 @@ SEITEN.ich = function (seite) {
   seite.append(
     el('div', { class: 'abschnitt' },
       el('p', { class: 'winzig still', style: { margin: '0 0 9px 2px' } }, 'Die App'),
-      zeile('Nach einer neuen Fassung sehen', 'Du hast ' + APP_VERSION, () => sucheAppUpdate(true)),
-      zeile('Sichtwechsel', 'Dieses Gerät als ' + nameVon(andereRolle()) + ' sehen', () => sichtWechseln()),
-      zeile('Nachts leiser ab', Gerät.lies('spaetAb', 22) + ':00 Uhr', () => spaetSetzen()),
-      zeile('Töne', toeneAn() ? 'An — Keks, Rad und Knopf klingen leise' : 'Aus', () => {
+      zeile('Nach einer neuen Fassung sehen', 'Du hast ' + APP_VERSION + ' — hier holst du dir Neues sofort', () => sucheAppUpdate(true)),
+      zeile('Sichtwechsel', 'Dieses Gerät zeigt dann die Sicht von ' + nameVon(andereRolle()) + ' — zum Ausprobieren', () => sichtWechseln()),
+      zeile('Nachts leiser ab', 'Ab ' + Gerät.lies('spaetAb', 22) + ':00 Uhr wird die App wärmer und dunkler', () => spaetSetzen()),
+      zeile('Töne', toeneAn() ? 'An — Keks, Rad und Knopf klingen leise. Antippen schaltet aus' : 'Aus. Antippen schaltet an', () => {
         Gerät.schreib('toene', !toeneAn());
         if (toeneAn()) tonSpielen('weich');
         zeigeSeite('ich');
       }),
-      zeile('Letzte Fehler', (Gerät.lies('fehlerlog', []).length || 'keine') + ' notiert', () => fehlerlogZeigen()),
-      istDomme() ? zeile('Kopplungscode zeigen', 'Für ein weiteres Gerät', () => kopplungscodeNochmal()) : null,
-      zeile('Diesen Raum vom Gerät nehmen', 'Alles Gemeinsame bleibt in der Ablage', () => geraetLeeren(), true)
+      zeile('Letzte Fehler', (Gerät.lies('fehlerlog', []).length || 'Keine') + ' notiert — bei Problemen hier nachsehen', () => fehlerlogZeigen()),
+      istDomme() ? zeile('Kopplungscode zeigen', 'Damit ein weiteres Gerät in diesen Raum kommt', () => kopplungscodeNochmal()) : null,
+      zeile('Diesen Raum vom Gerät nehmen', 'Nur dieses Gerät vergisst ihn — alles Gemeinsame bleibt gespeichert', () => geraetLeeren(), true)
     )
   );
 
   seite.append(el('p', { class: 'still klein mitte', style: { padding: '10px 0 20px' } },
-    'EMBER ' + APP_VERSION + ' · nur ihr beide'));
+    'EMBER ' + APP_VERSION + ' · nur wir beide'));
 };
 
 /* --- Bausteine ------------------------------------------------------------ */
@@ -383,7 +391,9 @@ SEITEN.verwaltung = function (seite) {
       zeile('Foto-Auftrag', 'Mit laufender Uhr', () => fotoAuftragGeben()),
       zeile('Sperre', 'Nichts ohne deine Erlaubnis', () => sperreSetzen()),
       zeile('Boss', 'Eine Prüfung mit Belohnung', () => bossAnlegen()),
-      zeile('Impuls', 'Kommt, wann er kommt', () => impulsAnlegen())
+      zeile('Impuls', 'Kommt, wann er kommt', () => impulsAnlegen()),
+      zeile('Regie-Skript', 'Aus Bausteinen, für später', () => regieBauen()),
+      zeile('Wenn-Dann-Regel', 'Feuert von selbst', () => zeigeSeite('maschine'))
     )
   );
 

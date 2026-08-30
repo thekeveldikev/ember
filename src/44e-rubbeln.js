@@ -1,12 +1,16 @@
 /* ==========================================================================
    44e-rubbeln.js — Rubbellose.
 
-   Sie legt etwas darunter, er rubbelt es frei. Das Haptische ist der Punkt:
-   Ein Knopf, der dasselbe enthüllt, fühlt sich nicht annähernd gleich an.
+   Sie legt etwas darunter, er rubbelt es frei. Das Haptische ist der
+   Punkt: Ein Knopf, der dasselbe enthüllt, fühlt sich nicht annähernd
+   gleich an.
 
-   Technisch: eine Leinwand über dem Inhalt, aus der der Finger Löcher
-   radiert. Wenn genug weg ist, verschwindet der Rest von selbst — niemand
-   soll das letzte Eckchen suchen müssen.
+   Seit dem Vorrat ist es ein richtiges Losspiel: ein Tageslos je Tag,
+   Seltenheiten von Grau bis Rotgold (2 % Jackpot), und nicht jedes Los
+   ist ein Gewinn — es gibt Nieten, Fallen, Gutscheine fürs Portemonnaie,
+   Zeitschlösser und Blindlose, bei denen sie erst schreibt, WENN er
+   gerubbelt hat. Sie kann die Serie wählen und Lose präparieren, ohne
+   dass er es merkt.
    ========================================================================== */
 
 SEITEN.rubbeln = function (seite) {
@@ -14,22 +18,117 @@ SEITEN.rubbeln = function (seite) {
     el('button', { class: 'winzig still', onclick: () => zeigeSeite('spiel') }, 'Zurück')
   ));
 
+  const blindplatz = el('div');
+  const tagesplatz = el('div');
   const platz = el('div');
-  seite.append(platz);
+  seite.append(blindplatz, tagesplatz, platz);
+
+  blindlosKarte(blindplatz);
+  tageslosKarte(tagesplatz);
 
   const stopp = datenHorch('lose', (lose) => loseZeichnen(platz, lose));
   beimVerlassen(stopp);
 };
 
+/* --- Das Tageslos ---------------------------------------------------------- */
+
+async function tageslosKarte(platz) {
+  platz.innerHTML = '';
+  if (istDomme() || !vorratAn()) return;
+
+  const heute = tagstempel();
+  if (Gerät.lies('tageslosTag') === heute) return;
+
+  platz.append(el('div', { class: 'karte glimmt', style: { textAlign: 'center', marginBottom: '12px' } },
+    el('p', { class: 'winzig still', style: { marginBottom: '4px' } }, 'Dein Tageslos'),
+    el('p', { class: 'leise klein', style: { marginBottom: '12px' } },
+      'Eins pro Tag. Was drunter liegt, weißt du erst, wenn du rubbelst — nicht jedes ist ein Gewinn.'),
+    el('button', {
+      class: 'knopf glut breit',
+      onclick: async () => {
+        /* Ein präpariertes Los schlägt den Zufall — und er merkt nichts. */
+        let gezogen = await datenLies('losPraepariert').catch(() => null);
+        if (gezogen) {
+          datenLoesch('losPraepariert').catch(() => {});
+        } else {
+          const serie = await datenLies('einst/losSerie', 'basis').catch(() => 'basis');
+          gezogen = vorratLosZiehen(0, serie);
+        }
+        if (!gezogen) return meldung('Heute liegt nichts im Topf.');
+
+        Gerät.schreib('tageslosTag', heute);
+        const id = await datenAnhaengen('lose', {
+          titel: 'Tageslos',
+          text: gezogen.text,
+          typ: gezogen.typ || 'sofort',
+          seltenheit: gezogen.seltenheit || 1,
+          bedingung: gezogen.bedingung || null,
+          verweis: gezogen.verweis || null,
+          aufgedeckt: false,
+        });
+        platz.innerHTML = '';
+        losOeffnen({ id, titel: 'Tageslos', ...gezogen, aufgedeckt: false });
+      },
+    }, 'Ziehen und rubbeln')
+  ));
+}
+
+/* --- Blindlos: sie schreibt, nachdem er gerubbelt hat ---------------------- */
+
+async function blindlosKarte(platz) {
+  platz.innerHTML = '';
+  const offen = await datenLies('blindlos').catch(() => null);
+  if (!offen || !istDomme()) return;
+
+  const feld = el('textarea', { class: 'feld', rows: 2, placeholder: 'Was gilt? Schreib das Erste, das kommt.' });
+  const uhr = el('span', { class: 'zier', style: { color: 'var(--glut-hell)', fontVariantNumeric: 'tabular-nums' } });
+
+  const karte = el('div', { class: 'karte glimmt', style: { marginBottom: '12px' } },
+    el('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' } },
+      el('p', { class: 'winzig still' }, 'Blindlos — er wartet'),
+      uhr
+    ),
+    el('p', { class: 'leise klein', style: { margin: '6px 0 10px' } },
+      'Er hat ein Blindlos gerubbelt. Was du jetzt schreibst, steht darunter.'),
+    feld,
+    el('button', {
+      class: 'knopf glut breit', style: { marginTop: '11px' },
+      onclick: async () => {
+        const text = feld.value.trim();
+        if (!text) return meldung('Da steht noch nichts.');
+        await datenAendern('lose', offen.losId, { text, blindWartet: false });
+        await datenLoesch('blindlos');
+        pushSenden('sub', 'antwort', 'Es steht fest.');
+        meldung('Er liest es jetzt.');
+        zeigeSeite('rubbeln');
+      },
+    }, 'So gilt es')
+  );
+
+  /* Die 60 Sekunden sind Ansporn, kein Gesetz — danach gilt trotzdem,
+     was sie schreibt. Aber die Uhr macht es zu ihrem Spiel. */
+  const ende = (offen.wann || jetzt()) + 60000;
+  const tick = setInterval(() => {
+    if (!karte.isConnected) return clearInterval(tick);
+    const uebrig = ende - jetzt();
+    uhr.textContent = uebrig > 0 ? Math.ceil(uebrig / 1000) + ' s' : 'Zeit ist um — schreib trotzdem.';
+  }, 500);
+
+  platz.append(karte);
+  setTimeout(() => feld.focus(), 300);
+}
+
+/* --- Die Liste ------------------------------------------------------------- */
+
 function loseZeichnen(platz, lose) {
   platz.innerHTML = '';
 
   const offen = lose.filter((l) => !l.aufgedeckt);
-  const alte = lose.filter((l) => l.aufgedeckt);
+  const boerse = lose.filter((l) => l.aufgedeckt && l.typ === 'gutschein' && !l.eingeloest);
+  const alte = lose.filter((l) => l.aufgedeckt && !(l.typ === 'gutschein' && !l.eingeloest));
 
-  if (!offen.length) {
-    platz.append(leerlauf('Keine Lose',
-      istDomme() ? 'Leg eins an — er sieht nur, dass es da ist.' : 'Gerade liegt keins bereit.'));
+  if (!offen.length && !boerse.length && istDomme()) {
+    platz.append(leerlauf('Keine Lose', 'Leg eins an — er sieht nur, dass es da ist.'));
   }
 
   offen.forEach((los) => {
@@ -60,30 +159,133 @@ function loseZeichnen(platz, lose) {
     platz.append(karte);
   });
 
+  /* --- Das Portemonnaie: Gutscheine, die noch gelten --- */
+  if (boerse.length) {
+    platz.append(el('p', { class: 'winzig still', style: { margin: '16px 0 7px 2px' } }, 'Portemonnaie'));
+    boerse.forEach((los) => {
+      const s = LOS_SELTENHEIT[(los.seltenheit || 1) - 1];
+      const karte = el('div', {
+        class: 'karte',
+        style: { marginTop: '8px', borderLeft: '3px solid ' + s.farbe },
+      },
+        el('p', { class: 'winzig still', style: { marginBottom: '4px' } }, 'Gutschein · ' + s.name),
+        el('div', {}, los.text),
+        los.einloeseWunsch
+          ? (istDomme()
+              ? el('div', { class: 'knopfreihe', style: { marginTop: '11px' } },
+                  el('button', {
+                    class: 'knopf leer', style: { minHeight: '38px', fontSize: '13px' },
+                    onclick: async () => { await datenAendern('lose', los.id, { einloeseWunsch: false }); meldung('Er wartet weiter.'); },
+                  }, 'Noch nicht'),
+                  el('button', {
+                    class: 'knopf glut', style: { minHeight: '38px', fontSize: '13px' },
+                    onclick: async () => {
+                      await datenAendern('lose', los.id, { eingeloest: true, eingeloestWann: jetzt() });
+                      pushSenden('sub', 'antwort', 'Eingelöst.');
+                      meldung('Eingelöst — jetzt gilt es.');
+                    },
+                  }, 'Einlösen')
+                )
+              : el('p', { class: 'still klein', style: { marginTop: '8px' } }, 'Zum Einlösen vorgelegt. Sie entscheidet.'))
+          : (!istDomme()
+              ? el('button', {
+                  class: 'knopf leer breit', style: { marginTop: '11px', minHeight: '38px', fontSize: '13px' },
+                  onclick: async () => {
+                    await datenAendern('lose', los.id, { einloeseWunsch: true, einloeseWann: jetzt() });
+                    pushSenden('domme', 'bitte', 'Er will einen Gutschein einlösen.');
+                    meldung('Vorgelegt. Sie entscheidet.');
+                  },
+                }, 'Einlösen')
+              : null)
+      );
+      platz.append(karte);
+    });
+  }
+
   if (istDomme()) {
     platz.append(el('button', {
       class: 'knopf leer breit', style: { marginTop: '12px' },
       onclick: losAnlegen,
-    }, '+ Neues Los'));
+    }, '+ Eigenes Los hinlegen'));
+
+    platz.append(el('div', { style: { display: 'flex', justifyContent: 'center', gap: '18px', marginTop: '12px' } },
+      el('button', { class: 'winzig still', onclick: losSerieWaehlen }, 'Serie wählen'),
+      el('button', { class: 'winzig still', onclick: losPraeparieren }, 'Ein Los präparieren')
+    ));
   }
 
   if (alte.length) {
     platz.append(el('div', { class: 'trenner' }),
       el('p', { class: 'winzig still', style: { marginBottom: '9px' } }, 'Schon aufgedeckt'));
     alte.slice(-6).reverse().forEach((los) => {
-      platz.append(el('div', { class: 'karte', style: { padding: '11px 13px' } },
+      platz.append(el('div', { class: 'karte', style: { padding: '11px 13px', opacity: los.typ === 'niete' ? '.55' : '1' } },
         el('div', {}, los.text),
-        el('p', { class: 'winzig still', style: { marginTop: '5px' } }, vorZeit(los.wann))
+        el('p', { class: 'winzig still', style: { marginTop: '5px' } },
+          (los.typ && los.typ !== 'sofort' ? los.typ + ' · ' : '') + vorZeit(los.aufgedecktWann || los.wann))
       ));
     });
   }
 }
 
-/* --- Das Rubbeln ---------------------------------------------------------- */
+/* --- Serie und Präparieren (nur sie) --------------------------------------- */
+
+function losSerieWaehlen() {
+  const SERIEN = [
+    { key: 'basis', name: 'Standard', text: 'Alles kann kommen — auch Nieten und Fallen.' },
+    { key: 'belohnung', name: 'Belohnung', text: 'Nur Gutes. Keine Fallen, keine Nieten.' },
+    { key: 'grausam', name: 'Grausam', text: 'Doppelt so viele Fallen und Nieten.' },
+    { key: 'sanft', name: 'Sanft', text: 'Ruhig und harmlos — für stille Tage.' },
+  ];
+  const b = blatt(
+    el('h2', {}, 'Welche Serie?'),
+    el('p', { class: 'leise klein', style: { margin: '7px 0 10px' } },
+      'Bestimmt, aus welchem Topf sein Tageslos kommt. Er erfährt es nicht.'),
+    ...SERIEN.map((s) => el('button', {
+      class: 'karte', style: { width: '100%', textAlign: 'left', marginTop: '9px' },
+      onclick: async () => {
+        b.schliessen();
+        await datenSchreib('einst/losSerie', s.key);
+        meldung('Ab jetzt: ' + s.name + '.');
+      },
+    },
+      el('div', { style: { fontWeight: '500' } }, s.name),
+      el('div', { class: 'still klein' }, s.text)
+    ))
+  );
+}
+
+function losPraeparieren() {
+  eingabeBlatt({
+    titel: 'Ein Los präparieren',
+    hinweis: 'Sein nächstes Tageslos ist dann genau das hier — er hält es für Zufall.',
+    platzhalter: 'Was unter der Schicht stehen soll …',
+    mehrzeilig: true,
+    jaText: 'Unterschieben',
+  }, async (text) => {
+    await datenSchreib('losPraepariert', { text, typ: 'sofort', seltenheit: 4 });
+    meldung('Liegt bereit. Er merkt nichts.');
+  });
+}
+
+/* --- Das Rubbeln ----------------------------------------------------------- */
 
 function losOeffnen(los) {
   const breite = 320;
   const hoehe = 190;
+
+  const seltenheit = LOS_SELTENHEIT[(los.seltenheit || 1) - 1];
+  const blind = los.typ === 'blind';
+  const niete = los.typ === 'niete';
+
+  const inhaltText = blind ? 'Sie schreibt es JETZT — gleich steht es hier.' : los.text;
+
+  const textEl = el('div', {
+    class: 'zier',
+    style: {
+      fontSize: '20px', lineHeight: '1.3',
+      color: niete ? 'var(--schrift-still)' : 'inherit',
+    },
+  }, inhaltText);
 
   const darunter = el('div', {
     style: {
@@ -93,7 +295,7 @@ function losOeffnen(los) {
     },
   }, los.bild
       ? el('img', { src: los.bild, style: { maxWidth: '100%', maxHeight: '150px', borderRadius: '10px' } })
-      : el('div', { class: 'zier', style: { fontSize: '21px', lineHeight: '1.3' } }, los.text));
+      : textEl);
 
   const tafel = el('canvas', {
     width: String(breite * 2), height: String(hoehe * 2),
@@ -109,18 +311,20 @@ function losOeffnen(los) {
       height: hoehe + 'px', margin: '6px auto 0',
       borderRadius: '16px', overflow: 'hidden',
       boxShadow: '0 8px 30px -10px var(--schein)',
+      border: '1px solid transparent',
+      transition: 'border-color .5s ease, box-shadow .5s ease',
     },
   }, darunter, tafel);
 
   const hinweis = el('p', { class: 'still klein mitte', style: { marginTop: '14px' } }, 'Rubbel es frei.');
+  const nachspiel = el('div');
 
   const b = blatt(
     el('p', { class: 'winzig still mitte', style: { marginBottom: '4px' } }, los.titel || 'Ein Los'),
-    rahmen, hinweis
+    rahmen, hinweis, nachspiel
   );
 
-  /* Die Deckschicht: warmes Metall mit ein wenig Unruhe, damit es nicht
-     nach einem grauen Rechteck aussieht. */
+  /* Die Deckschicht: warmes Metall mit ein wenig Unruhe. */
   const stift = tafel.getContext('2d');
   const verlauf = stift.createLinearGradient(0, 0, tafel.width, tafel.height);
   verlauf.addColorStop(0, '#8f5539');
@@ -174,8 +378,6 @@ function losOeffnen(los) {
     if (Math.random() < 0.09) pruefen();
   };
 
-  /* Wie viel ist schon weg? Eine Stichprobe reicht — jeden Punkt zu
-     zählen wäre bei jedem Strich zu teuer. */
   function pruefen() {
     const daten = stift.getImageData(0, 0, tafel.width, tafel.height).data;
     let leer = 0, gezaehlt = 0;
@@ -186,16 +388,77 @@ function losOeffnen(los) {
     if (gezaehlt && leer / gezaehlt > 0.52) enthuellen();
   }
 
-  function enthuellen() {
+  async function enthuellen() {
     if (fertig) return;
     fertig = true;
     tafel.style.transition = 'opacity .5s ease';
     tafel.style.opacity = '0';
     hinweis.textContent = '';
-    puls('antwortJa');
     setTimeout(() => tafel.remove(), 520);
-    datenAendern('lose', los.id, { aufgedeckt: true, aufgedecktWann: jetzt() });
-    if (!istDomme()) pushSenden('domme', 'hinweis', 'Er hat gerubbelt.');
+
+    await datenAendern('lose', los.id, { aufgedeckt: true, aufgedecktWann: jetzt(), blindWartet: blind });
+    if (!istDomme() && !blind) pushSenden('domme', 'hinweis', 'Er hat gerubbelt.');
+
+    /* Jetzt zeigt sich, was für ein Los es war. */
+    const s = los.seltenheit || 1;
+    if (s >= 3 && !niete) {
+      rahmen.style.borderColor = seltenheit.farbe;
+      rahmen.style.boxShadow = '0 0 34px -6px ' + seltenheit.farbe;
+      nachspiel.append(el('p', {
+        class: 'winzig mitte',
+        style: { marginTop: '10px', color: seltenheit.farbe, letterSpacing: '.2em' },
+      }, seltenheit.name.toUpperCase()));
+    }
+
+    if (los.typ === 'jackpot' || s === 5) {
+      tonSpielen('weich');
+      puls('antwortJa');
+      konfetti();
+    } else if (niete) {
+      puls('antwortNein');
+      nachspiel.append(el('p', { class: 'still klein mitte', style: { marginTop: '10px' } }, 'So ist das mit Losen.'));
+    } else if (los.typ === 'falle') {
+      tonSpielen('tief');
+      puls('antwortNein');
+      if (!istDomme()) {
+        await datenAnhaengen('strafen', { text: 'Fallen-Los: ' + los.text, enthuellt: true, erledigt: false }).catch(() => {});
+      }
+      nachspiel.append(el('p', { class: 'winzig mitte', style: { marginTop: '10px', color: 'var(--rot)', letterSpacing: '.2em' } }, 'EINE FALLE'));
+    } else if (los.typ === 'gutschein') {
+      tonSpielen('weich');
+      puls('antwortJa');
+      nachspiel.append(el('p', { class: 'still klein mitte', style: { marginTop: '10px' } }, 'Liegt jetzt in deinem Portemonnaie — einlösen, wann du dich traust.'));
+    } else if (los.typ === 'zeitschloss') {
+      nachspiel.append(el('p', { class: 'still klein mitte', style: { marginTop: '10px' } }, 'Ein Zeitschloss — es gilt, wenn die Zeit reif ist. Steht im Text.'));
+    } else if (los.typ === 'bedingt' && los.bedingung) {
+      nachspiel.append(el('p', { class: 'still klein mitte', style: { marginTop: '10px' } }, 'Nur wenn: ' + los.bedingung));
+    } else if (los.typ === 'wildcard' && los.verweis) {
+      const ziel = /rad/i.test(los.verweis) ? 'rad' : /deck|karte/i.test(los.verweis) ? 'spiel' : null;
+      if (ziel) {
+        nachspiel.append(el('button', {
+          class: 'knopf glut breit', style: { marginTop: '12px' },
+          onclick: () => { b.schliessen(); zeigeSeite(ziel); },
+        }, 'Dann los'));
+      }
+    } else if (blind) {
+      await datenSchreib('blindlos', { losId: los.id, wann: jetzt() });
+      pushSenden('domme', 'befehl', 'Blindlos! 60 Sekunden — schreib.');
+      nachspiel.append(el('p', { class: 'still klein mitte', style: { marginTop: '10px' } },
+        'Sie hat 60 Sekunden. Lass das Blatt offen — es füllt sich von selbst.'));
+      /* Und wirklich live: sobald ihr Text da ist, erscheint er hier. */
+      const horch = ablageHorch('lose/' + los.id, async () => {
+        const frisch = await datenLies('lose/' + los.id).catch(() => null);
+        if (frisch && frisch.text && !frisch.blindWartet) {
+          textEl.textContent = frisch.text;
+          textEl.style.animation = 'einblenden .4s ease';
+          tonSpielen('weich');
+          puls('befehl');
+          horch.then((f) => f && f()).catch(() => {});
+        }
+      });
+    } else {
+      puls('antwortJa');
+    }
   }
 
   tafel.addEventListener('pointerdown', (e) => { rubbelt = true; letzte = null; kratzen(e); });
@@ -203,6 +466,22 @@ function losOeffnen(los) {
   tafel.addEventListener('pointerup', () => { rubbelt = false; letzte = null; pruefen(); });
   tafel.addEventListener('pointerleave', () => { rubbelt = false; letzte = null; });
   tafel.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+}
+
+/* Ein kurzer, warmer Funkenregen — für die zwei Prozent. */
+function konfetti() {
+  for (let i = 0; i < 26; i++) {
+    const teil = el('div', { class: 'kruemel' });
+    teil.style.left = (window.innerWidth / 2 + (Math.random() * 60 - 30)) + 'px';
+    teil.style.top = (window.innerHeight * 0.35) + 'px';
+    teil.style.width = teil.style.height = (3 + Math.random() * 4) + 'px';
+    teil.style.background = ['#e8a87c', '#c4785a', '#e0b45a', '#f0e6d3'][i % 4];
+    teil.style.setProperty('--kx', (Math.random() * 260 - 130) + 'px');
+    teil.style.setProperty('--ky', (Math.random() * 200 - 40) + 'px');
+    teil.style.animationDuration = (0.7 + Math.random() * 0.5) + 's';
+    document.body.append(teil);
+    setTimeout(() => teil.remove(), 1300);
+  }
 }
 
 /* --- Anlegen -------------------------------------------------------------- */
@@ -245,6 +524,8 @@ function losAnlegen() {
             titel: titel.value.trim() || 'Ein Los',
             text: text.value.trim(),
             bild,
+            typ: 'sofort',
+            seltenheit: 4,
             aufgedeckt: false,
           });
           pushSenden('sub', 'hinweis', 'Ein Los liegt bereit.');

@@ -24,7 +24,45 @@ const vorrat = {
   challenges: [],      // Stufen 1–5 (id ch…)
   challengePools: { wochenende: [], getrennt: [], ruhig: [], domme: [] },
   kekse: [],           // [{id,text,kategorie,fuer,intensitaet,tageszeit}]
+  wup: [],             // Wahrheit oder Pflicht: [{id,text,typ,stufe,intensitaet,an,kategorie,dauer_min,tags}]
+  lose: [],            // [{id,text,typ,seltenheit,einloesbar_bis,bedingung,verweis,tags}]
+  loseQuellen: [],     // [{key,name,beschreibung,seltenheits_boost}]
+  loseSerien: [],      // [{key,name,beschreibung,...}]
+  regien: [],          // Session-Skripte: [{id,name,beschreibung,gesamtdauer_min,intensitaet,anzeige,schritte:[…]}]
+  regieBausteine: [],  // [{key,text,dauer_sek,typ}]
+  regeln: [],          // Wenn-Dann-Bibliothek: [{id,name,aktiv,ausloeser,bedingungen,aktionen}]
+  toysMeta: null,      // {felder,kategorien,material_warnungen}
 };
+
+/* Die Stimme geraderücken: Texte, die BEI den beiden ankommen, dürfen
+   nicht über sie reden wie eine dritte App von außen. Aus „ihr beide"
+   wird „wir beide" — nur dort, wo die Grammatik es sauber hergibt. */
+function wirStimme(s) {
+  if (typeof s !== 'string') return s;
+  return s
+    .replace(/\bIhr beide\b/g, 'Wir beide')
+    .replace(/\bihr beide\b/g, 'wir beide')
+    .replace(/\bIhr zwei\b/g, 'Wir zwei')
+    .replace(/\bihr zwei\b/g, 'wir zwei')
+    .replace(/\bIhr habt\b/g, 'Wir haben')
+    .replace(/\bihr habt\b/g, 'wir haben')
+    .replace(/\bZwischen euch\b/g, 'Zwischen uns')
+    .replace(/\bnur ihr zwei\b/g, 'nur wir zwei');
+}
+
+function wirStimmeTief(wert) {
+  if (typeof wert === 'string') return wirStimme(wert);
+  if (Array.isArray(wert)) return wert.map(wirStimmeTief);
+  if (wert && typeof wert === 'object') {
+    const raus = {};
+    for (const [k, v] of Object.entries(wert)) {
+      raus[k] = (k === 'text' || k === 'text_domme' || k === 'text_sub' || k === 'beschreibung')
+        ? wirStimme(v) : wirStimmeTief(v);
+    }
+    return raus;
+  }
+  return wert;
+}
 
 const dateien = readdirSync(ordner).filter((d) => d.endsWith('.md')).sort();
 let bloecke = 0;
@@ -37,10 +75,14 @@ for (const datei of dateien) {
     let wert;
     try { wert = JSON.parse(roh); }
     catch (f) { console.error(`JSON kaputt in ${datei}: ${f.message}`); process.exit(1); }
+    wert = wirStimmeTief(wert);
     bloecke++;
 
     if (Array.isArray(wert)) {
       const erst = wert[0] || {};
+      if (erst.typ === 'wahrheit' || erst.typ === 'pflicht') { vorrat.wup.push(...wert); continue; }
+      if (erst.seltenheit !== undefined) { vorrat.lose.push(...wert); continue; }
+      if (erst.ausloeser && erst.aktionen) { vorrat.regeln.push(...wert); continue; }
       if (erst.deck) { vorrat.dares.push(...wert); continue; }
       if (erst.slot) {
         for (const b of wert) (vorrat.szenarioSlots[b.slot] = vorrat.szenarioSlots[b.slot] || []).push(b);
@@ -61,9 +103,17 @@ for (const datei of dateien) {
     }
 
     if (wert.segmente) { vorrat.raeder.push(wert); continue; }
+    if (wert.schritte) { vorrat.regien.push(wert); continue; }
     if (wert.kombinationen) { vorrat.radKombis.push(...wert.kombinationen); continue; }
     if (wert.decks) { vorrat.deckMeta.push(...wert.decks); continue; }
     if (wert.templates) { vorrat.szenarioTemplates.push(...wert.templates); continue; }
+    if (wert.quellen) { vorrat.loseQuellen.push(...wert.quellen); continue; }
+    if (wert.serien) { vorrat.loseSerien.push(...wert.serien); continue; }
+    if (wert.bausteine) { vorrat.regieBausteine.push(...wert.bausteine); continue; }
+    if (wert.felder && wert.material_warnungen) { vorrat.toysMeta = wert; continue; }
+    if (wert.muster) continue;            // Haptik: die Muster leben als PULS im Code
+    if (wert.ausloeser || wert.bedingungen || wert.aktionen) continue; // Katalog: der Code kennt nur, was er kann
+    if (wert.mechanik || wert.sicherungen || wert.beispiel_kette || wert.beispiel_eintraege) continue;
     if (wert.auswahl_regeln || wert.auswahl) continue; // Regeln stehen im Code, nicht in Daten
     console.error(`Unbekannter Block in ${datei} (Felder: ${Object.keys(wert).join(',')})`);
     process.exit(1);
@@ -79,6 +129,10 @@ const zaehlung = {
   challenges: vorrat.challenges.length,
   pools: Object.values(vorrat.challengePools).reduce((s, l) => s + l.length, 0),
   kekse: vorrat.kekse.length,
+  wup: vorrat.wup.length,
+  lose: vorrat.lose.length,
+  regien: vorrat.regien.length,
+  regeln: vorrat.regeln.length,
 };
 
 const kopf = `/* ==========================================================================

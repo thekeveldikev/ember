@@ -33,15 +33,17 @@ SEITEN.heim = function (seite) {
   const fotoplatz = el('div');
   const tagesplatz = el('div');
   const aufgabenplatz = el('div');
+  const frageplatz = el('div');
   const knopfplatz = el('div');
   const untenplatz = el('div');
-  seite.append(sperrplatz, fotoplatz, tagesplatz, aufgabenplatz, knopfplatz, untenplatz);
+  seite.append(sperrplatz, fotoplatz, tagesplatz, aufgabenplatz, frageplatz, knopfplatz, untenplatz);
 
   knopfBuehneBauen(knopfplatz);
   sperreKarte(sperrplatz);
   fotoAuftragKarte(fotoplatz);
   tagesNachrichtLaden(tagesplatz);
   tagesaufgabeKarte(aufgabenplatz);
+  checkinZeile(frageplatz);
   untenBauen(untenplatz);
 };
 
@@ -50,6 +52,14 @@ SEITEN.heim = function (seite) {
    einzige Zeile von 0fr auf 1fr wächst — Höhe wird animierbar, ohne dass
    jemand messen muss. */
 function sanftEinfuegen(platz, knoten) {
+  /* Beim stillen Auffrischen derselben Seite stünde die Karte schon da —
+     dann darf sie nicht noch einmal aufklappen, sonst hüpft alles. */
+  if (platz.closest && platz.closest('.seite.still-wechsel')) {
+    const ruhig = el('div', { class: 'aufklapp offen' },
+      el('div', { style: { minHeight: '0' } }, knoten));
+    platz.append(ruhig);
+    return ruhig;
+  }
   const huelle = el('div', { class: 'aufklapp' },
     el('div', { style: { minHeight: '0' } }, knoten));
   platz.append(huelle);

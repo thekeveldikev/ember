@@ -232,7 +232,7 @@ function bildGross(quelle) {
 }
 
 async function nachrichtWegnehmen(id) {
-  const weg = await frage('Wegnehmen?', 'Bei euch beiden. Das lässt sich nicht rückgängig machen.', 'Wegnehmen', true);
+  const weg = await frage('Wegnehmen?', 'Bei uns beiden. Das lässt sich nicht rückgängig machen.', 'Wegnehmen', true);
   if (weg) await datenEintragLoeschen('plausch', id);
 }
 
