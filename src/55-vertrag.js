@@ -413,7 +413,7 @@ function eigenesZeichnen(platz) {
   }, 'Etwas aufschreiben'));
 
   if (!eintraege.length) {
-    platz.append(leerlauf('Noch leer', 'Manches muss erst reifen, bevor man es ausspricht.'));
+    platz.append(leerlauf('Noch leer', 'Für Gedanken, die noch nicht ausgesprochen sind — Entwürfe, Fragen, Halbfertiges. Nur du siehst sie.'));
     return;
   }
 

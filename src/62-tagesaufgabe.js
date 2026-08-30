@@ -46,6 +46,7 @@ async function tagesaufgabenStart() {
 
 async function tagesaufgabeKarte(platz, ruhig = false) {
   if (!platz) return;
+  const aktuell = rennwache(platz);
   platz.innerHTML = '';
   if (!vorratAn()) return;
   if (!(await datenLies('einst/aufgaben', true).catch(() => true))) return;
@@ -58,6 +59,8 @@ async function tagesaufgabeKarte(platz, ruhig = false) {
     : null;
   const serie = await datenLies('aufgabenSerie', { zahl: 0, letzterTag: '' }).catch(() => ({ zahl: 0 }));
 
+  if (!aktuell()) return;
+  platz.innerHTML = '';
   if (eigene) sanftEinfuegen(platz, _aufgabeKarte(eigene, D.rolle, serie, platz), ruhig);
   if (seine && istDomme()) sanftEinfuegen(platz, _aufgabeKarte(seine, 'sub', serie, platz), ruhig);
 }

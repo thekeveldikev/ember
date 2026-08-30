@@ -220,6 +220,8 @@ export function ladeApp({ rolle = 'domme', dateien, ablage = baueAblage() } = {}
       ...(typeof _getarnt !== 'undefined'
         ? { istGetarnt, __tarnung: (an) => { _getarnt = an; } } : {}),
       ...(typeof mischen === 'function' ? { mischen } : {}),
+      ...(typeof rennwache === 'function' ? { rennwache } : {}),
+      ...(typeof tagesaufgabeKarte === 'function' ? { tagesaufgabeKarte } : {}),
       ...(typeof zeigeSeite === 'function' ? { SEITEN, zeigeSeite } : {}),
       ...(typeof maschineFeuern === 'function' ? { maschineFeuern } : {}),
       ...(typeof kontoBuchen === 'function'

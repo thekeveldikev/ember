@@ -110,7 +110,7 @@ SEITEN.glossar = function (seite) {
   const stopp = datenHorch('glossar', (liste) => {
     platz.innerHTML = '';
     if (!liste.length) {
-      platz.append(leerlauf('Noch leer', 'Das erste Wort legt den Grundstein.'));
+      platz.append(leerlauf('Noch leer', 'Legt euer erstes Wort an — mit dem, was es nur zwischen euch bedeutet.'));
     }
     liste.forEach((w) => {
       const zeile = el('div', { class: 'karte', style: { marginTop: '9px', padding: '12px 15px' } },
@@ -185,6 +185,7 @@ const CHECKIN_FRAGEN = [
 ];
 
 async function checkinZeile(platz) {
+  const aktuell = rennwache(platz);
   if (!(await datenLies('einst/frage', true).catch(() => true))) return;
   const heute = tagstempel();
   let summe = 0;
@@ -206,6 +207,8 @@ async function checkinZeile(platz) {
           : 'Frage des Tages'),
     el('span', { class: 'still', style: { flex: 'none', fontSize: '15px' } }, '›')
   );
+  if (!aktuell()) return;
+  platz.innerHTML = '';
   platz.append(zeile);
 }
 

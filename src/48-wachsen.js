@@ -37,6 +37,11 @@ SEITEN.wachsen = function (seite) {
     el('button', { class: 'winzig still', onclick: () => zeigeSeite('ich') }, 'Zurück')
   ));
 
+  seite.append(el('p', { class: 'leise klein', style: { marginBottom: '14px' } },
+    istDomme()
+      ? 'Seine Stufe, seine Punkte, seine Werte — Erledigtes zahlt hier automatisch ein. Auszeichnungen vergibst du selbst.'
+      : 'Deine Stufe und Punkte. Erledigte Aufgaben und Aufträge zahlen hier von selbst ein.'));
+
   const standplatz = el('div', { class: 'abschnitt' });
   const werteplatz = el('div', { class: 'abschnitt' });
   const karmaplatz = el('div', { class: 'abschnitt' });

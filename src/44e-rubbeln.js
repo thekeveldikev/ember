@@ -18,6 +18,11 @@ SEITEN.rubbeln = function (seite) {
     el('button', { class: 'winzig still', onclick: () => zeigeSeite('spiel') }, 'Zurück')
   ));
 
+  seite.append(el('p', { class: 'leise klein', style: { marginBottom: '14px' } },
+    istDomme()
+      ? 'Du legst Lose an, er rubbelt sie frei. Was drunter liegt, weißt bis dahin nur du.'
+      : 'Freirubbeln, was drunter liegt — nicht jedes Los ist ein Gewinn.'));
+
   const blindplatz = el('div');
   const tagesplatz = el('div');
   const platz = el('div');

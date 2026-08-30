@@ -24,6 +24,11 @@ SEITEN.regie = function (seite) {
     el('button', { class: 'winzig still', onclick: () => zeigeSeite('spiel') }, 'Zurück')
   ));
 
+  seite.append(el('p', { class: 'leise klein', style: { marginBottom: '14px' } },
+    istDomme()
+      ? 'Ein Skript führt euch Schritt für Schritt durch eine Szene. Du siehst alle Schritte — er bekommt immer nur den nächsten.'
+      : 'Sie startet ein Skript — du bekommst immer nur den nächsten Schritt, nie den ganzen Plan.'));
+
   const laufplatz = el('div');
   const listenplatz = el('div');
   seite.append(laufplatz, listenplatz);

@@ -19,12 +19,12 @@
    ========================================================================== */
 
 const LADEN_ABTEILUNGEN = [
-  { key: 'kleinigkeiten', name: 'Kleine Gesten', wort: 'Für zwischendurch.' },
-  { key: 'koerper', name: 'Haut & Hände', wort: 'Zum Anfassen.' },
-  { key: 'privilegien', name: 'Freiheiten', wort: 'Für eine Weile mehr Leine.' },
-  { key: 'erlass', name: 'Gnade', wort: 'Was Schulden und Strafen löst.' },
-  { key: 'gross', name: 'Das Große', wort: 'Nur für Siegel. Nur für Verdiente.' },
-  { key: 'gluecksspiel', name: 'Das Risiko', wort: 'Wer wagt, verliert auch mal.' },
+  { key: 'kleinigkeiten', name: 'Kleine Gesten', wort: 'Kleine Belohnungen für wenig Glut — für zwischendurch.' },
+  { key: 'koerper', name: 'Haut & Hände', wort: 'Berührung, Massage, Nähe — alles zum Anfassen.' },
+  { key: 'privilegien', name: 'Freiheiten', wort: 'Erlaubnisse auf Zeit — für eine Weile mehr Leine.' },
+  { key: 'erlass', name: 'Gnade', wort: 'Löst Schulden, Strafen und Ausstehendes ab.' },
+  { key: 'gross', name: 'Das Große', wort: 'Die großen Wünsche. Nur für Siegel — und die muss man sich verdienen.' },
+  { key: 'gluecksspiel', name: 'Das Risiko', wort: 'Lose, Münzwurf, Rad: Glut einsetzen und gewinnen — oder verlieren.' },
 ];
 
 const SIEGEL_KURS = 50;
@@ -225,8 +225,11 @@ function kontoFunkeln(diff) {
 async function heimKontoZeile(platz) {
   const ziel = platz || ($('#kontozeile') && $('#kontozeile').parentNode);
   if (!ziel) return;
+  const aktuell = rennwache(ziel);
   ziel.innerHTML = '';
   const konto = _konto || await kontoLaden();
+  if (!aktuell()) return;
+  ziel.innerHTML = '';
   if (!konto || !konto.an) return;
 
   const sparRoh = konto.spar ? VORRAT.laden.find((a) => a.id === konto.spar) : null;
@@ -239,7 +242,8 @@ async function heimKontoZeile(platz) {
   },
     el('span', { class: 'lichtpunkt' }),
     el('span', { class: 'klein', style: { flex: '1', textAlign: 'left' } },
-      'Deine Glut'),
+      /* Das Konto ist SEINS — bei ihr darf die Zeile nicht „Deine" sagen. */
+      istDomme() ? 'Seine Glut' : 'Deine Glut'),
     el('span', { class: 'klein', style: { flex: 'none', color: 'var(--glut-hell)', fontVariantNumeric: 'tabular-nums' } },
       (konto.karma || 0) + ' ●' + ((konto.siegel || 0) > 0 ? '  ·  ' + konto.siegel + ' ✦' : '')),
     el('span', { class: 'still', style: { flex: 'none', fontSize: '15px' } }, '›')
@@ -252,7 +256,7 @@ async function heimKontoZeile(platz) {
       el('div', { style: { height: '3px', borderRadius: '2px', background: 'var(--grund2)', overflow: 'hidden' } },
         el('div', { style: { height: '100%', width: (anteil * 100) + '%', background: 'var(--verlauf)', borderRadius: '2px', transition: 'width .6s ease' } })),
       el('p', { class: 'winzig still', style: { marginTop: '3px' } },
-        'Du sparst auf: ' + spar.artikel + ' (' + sparPreis + ' ●)')
+        (istDomme() ? 'Er spart auf: ' : 'Du sparst auf: ') + spar.artikel + ' (' + sparPreis + ' ●)')
     ));
   }
 }
@@ -273,7 +277,12 @@ SEITEN.laden = function (seite) {
 
     if (!konto || !konto.an) {
       platz.append(leerlauf('Der Laden ist zu',
-        istDomme() ? 'Öffne ihn — ab dann verdient er, spart er, zahlt er.' : 'Ob er öffnet, entscheidet sie.'));
+        istDomme() ? 'Öffne ihn — ab dann verdient er Glut mit Aufgaben und gibt sie hier aus.'
+          : 'Hier könnte er sein: verdienen, sparen, kaufen. Ob er öffnet, entscheidet sie.'));
+      platz.append(el('button', {
+        class: 'winzig still', style: { display: 'block', margin: '10px auto 0' },
+        onclick: () => ladenErklaerung(),
+      }, 'Wie es funktioniert'));
       if (istDomme()) {
         platz.append(el('button', {
           class: 'knopf glut breit', style: { marginTop: '12px' },
@@ -314,8 +323,20 @@ SEITEN.laden = function (seite) {
       ),
       stufe ? el('p', { class: 'winzig', style: { marginTop: '10px', color: 'var(--rot)', letterSpacing: '.14em' } },
         stufe.name.toUpperCase()) : null,
-      stufe && stufe.gehaltTilgt ? el('p', { class: 'still klein', style: { marginTop: '5px' } },
-        'Das Gehalt tilgt zuerst. Der Laden wartet, bis du wieder im Licht bist.') : null,
+      /* Die Stufe darf kein Rätsel sein: Was sie konkret bedeutet, steht
+         direkt darunter — je Rolle in eigenen Worten. */
+      stufe ? el('p', { class: 'still klein', style: { marginTop: '5px' } },
+        stufe.sieEntscheidet
+          ? (istDomme() ? 'Ab hier entscheidest du, wie es weitergeht — die App tut von selbst nichts mehr.'
+            : 'Ab hier entscheidet sie, wie es weitergeht.')
+          : stufe.gehaltTilgt
+            ? (istDomme() ? 'Sein Gehalt tilgt jetzt zuerst die Schulden. Kaufen kann er nichts.'
+              : 'Dein Gehalt tilgt zuerst die Schulden. Der Laden wartet, bis du wieder im Licht bist.')
+            : stufe.keineKaeufe
+              ? (istDomme() ? 'Er kann gerade nichts kaufen — erst müssen die Schulden kleiner werden.'
+                : 'Kaufen geht gerade nicht — erst müssen die Schulden kleiner werden.')
+              : (istDomme() ? 'Im leichten Minus kann er nur noch Gnade kaufen.'
+                : 'Im Minus bleibt dir nur die Abteilung Gnade — sie löst Schulden.')) : null,
       (konto.sperr || 0) > 0 ? el('p', { class: 'still klein', style: { marginTop: '8px' } },
         (konto.sperr) + ' ● liegen versiegelt — wann sie zurückkommen, entscheidet sie.') : null,
       (konto.siegel || 0) > 0 && !istDomme() ? el('button', {
@@ -345,7 +366,8 @@ SEITEN.laden = function (seite) {
       el('button', { class: 'winzig still', onclick: () => katalogZeigen() }, 'Der Katalog'),
       el('button', { class: 'winzig still', onclick: () => bilanzZeigen(konto) }, 'Die Bilanz'),
       el('button', { class: 'winzig still', onclick: () => aboBlatt(konto, zeichnen) }, 'Abos'),
-      !istDomme() ? el('button', { class: 'winzig still', onclick: () => schwarzmarktFragen() }, 'Leise fragen') : null
+      !istDomme() ? el('button', { class: 'winzig still', onclick: () => schwarzmarktFragen() }, 'Leise fragen') : null,
+      el('button', { class: 'winzig still', onclick: () => ladenErklaerung() }, 'Wie es funktioniert')
     ));
 
     if (istDomme()) {
@@ -461,8 +483,12 @@ function kaufBlatt(a, preis, zeichnen) {
   const b = blatt(
     el('p', { class: 'winzig still mitte' }, 'Kaufen'),
     el('p', { class: 'zier mitte', style: { fontSize: '21px', lineHeight: '1.35', padding: '12px 4px 6px' } }, a.artikel),
-    el('p', { class: 'mitte', style: { color: siegelWare ? 'var(--glut-hell)' : 'var(--gelb)', fontSize: '18px', marginBottom: '14px' } },
+    el('p', { class: 'mitte', style: { color: siegelWare ? 'var(--glut-hell)' : 'var(--gelb)', fontSize: '18px', marginBottom: '10px' } },
       preis + ' ' + (siegelWare ? '✦' : '●')),
+    /* Vor dem Kauf steht, was er auslöst — kein Kleingedrucktes danach. */
+    el('p', { class: 'still klein mitte', style: { marginBottom: '14px', lineHeight: '1.5' } },
+      a.kategorie === 'gluecksspiel' ? 'Wirkt sofort — was dabei herauskommt, siehst du gleich.'
+        : 'Liegt danach als offener Kauf bei dir. Einlösen legst du ihr vor — den Moment wählt sie.'),
     el('div', { class: 'knopfreihe' },
       el('button', { class: 'knopf leer', onclick: () => b.schliessen() }, 'Doch nicht'),
       el('button', {
@@ -580,6 +606,80 @@ function siegelSchmelzen(zeichnen) {
   );
 }
 
+/* --- Wie das hier funktioniert ----------------------------------------------- */
+
+/* Jede Rolle bekommt ihre eigene Erklärung — in einfachen Sätzen.
+   Er liest, wie er verdient und was Kaufen bedeutet. Sie liest, welche
+   Hebel sie hat. Nichts davon steht zwischen den Zeilen. */
+function ladenErklaerung() {
+  const absatz = (kopf, text) => el('div', { style: { marginTop: '13px' } },
+    el('div', { style: { fontWeight: '600', fontSize: '14px', marginBottom: '3px' } }, kopf),
+    el('p', { class: 'leise klein', style: { lineHeight: '1.55' } }, text)
+  );
+
+  const seine = [
+    absatz('● Glut — dein Geld hier',
+      'Du verdienst Glut, indem du Dinge erledigst: Tagesaufgaben, Aufträge, Serien. ' +
+      'Jeden Sonntag um 20 Uhr kommt dein Gehalt dazu. Mit Glut kaufst du im Laden ein.'),
+    absatz('✦ Siegel — die seltene Währung',
+      'Siegel gibt es nur für Meilensteine: eine neue Stufe, ein besiegter Boss, dreißig Tage Serie. ' +
+      'Sie verfallen nie. Ein Siegel lässt sich in ' + SIEGEL_KURS + ' Glut einschmelzen — der Weg zurück existiert nicht. ' +
+      'Nur „Das Große" kostet Siegel.'),
+    absatz('Kaufen — und dann?',
+      'Ein Kauf verschwindet nicht: Er liegt als offener Kauf in deinem Stapel. ' +
+      'Wenn du ihn haben willst, tippst du „Einlösen" — dann liegt er bei ihr, und sie wählt den Moment. ' +
+      'Nur das Risiko wirkt sofort.'),
+    absatz('Sparen',
+      'Halt einen Artikel gedrückt und wähl „Sparen" — auf dem Heim zeigt dir dann ein Balken, wie nah du dran bist. ' +
+      'Ersparte Glut ist außerdem vor dem Monatsschwund sicher.'),
+    absatz('Was deine Glut von selbst tut',
+      'Am Monatsersten verglimmt ungenutzte Glut ein wenig (ab 20 freier Glut, fünf Prozent) — ausgeben oder sparen schützt. ' +
+      'Schulden kosten jeden Sonntag zehn Prozent Zinsen. Und je tiefer im Minus, desto enger wird der Laden: ' +
+      'erst gibt es nur noch Gnade, dann gar nichts mehr.'),
+    absatz('Abos und Katalog',
+      'Abos sind Dauer-Freiheiten, die monatlich Glut kosten — kannst du sie nicht zahlen, erlöschen sie sofort. ' +
+      'Der Katalog zeigt dir jeden Bußgeld-Preis im Voraus: Du weißt immer, was dich was kostet. ' +
+      'Dasselbe Vergehen binnen sieben Tagen kostet doppelt.'),
+    absatz('Fest versprochen',
+      'Bei Rot wird nichts berechnet — keine Bußgelder, keine Zinsen. ' +
+      'Und Schulden sperren höchstens den Laden, nie dich.'),
+  ];
+
+  const ihre = [
+    absatz('Worum es geht',
+      'Er verdient Glut (●) mit Aufgaben und Aufträgen und gibt sie hier aus. ' +
+      'Siegel (✦) gibt es nur für Meilensteine. Der Reiz liegt nicht im Kaufen — ' +
+      'er liegt darin, dass DU die Regeln dieser kleinen Welt bestimmst.'),
+    absatz('Deine Hebel, kurz erklärt',
+      'Geben oder nehmen: frei buchen, mit oder ohne Grund. ' +
+      'Bußgeld: fester Katalogpreis, Wiederholung binnen sieben Tagen kostet von selbst doppelt. ' +
+      'Sonderabgabe: ein Betrag deiner Wahl, er sieht nur die Zahl. ' +
+      'Gehalt: was jeden Sonntag um 20 Uhr automatisch kommt. ' +
+      'Versiegeln: Glut hinter Glas — er sieht sie, erreicht sie nicht.'),
+    absatz('Je Artikel',
+      'Halt einen Artikel gedrückt: Preis ändern, ausverkauft stellen oder ein 24-Stunden-Angebot starten. ' +
+      'Er sieht immer nur das Ergebnis, nie den Grund.'),
+    absatz('Was von selbst läuft',
+      'Sonntags 20 Uhr: Gehalt, und auf Schulden zehn Prozent Zinsen. ' +
+      'Am Monatsersten: fünf Prozent Schwund auf ungenutzte Glut ab 20 (Erspartes ist sicher) und die Abo-Abbuchung — ' +
+      'was er nicht zahlen kann, wird wortlos gekündigt.'),
+    absatz('Kauf und Einlösung',
+      'Ein Kauf liegt erst als offener Kauf bei ihm. Zum Einlösen legt er ihn dir vor — ' +
+      'den Moment wählst du. Blindkäufe landen direkt bei dir: Du entscheidest, was er bekommt.'),
+    absatz('Fest verdrahtet',
+      'Bei Rot berechnet die App nichts — keine Bußgelder, keine Zinsen. ' +
+      'Schulden sperren höchstens den Laden, nie den Menschen. Das bleibt so, egal was eingestellt ist.'),
+  ];
+
+  blatt(
+    el('h2', {}, 'Wie der Laden funktioniert'),
+    ...(istDomme() ? ihre : seine),
+    el('p', { class: 'still klein', style: { marginTop: '14px' } },
+      istDomme() ? 'Abschalten geht jederzeit: Verwaltung → Bausteine. Alles bleibt gespeichert.'
+        : 'Alle Zahlen findest du in der Bilanz — jede Buchung, chronologisch.')
+  );
+}
+
 /* --- Katalog, Bilanz, Abos, Schwarzmarkt ------------------------------------- */
 
 function katalogZeigen() {
@@ -605,7 +705,7 @@ async function bilanzZeigen(konto) {
   blatt(
     el('h2', {}, 'Die Bilanz'),
     el('p', { class: 'leise klein', style: { margin: '7px 0 12px' } },
-      'Jede Zahl, chronologisch. Die Gründe stehen woanders.'),
+      'Jede Buchung mit Betrag und neuem Stand (→). Das Neueste steht oben.'),
     el('div', { style: { maxHeight: '54vh', overflowY: 'auto' } },
       ...buch.slice(-30).reverse().map((z) => el('div', {
         style: { display: 'flex', justifyContent: 'space-between', gap: '12px', padding: '8px 2px', borderBottom: '1px solid var(--kante)' },

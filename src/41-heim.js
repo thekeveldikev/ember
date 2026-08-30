@@ -101,9 +101,12 @@ function sanftEinfuegen(platz, knoten, ruhig = false) {
 
 async function tagesNachrichtLaden(platz) {
   const heute = tagstempel();
+  const aktuell = rennwache(platz);
   platz.innerHTML = '';
 
   const nachricht = await datenLies('tag/' + heute + '/nachricht');
+  if (!aktuell()) return;
+  platz.innerHTML = '';
 
   if (nachricht) {
     const karte = el('div', { class: 'karte glimmt', style: { marginBottom: '6px' } },

@@ -353,6 +353,30 @@ Debuggen: Der Dev-Server-Eindruck kann täuschen — der Service Worker
 serviert notfalls die alte Fassung aus dem Cache, auch wenn gar kein
 Server läuft.
 
+**0.8.3 — die App erklärt sich selbst, die Rennwache (100):**
+Klarheits-Runde. Der Laden hat jetzt ein rollen-spezifisches
+Erklärblatt „Wie es funktioniert" (ladenErklaerung in 66-laden):
+Er liest in einfachen Sätzen, wie er verdient, was Kaufen/Einlösen
+bedeutet, was Zahltag/Zins/Monatsschwund tun und was fest versprochen
+ist; sie liest ihre Hebel. Erreichbar aus dem Rand UND aus dem
+Zu-Zustand. Abteilungs-Untertitel sind erklärend statt poetisch,
+die Schuldenstufe sagt je Rolle in Klartext, was sie konkret
+bedeutet, das Kaufblatt sagt VOR dem Kauf, was er auslöst, die
+Bilanz erklärt ihre Pfeile. Fund: Die Heim-Kontozeile sagte auch
+bei ihr „Deine Glut" — jetzt „Seine Glut"/„Er spart auf".
+Seiten-Intros je Rolle auf Rad, Lose, Regie, Wachsen, Pfade,
+Spannung; kryptische Leerlauf-Einzeiler (Nur-für-dich, Countdowns,
+Glossar, Buch) erklären jetzt, was zu TUN ist. DER Bugfix der Runde:
+„Timos Aufgabe" stand manchmal doppelt auf dem Heim — ein
+Async-Render-Rennen (Seitenaufbau und Horcher räumen beide erst den
+Platz und hängen dann beide an). Neues Kern-Werkzeug rennwache(platz)
+in 20-core: Jeder Lauf zieht eine Nummer, nur der jüngste baut an.
+Eingezogen in tagesaufgabeKarte, sperreKarte, fotoAuftragKarte,
+tagesNachrichtLaden, checkinZeile, gluecksKeksLaden, heimKontoZeile.
+Regressionstest test/rennen.mjs stellt das Rennen nach (zwei
+gleichzeitige Läufe → genau eine Karte); im Browser mit sechs
+parallelen Läufen bewiesen — null Duplikate.
+
 ## Was in der Bugjagd zutage kam
 
 Sieben Fehler, alle vor der Veröffentlichung gefunden. Sie stehen hier,

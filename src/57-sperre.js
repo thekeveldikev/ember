@@ -71,6 +71,7 @@ function sperreSetzen(vorhandene) {
 /* --- Das Siegel auf dem Heim ---------------------------------------------- */
 
 async function sperreKarte(platz, ruhig = false) {
+  const aktuell = rennwache(platz);
   const sperre = await datenLies('sperre');
   if (!sperre || !sperre.aktiv) return;
 
@@ -177,6 +178,8 @@ async function sperreKarte(platz, ruhig = false) {
     }
   }
 
+  if (!aktuell()) return;
+  platz.innerHTML = '';
   sanftEinfuegen(platz, karte, ruhig);
 }
 

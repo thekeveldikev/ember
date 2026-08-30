@@ -14,6 +14,11 @@ SEITEN.rad = function (seite) {
     el('button', { class: 'winzig still', onclick: () => zeigeSeite('spiel') }, 'Zurück')
   ));
 
+  seite.append(el('p', { class: 'leise klein', style: { marginBottom: '14px' } },
+    istDomme()
+      ? 'Antippen dreht — das Feld unterm Zeiger gilt. Eigene Räder baust du unter Verwaltung → Anlegen.'
+      : 'Antippen dreht — das Feld unterm Zeiger gilt. Was auf den Feldern steht, bestimmt sie.'));
+
   const platz = el('div');
   seite.append(platz);
 

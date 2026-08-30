@@ -95,7 +95,7 @@ function logListeZeichnen(platz, liste) {
   platz.innerHTML = '';
 
   if (!liste.length) {
-    platz.append(leerlauf('Noch leer', 'Nach dem nächsten Mal ein paar Zeichen — mehr braucht es nicht.'));
+    platz.append(leerlauf('Noch leer', 'Schreibt nach einer Session ein paar Zeilen hinein — die Wärmekarte oben füllt sich von selbst.'));
     return;
   }
 

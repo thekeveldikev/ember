@@ -174,7 +174,7 @@ function countdownsZeichnen(platz, liste) {
     .sort((a, b) => a.wann_ziel - b.wann_ziel);
 
   if (!kommend.length) {
-    platz.append(leerlauf('Nichts in Sicht', 'Ein Wochenende, ein Jahrestag, eine Heimkehr.'));
+    platz.append(leerlauf('Nichts in Sicht', 'Leg einen Countdown auf ein Datum an — ein Wochenende, einen Jahrestag, eine Heimkehr. Beide sehen ihn ticken.'));
     return;
   }
 

@@ -13,6 +13,11 @@ SEITEN.pfade = function (seite) {
     el('button', { class: 'winzig still', onclick: () => zeigeSeite('ich') }, 'Zurück')
   ));
 
+  seite.append(el('p', { class: 'leise klein', style: { marginBottom: '14px' } },
+    istDomme()
+      ? 'Ein Pfad ist ein Stufenplan, den du baust. Er sieht immer nur die nächste Stufe — nie das Ziel.'
+      : 'Stufenpläne, die sie für dich baut. Du siehst immer nur die nächste Stufe — das Ziel kennt nur sie.'));
+
   const platz = el('div');
   seite.append(platz);
 

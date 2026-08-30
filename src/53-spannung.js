@@ -17,6 +17,11 @@ SEITEN.spannung = function (seite) {
     el('button', { class: 'winzig still', onclick: () => zeigeSeite('ich') }, 'Zurück')
   ));
 
+  seite.append(el('p', { class: 'leise klein', style: { marginBottom: '14px' } },
+    istDomme()
+      ? 'Alles, was Vorfreude baut: eine tickende Uhr, Verborgenes mit Datum, Krümel über den Tag, Impulse aus dem Topf.'
+      : 'Was sie für dich vorbereitet hat: Uhren, Verborgenes, Krümel — du siehst, DASS etwas kommt, nie was.'));
+
   const uhrplatz = el('div', { class: 'abschnitt' });
   const verborgenplatz = el('div', { class: 'abschnitt' });
   const kruemelplatz = el('div', { class: 'abschnitt' });

@@ -187,6 +187,16 @@ function mischen(liste) {
   return raus;
 }
 
+/* Async-Renderer räumen ihren Platz erst leer und bauen dann — nach
+   mehreren awaits — neu auf. Laufen zwei davon gleichzeitig (Seitenaufbau
+   und ein Horcher etwa), hängen BEIDE ihre Karte an: „Timos Aufgabe"
+   stand doppelt da. Die Rennwache: Jeder Lauf zieht eine Nummer; wer
+   beim Anbauen nicht mehr der neueste ist, wirft seins stumm weg. */
+function rennwache(platz) {
+  const meine = (platz._renn = (platz._renn || 0) + 1);
+  return () => platz._renn === meine;
+}
+
 /* Nutzerinhalte wandern grundsätzlich als Text in den Baum, nie als HTML.
    Wo doch einmal HTML nötig ist, geht es hier durch. */
 const sicher = (s) => String(s == null ? '' : s)

@@ -82,6 +82,7 @@ function fotoHorcherStarten() {
 /* --- Die Karte auf dem Heim ----------------------------------------------- */
 
 async function fotoAuftragKarte(platz, ruhig = false) {
+  const aktuell = rennwache(platz);
   const auftrag = await datenLies('fotoauftrag');
   if (!auftrag || !auftrag.status) return;
 
@@ -224,5 +225,7 @@ async function fotoAuftragKarte(platz, ruhig = false) {
     );
   }
 
+  if (!aktuell()) return;
+  platz.innerHTML = '';
   sanftEinfuegen(platz, karte, ruhig);
 }
