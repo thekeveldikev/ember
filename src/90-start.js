@@ -25,6 +25,11 @@ async function appStarten() {
   stimmungSetzen();
   farbweltAnwenden();
   appSymbolAnwenden();
+  /* Der Modus entscheidet, wer führt — er muss VOR dem ersten Zeichnen
+     stehen, sonst baut sich die Seite in der falschen Rolle auf. Der
+     letzte bekannte Stand liegt auf dem Gerät; die Ablage bestätigt
+     ihn gleich darauf. */
+  _modus = Gerät.lies('modus', 'gefuehrt');
   baueFussleiste();
   notausAnbringen();
   zeigeSeite('heim');
@@ -71,6 +76,10 @@ async function appStarten() {
 
   await ampelLaden().catch(() => {});
   stimmungSetzen();
+
+  /* Wer führt: aus der Ablage bestätigen und ab da mithorchen. Das Gerät
+     hat den letzten Stand schon vor dem ersten Zeichnen geliefert. */
+  await modusLaden().catch(() => {});
 
   /* Der Vorrat: erst die Einstellung, dann die Tagesaufgabe des Tages. */
   await vorratLaden().catch(() => {});

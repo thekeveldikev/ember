@@ -310,6 +310,18 @@ const HILFE = {
       'Private Notizen, die dieses Gerät nie verlassen. Auch sie kann sie nicht lesen.',
     ],
   },
+  handbuch: {
+    titel: 'Das Handbuch',
+    sie: [
+      'Alles, was diese App kann — in Kapiteln sortiert, von den einfachen Dingen zu den feineren, jeder Eintrag mit einem Beispiel.',
+      'Ganz oben das Suchfeld: Ein Wort genügt, und die App durchsucht Handbuch und Fragen auf einmal. Ohne Suche blätterst du durch die Kapitel.',
+      'Unten stehen die Fragen und Antworten — vom Banalen bis zum Heiklen.',
+    ],
+    er: [
+      'Alles, was diese App kann, in Ruhe erklärt — mit Beispielen und aus deiner Sicht geschrieben.',
+      'Such nach einem Wort oder blättere durch die Kapitel. Unten stehen die Fragen und Antworten.',
+    ],
+  },
   maschine: {
     titel: 'Wenn — Dann',
     sie: [
@@ -356,6 +368,7 @@ const HILFE_BEISPIEL = {
   toys: '„Augenbinde: vorhanden" ankreuzen — ab da tauchen Karten damit in den Decks auf.',
   eigenes: 'Ein halber Gedanke um Mitternacht — bleibt hier, bis du ihn aussprechen willst. Oder für immer.',
   maschine: 'WENN er die Tagesaufgabe verpasst, DANN kostet es abends 2 ● — von selbst, jedes Mal.',
+  handbuch: 'Tipp „Tarnung" ins Suchfeld — und du erfährst in zwei Sätzen, wie die App zur Notizliste wird.',
 };
 
 const hilfeAn = () => Gerät.lies('hilfeKnopf', true) !== false;

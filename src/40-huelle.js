@@ -105,7 +105,7 @@ const ZURUECK_ZIEL = {
   wuensche: 'ich', grenzen: 'ich', koerper: 'ich', tresor: 'ich',
   rituale: 'ich', vertrag: 'ich', nachher: 'ich', reparatur: 'ich',
   glossar: 'ich', toys: 'ich', maschine: 'ich', eigenes: 'ich',
-  buch: 'ich', verwaltung: 'ich',
+  buch: 'ich', verwaltung: 'ich', handbuch: 'ich',
 };
 
 function wischZurueckAnbringen() {

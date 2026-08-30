@@ -14,6 +14,15 @@ let _knopfHorcherLaeuft = false;
 let _befehlOffen = null;
 let _letzterKnopf = null;
 
+/* An wen richtet sich das hier? Trägt der Eintrag einen Absender, gilt er
+   dem jeweils anderen — im Modus „gleich" führen ja beide, da wäre „wer
+   folgt" keine Antwort mehr. Ältere Einträge ohne Absender fallen auf die
+   frühere Regel zurück. */
+function _fuerMich(eintrag) {
+  if (eintrag && eintrag.wer) return eintrag.wer !== D.rolle;
+  return eintrag && eintrag.art === 'befehl' ? !istDomme() : istDomme();
+}
+
 /* --- Die Bühne auf der Heim-Seite ----------------------------------------- */
 
 function knopfBuehneBauen(platz) {
@@ -82,9 +91,9 @@ async function befehlSofort() {
   tonSpielen('tief');
   puls('befehl');
   await datenSchreib('knopf/aktuell', {
-    art: 'befehl', text: '', bis: null, wann: jetzt(), quittiert: false,
+    art: 'befehl', text: '', bis: null, wann: jetzt(), quittiert: false, wer: D.rolle,
   });
-  pushSenden('sub', 'befehl');
+  pushSenden(andereRolle(), 'befehl');
   meldung('Er weiß Bescheid.');
 }
 
@@ -98,10 +107,12 @@ function befehlBlatt() {
   const b = blatt(
     el('h2', {}, 'SEX'),
     el('p', { class: 'leise klein', style: { margin: '7px 0 14px' } },
-      'Sein Bildschirm gehört dir, sobald du drückst.'),
+      gefaelleAn() ? 'Sein Bildschirm gehört dir, sobald du drückst.'
+        : 'Der Bildschirm von ' + nameVon(andereRolle()) + ' füllt sich damit, sofort.'),
     feld,
     el('div', {},
-      el('p', { class: 'winzig still', style: { marginTop: '15px' } }, 'Er hat … (leer = keine Frist)'),
+      el('p', { class: 'winzig still', style: { marginTop: '15px' } },
+        (gefaelleAn() ? 'Er hat' : nameVon(andereRolle()) + ' hat') + ' … (leer = keine Frist)'),
       minuten
     ),
     el('div', { class: 'knopfreihe', style: { marginTop: '18px' } },
@@ -122,9 +133,10 @@ function befehlBlatt() {
       bis: frist > 0 ? jetzt() + frist * 60000 : null,
       wann: jetzt(),
       quittiert: false,
+      wer: D.rolle,
     });
 
-    pushSenden('sub', 'befehl');
+    pushSenden(andereRolle(), 'befehl');
     puls('befehl');
     meldung('Angekommen.');
   }
@@ -136,11 +148,13 @@ function befehlBlatt() {
 async function offeneBitteZeigen(platz) {
   const aktuell = await datenLies('knopf/aktuell');
   if (!aktuell || aktuell.art !== 'bitte' || aktuell.antwort) return;
+  /* Die eigene Bitte beantwortet man nicht selbst. */
+  if (aktuell.wer && aktuell.wer === D.rolle) return;
 
   platz.append(
     el('div', { class: 'karte glimmt', style: { marginTop: '4px' } },
       el('p', { class: 'winzig still', style: { marginBottom: '8px' } },
-        nameVon('sub') + ' bittet · ' + vorZeit(aktuell.wann)),
+        nameVon(aktuell.wer || 'sub') + ' bittet · ' + vorZeit(aktuell.wann)),
       aktuell.text ? el('p', { class: 'zier', style: { fontSize: '18px', marginBottom: '14px' } }, aktuell.text) : null,
       el('div', { class: 'knopfreihe' },
         el('button', { class: 'knopf leer warnend', onclick: () => antworten(false) }, 'Nein'),
@@ -155,7 +169,7 @@ async function offeneBitteZeigen(platz) {
 
   async function antworten(ok, bedingung) {
     await datenSchreib('knopf/aktuell', { ...aktuell, antwort: { ok, text: bedingung || '', wann: jetzt() } });
-    pushSenden('sub', 'antwort');
+    pushSenden(andereRolle(), 'antwort');
     puls(ok ? 'antwortJa' : 'antwortNein');
     meldung(ok ? 'Ja.' : 'Nein.');
     heimAuffrischen('knopf');
@@ -184,9 +198,9 @@ function bitteBlatt() {
     jaText: 'Fragen',
   }, async (text) => {
     await datenSchreib('knopf/aktuell', {
-      art: 'bitte', text, wann: jetzt(), antwort: null, gesehen: false,
+      art: 'bitte', text, wann: jetzt(), antwort: null, gesehen: false, wer: D.rolle,
     });
-    pushSenden('domme', 'bitte');
+    pushSenden(andereRolle(), 'bitte');
     puls('bitte');
     meldung('Gefragt.');
     if (typeof maschineEreignis === 'function') maschineEreignis('knopf');
@@ -251,7 +265,7 @@ function knopfHorcherStarten() {
        null. iOS kann das ab 16.4 für installierte Apps — wo nicht, tut
        der Versuch einfach nichts. */
     try {
-      const offenerBefehl = aktuell && aktuell.art === 'befehl' && !aktuell.quittiert && !istDomme();
+      const offenerBefehl = aktuell && aktuell.art === 'befehl' && !aktuell.quittiert && _fuerMich(aktuell);
       if (navigator.setAppBadge && offenerBefehl) navigator.setAppBadge(1);
       else if (navigator.clearAppBadge) navigator.clearAppBadge();
     } catch { /* dann eben ohne Zahl */ }
@@ -264,24 +278,24 @@ function knopfHorcherStarten() {
     /* Beim Start nicht rückwirkend übernehmen — nur was frisch ist. */
     const frisch = jetzt() - aktuell.wann < 5 * 60000;
 
-    if (aktuell.art === 'befehl' && !istDomme() && !aktuell.quittiert) {
+    if (aktuell.art === 'befehl' && _fuerMich(aktuell) && !aktuell.quittiert) {
       if (!ersterDurchlauf || frisch) befehlZeigen(aktuell);
       return;
     }
 
-    if (aktuell.art === 'befehl' && istDomme() && aktuell.quittiert && !ersterDurchlauf) {
+    if (aktuell.art === 'befehl' && !_fuerMich(aktuell) && aktuell.quittiert && !ersterDurchlauf) {
       puls('antwortJa');
       meldung(nameVon('sub') + ': Jawohl.');
       heimAuffrischen('knopf', true);
       return;
     }
 
-    if (aktuell.art === 'bitte' && istDomme() && !aktuell.antwort && !ersterDurchlauf) {
+    if (aktuell.art === 'bitte' && !_fuerMich(aktuell) && !aktuell.antwort && !ersterDurchlauf) {
       puls('bitte');
       meldungMitTat(nameVon('sub') + ' fragt.', 'Ansehen', () => zeigeSeite('heim'), 10000);
     }
 
-    if (aktuell.art === 'bitte' && !istDomme() && aktuell.antwort && !ersterDurchlauf) {
+    if (aktuell.art === 'bitte' && _fuerMich(aktuell) && aktuell.antwort && !ersterDurchlauf) {
       puls(aktuell.antwort.ok ? 'antwortJa' : 'antwortNein');
       meldungMitTat('Sie hat geantwortet.', 'Ansehen', () => zeigeSeite('heim'), 10000);
     }

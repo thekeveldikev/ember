@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { ladeApp, rein } from './rahmen.mjs';
 
 const DATEIEN = [
-  'src/20-core.js', 'src/21-krypto.js', 'src/22-firebase.js', 'src/24-daten.js',
+  'src/20-core.js', 'src/21-krypto.js', 'src/22-firebase.js', 'src/24-daten.js', 'src/26-modus.js',
   'src/48-wachsen.js', 'src/49-wuensche.js', 'src/56-rituale.js',
 ];
 

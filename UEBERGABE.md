@@ -483,6 +483,47 @@ Horcher schneller auf und ab, als Firebase mag — das kann hängen,
 ohne dass die App etwas hat. Im Zweifel datenLies + datenHorch
 einzeln prüfen (beide antworteten in Millisekunden).
 
+**0.10.0 — das Handbuch, die drei Weisen zu spielen (113):**
+(1) src/47c-handbuch.js: Das große, durchsuchbare Handbuch (SEITEN.
+handbuch, verlinkt ganz oben auf der Ich-Seite). Elf Kapitel von „Zum
+Anfangen" bis „Einstellen", rund fünfzig Einträge, jeder mit Titel,
+rollenspezifischem Text (s: führend, e: folgend) und einem Beispiel
+(b:, oder bs:/be: je Rolle). Darunter vier FAQ-Blöcke mit über
+zwanzig Fragen, die Gioia und Kevin beim Namen nennen. Die Suche
+läuft über Handbuch UND Fragen zugleich; ohne Suchwort sind es
+Klappen. Kapitel können sich ausblenden (nurFuehrend, nurMitLaden).
+Statik-Wache erzwingt Vollständigkeit (≥8 Kapitel, ≥45 Einträge,
+jeder mit Text UND Beispiel, ≥20 Fragen).
+WICHTIG zur Ladereihenfolge: Die Datei hieß zuerst 38-handbuch.js
+und stürzte beim Start ab — `const SEITEN` steht in 40-huelle.js und
+ist vorher in der temporalen Todeszone. Alles, was SEITEN.x auf
+oberster Ebene setzt, MUSS nach 40-huelle geladen werden.
+
+(2) src/26-modus.js: Drei Weisen zu spielen — 'gefuehrt' (Vorgabe),
+'gleich' (niemand führt, beide haben den SEX-Knopf) und 'getauscht'.
+Der Modus liegt in einst/modus, wird auf dem Gerät gespiegelt
+(sofortige richtige Rolle beim Start, ohne Netz) und per Horcher
+verteilt. Ein Wechsel MUSS von beiden getragen werden: einst/
+modusWunsch {modus, von, wann}, Karte auf dem Heim (heimAuffrischen
+('modus')), der Vorschlagende sieht nur „wartet" mit Zurückziehen,
+Vorschläge verfallen nach drei Tagen.
+DIE zentrale Unterscheidung, bitte nie wieder verwischen:
+  istDomme()   — darf ich FÜHREN? (modusabhängig; in 'gleich' true
+                 für beide)
+  istSub()     — folge ich? (in 'gleich' für NIEMANDEN true, also
+                 nicht einfach !istDomme())
+  istWaechter() — rechne ich die Automatik? IMMER D.rolle==='domme',
+                 modusunabhängig. Sonst liefe in 'gleich' der
+                 Zahltag doppelt. Eingesetzt in ladenPflegen,
+                 fotoAuftragKarte (Versäumnis) und maschinePruefen.
+  gefaelleAn() — gibt es ein Oben? (false in 'gleich')
+Der Knopf trägt jetzt einen Absender (wer: D.rolle); _fuerMich()
+entscheidet, wer Befehl/Bitte sieht — in 'gleich' wäre „wer folgt"
+keine Antwort mehr. Alte Einträge ohne Absender fallen auf die
+frühere Regel zurück. pushSenden-Ziele sind überall andereRolle()
+statt fester Rollen. test/modus.mjs hält alles fest (7 Prüfungen,
+inklusive „der Wächter bleibt in jedem Modus derselbe").
+
 ## Was in der Bugjagd zutage kam
 
 Sieben Fehler, alle vor der Veröffentlichung gefunden. Sie stehen hier,

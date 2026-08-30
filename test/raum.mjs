@@ -8,7 +8,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { ladeApp, anmelden, rein } from './rahmen.mjs';
 
-const RAUM_DATEIEN = ['src/20-core.js', 'src/21-krypto.js', 'src/22-firebase.js', 'src/24-daten.js', 'src/25-raeume.js'];
+const RAUM_DATEIEN = ['src/20-core.js', 'src/21-krypto.js', 'src/22-firebase.js', 'src/24-daten.js', 'src/26-modus.js', 'src/25-raeume.js'];
 
 /* --- Die Migration ---------------------------------------------------------- */
 
@@ -131,7 +131,7 @@ test('_aufgabeZiel erkennt App-Bezüge und schweigt sonst', () => {
 
 test('in der Tarnung dringt nichts durch: kein Blatt, keine Meldung, kein Puls, keine Seite', () => {
   const { raum } = ladeApp({
-    dateien: ['src/20-core.js', 'src/21-krypto.js', 'src/22-firebase.js', 'src/24-daten.js',
+    dateien: ['src/20-core.js', 'src/21-krypto.js', 'src/22-firebase.js', 'src/24-daten.js', 'src/26-modus.js',
       'src/25-raeume.js', 'src/40-huelle.js', 'src/52-tarnung.js'],
   });
 

@@ -171,6 +171,31 @@ test('jede Seite hat ihren Hilfe-Eintrag — niemand bleibt unerklärt', () => {
   }
 });
 
+test('das Handbuch ist vollständig: jede Gruppe, jeder Eintrag, jedes Beispiel', () => {
+  const quelle = readFileSync(join(wurzel, 'src', '47c-handbuch.js'), 'utf8');
+
+  const gruppen = sammle(/gruppe: '([^']+)'/g, quelle);
+  assert.ok(gruppen.length >= 8, gruppen.length + ' Kapitel — zu wenige');
+  assert.equal(new Set(gruppen).size, gruppen.length, 'ein Kapitelname doppelt');
+
+  /* Jeder Eintrag braucht Titel, Text und Beispiel. Nur der Teil vor der
+     Fragen-Sammlung zählt — darunter stehen Stil-Angaben, die zufällig
+     ähnlich aussehen. */
+  const nurHandbuch = quelle.split('const FAQ =')[0];
+  const eintraege = nurHandbuch.split(/\n      \{\n/).slice(1);
+  assert.ok(eintraege.length >= 45, eintraege.length + ' Einträge — zu wenige');
+  for (const e of eintraege) {
+    const titel = (e.match(/\n        t: '([^']+)'/) || [])[1];
+    if (!titel) continue;
+    assert.ok(/\n        s:|\n        e:/.test(e), titel + ': kein Text');
+    assert.ok(/\n        b:|\n        bs:/.test(e), titel + ': kein Beispiel');
+  }
+
+  const fragen = sammle(/f: '([^']+)'/g, quelle);
+  assert.ok(fragen.length >= 20, fragen.length + ' Fragen — zu wenige');
+  for (const f of fragen) assert.ok(f.endsWith('?') || f.endsWith('.'), 'seltsame Frage: ' + f);
+});
+
 test('jeder Laden-Artikel hat seinen Was-ist-das-Satz', () => {
   const vorrat = JSON.parse(
     readFileSync(join(wurzel, 'src', '15-vorrat.js'), 'utf8')

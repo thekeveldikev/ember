@@ -89,7 +89,7 @@ async function fotoAuftragKarte(platz, ruhig = false) {
   /* Verpasst? Das stellt das Domme-Gerät fest — sonst schrieben beide
      gleichzeitig eine Strafe, und es wären zwei. */
   if (auftrag.status === 'offen' && auftrag.bis && auftrag.bis < jetzt()) {
-    if (istDomme()) {
+    if (istWaechter()) {
       await datenSchreib('fotoauftrag', { ...auftrag, status: 'versaeumt' });
       await datenAnhaengen('strafen', {
         text: 'Foto-Auftrag versäumt: ' + auftrag.text,

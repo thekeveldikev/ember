@@ -26,6 +26,7 @@ function heimAuffrischen(teil, nurWennDa = false) {
   if (!teil || teil === 'sperre') { _heim.sperre.innerHTML = ''; sperreKarte(_heim.sperre, ruhig); }
   if (!teil || teil === 'foto') { _heim.foto.innerHTML = ''; fotoAuftragKarte(_heim.foto, ruhig); }
   if (!teil || teil === 'aufgaben') { tagesaufgabeKarte(_heim.aufgaben, ruhig); }
+  if (!teil || teil === 'modus') { modusWunschKarte(_heim.modus, ruhig); }
 }
 
 SEITEN.heim = function (seite) {
@@ -52,6 +53,7 @@ SEITEN.heim = function (seite) {
     )
   );
 
+  const modusplatz = el('div');
   const sperrplatz = el('div');
   const fotoplatz = el('div');
   const tagesplatz = el('div');
@@ -60,11 +62,12 @@ SEITEN.heim = function (seite) {
   const kontoplatz = el('div');
   const knopfplatz = el('div');
   const untenplatz = el('div');
-  seite.append(sperrplatz, fotoplatz, tagesplatz, aufgabenplatz, frageplatz, kontoplatz, knopfplatz, untenplatz);
+  seite.append(modusplatz, sperrplatz, fotoplatz, tagesplatz, aufgabenplatz, frageplatz, kontoplatz, knopfplatz, untenplatz);
 
-  _heim = { sperre: sperrplatz, foto: fotoplatz, aufgaben: aufgabenplatz, knopf: knopfplatz };
+  _heim = { sperre: sperrplatz, foto: fotoplatz, aufgaben: aufgabenplatz, knopf: knopfplatz, modus: modusplatz };
 
   knopfBuehneBauen(knopfplatz);
+  modusWunschKarte(modusplatz);
   sperreKarte(sperrplatz);
   fotoAuftragKarte(fotoplatz);
   tagesNachrichtLaden(tagesplatz);

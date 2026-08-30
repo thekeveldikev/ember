@@ -45,6 +45,7 @@ SEITEN.ich = function (seite) {
   seite.append(
     el('div', { class: 'abschnitt' },
       zeile('Wie geht\'s dir?', 'Deine Ampel steht auf ' + ampelWort(D.ampel[D.rolle]) + ' — antippen zum Ändern', () => ampelBlatt()),
+      zeile('Das Handbuch', 'Alles, was die App kann — durchsuchbar, mit Beispielen und Antworten auf eure Fragen', () => zeigeSeite('handbuch')),
       istDomme() ? zeile('Verwaltung', 'Dein Werkzeugkasten: anlegen, steuern, aufräumen', () => zeigeSeite('verwaltung')) : null,
 
       klappGruppe('spiel', 'pfeilauf', 'Wachsen & Spannung', 'Stufen, Pläne, Überraschungen, Regeln',
@@ -87,6 +88,8 @@ SEITEN.ich = function (seite) {
   seite.append(
     el('div', { class: 'abschnitt' },
       el('p', { class: 'winzig still', style: { margin: '0 0 9px 2px' } }, 'Einstellungen'),
+
+      zeile('Wie ihr spielt', modusInfo().name + ' — ' + modusInfo().kurz + ' Ändern geht nur, wenn beide zustimmen', () => modusBlatt()),
 
       klappGruppe('raeume', 'mond', 'Räume', 'Dieser Raum: ' + (raumName() || '—'),
         zeile('Raum wechseln', 'Ein Raum ist eine eigene Welt — zum Proben oder für uns', () => raumWechslerBlatt()),

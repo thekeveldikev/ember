@@ -410,7 +410,7 @@ const D = {
   horcher: {},          // laufende Verbindungen zur Ablage
 };
 
-const istDomme = () => D.rolle === 'domme';
+/* istDomme() steht in 26-modus.js: Wer führt, hängt am Modus. */
 const andereRolle = () => (D.rolle === 'domme' ? 'sub' : 'domme');
 
 function nameVon(rolle) {

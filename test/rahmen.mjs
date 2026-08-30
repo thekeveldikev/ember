@@ -186,7 +186,7 @@ export function ladeApp({ rolle = 'domme', dateien, ablage = baueAblage() } = {}
   };
 
   const reihe = dateien || [
-    'src/20-core.js', 'src/21-krypto.js', 'src/22-firebase.js', 'src/24-daten.js',
+    'src/20-core.js', 'src/21-krypto.js', 'src/22-firebase.js', 'src/24-daten.js', 'src/26-modus.js',
   ];
 
   /* In einem Rutsch, nicht Datei für Datei: Die App ist ein einziger
@@ -233,6 +233,9 @@ export function ladeApp({ rolle = 'domme', dateien, ablage = baueAblage() } = {}
         ? { istGetarnt, __tarnung: (an) => { _getarnt = an; } } : {}),
       ...(typeof mischen === 'function' ? { mischen } : {}),
       ...(typeof rennwache === 'function' ? { rennwache } : {}),
+      ...(typeof modusJetzt === 'function'
+        ? { MODI, modusJetzt, modusInfo, modusLaden, istWaechter, istSub, gefaelleAn,
+            __modus: (m) => { _modus = m; } } : {}),
       ...(typeof tagesaufgabeKarte === 'function' ? { tagesaufgabeKarte } : {}),
       ...(typeof zeigeSeite === 'function' ? { SEITEN, zeigeSeite } : {}),
       ...(typeof maschineFeuern === 'function' ? { maschineFeuern } : {}),

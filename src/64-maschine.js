@@ -432,7 +432,8 @@ async function _aktionAusfuehren(aktion) {
 
 /* Zeit-Regeln prüft nur ihr Gerät — sonst feuerte alles doppelt. */
 async function maschinePruefen() {
-  if (!istDomme() || !D.offen) return;
+  /* Nur der Wächter prüft Zeitregeln — sonst feuerte alles doppelt. */
+  if (!istWaechter() || !D.offen) return;
   if (!(await _maschineDarf())) return;
 
   const regeln = await datenListe('maschine/regeln').catch(() => []);

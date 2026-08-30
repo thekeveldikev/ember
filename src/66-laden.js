@@ -222,7 +222,9 @@ function _letzterFaelligerSonntag() {
 }
 
 async function ladenPflegen() {
-  if (!istDomme()) return;
+  /* Nur EIN Gerät rechnet — immer dasselbe, ganz gleich, wer gerade
+     führt. Sonst liefe der Zahltag im Modus „gleich" doppelt. */
+  if (!istWaechter()) return;
   let konto = await datenLies('konto').catch(() => null);
   if (!konto || !konto.an) return;
 

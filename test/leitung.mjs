@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { ladeApp, anmelden, rein } from './rahmen.mjs';
 
 const DATEIEN = [
-  'src/20-core.js', 'src/21-krypto.js', 'src/22-firebase.js', 'src/23-push.js', 'src/24-daten.js',
+  'src/20-core.js', 'src/21-krypto.js', 'src/22-firebase.js', 'src/23-push.js', 'src/24-daten.js', 'src/26-modus.js',
 ];
 
 const app = (einst = {}) => ladeApp({ dateien: DATEIEN, ...einst });

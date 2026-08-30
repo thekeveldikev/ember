@@ -10,7 +10,7 @@ import { ladeApp, rein } from './rahmen.mjs';
 
 const DATEIEN = [
   'src/15-vorrat.js', 'src/16-toene.js', 'src/17-vorrathilfen.js',
-  'src/20-core.js', 'src/21-krypto.js', 'src/22-firebase.js', 'src/24-daten.js',
+  'src/20-core.js', 'src/21-krypto.js', 'src/22-firebase.js', 'src/24-daten.js', 'src/26-modus.js',
   'src/63-regie.js', 'src/64-maschine.js',
 ];
 
