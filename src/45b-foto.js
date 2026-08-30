@@ -55,6 +55,30 @@ function fotoAuftragGeben() {
   setTimeout(() => text.focus(), 260);
 }
 
+/* Der Horcher: Ein frischer Auftrag soll auf seinem Heim AUFTAUCHEN,
+   nicht auf den nächsten Seitenwechsel warten. */
+let _fotoHorcherLaeuft = false;
+
+function fotoHorcherStarten() {
+  if (_fotoHorcherLaeuft) return;
+  _fotoHorcherLaeuft = true;
+
+  let letzter = null;
+  ablageHorch('fotoauftrag', async () => {
+    const auftrag = await datenLies('fotoauftrag');
+    const stempel = auftrag ? (auftrag.wann + ':' + auftrag.status) : 'leer';
+    const erster = letzter === null;
+    if (stempel === letzter) return;
+    letzter = stempel;
+
+    if (!erster && auftrag && auftrag.status === 'offen' && !istDomme()) {
+      puls('befehl');
+      meldungMitTat('Ein Foto-Auftrag — die Uhr läuft.', 'Ansehen', () => zeigeSeite('heim'), 10000);
+    }
+    if (D.seite === 'heim') zeigeSeite('heim');
+  }).catch(() => {});
+}
+
 /* --- Die Karte auf dem Heim ----------------------------------------------- */
 
 async function fotoAuftragKarte(platz) {
@@ -123,16 +147,38 @@ async function fotoAuftragKarte(platz) {
         type: 'file', accept: 'image/*', hidden: true,
         onchange: async (e) => {
           const datei = e.target.files[0];
+          e.target.value = '';
           if (!datei) return;
-          meldung('Schickt …');
+
+          /* Zwei getrennte Fehlerwege: Ein unlesbares Bild ist etwas
+             anderes als ein gescheiterter Versand — und beides muss
+             LAUT sein. Das stille Versagen hier hat am ersten Testtag
+             ein Foto verschluckt, ohne ein Wort zu sagen. */
+          const laufend = meldung('Bild wird vorbereitet …', 90000);
+          let bild;
           try {
-            const bild = await bildVerkleinern(datei);
+            bild = await bildVerkleinern(datei);
+          } catch (f) {
+            laufend.remove();
+            fehlerNotieren('Foto lesen: ' + (f && f.message || f));
+            return meldung('Dieses Bild ließ sich nicht lesen. Versuch eine andere Aufnahme.', 6000);
+          }
+
+          laufend.textContent = 'Schickt … bleib kurz in der App.';
+          try {
             await datenAnhaengen('plausch', { bild });
             await datenSchreib('fotoauftrag', { ...auftrag, status: 'erfuellt', erfuelltWann: jetzt() });
-            pushSenden('domme', 'hinweis', 'Es ist da.');
-            puls('antwortJa');
-            zeigeSeite('heim');
-          } catch { meldung('Das Bild ließ sich nicht lesen.'); }
+          } catch (f) {
+            laufend.remove();
+            fehlerNotieren('Foto senden: ' + (f && f.message || f));
+            return meldung('Senden gescheitert: ' + String(f && f.message || f).slice(0, 70) + ' — noch einmal.', 7000);
+          }
+
+          laufend.remove();
+          pushSenden('domme', 'hinweis', 'Es ist da.');
+          puls('antwortJa');
+          meldung('Angekommen.');
+          zeigeSeite('heim');
         },
       });
 

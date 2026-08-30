@@ -198,64 +198,136 @@ async function warteschlangeLeeren() {
 
 /* --- Zuhören -------------------------------------------------------------- */
 
-/* EventSource statt eigener Strom-Auswertung: der Browser kümmert sich um
-   Wiederverbindung und Zeilenzerlegung. Der Ausweis reist als Abfrage mit,
-   weil EventSource keine Kopfzeilen setzen kann. */
+/* EINE Leitung für alles.
+
+   Der Echtzeit-Server der Ablage spricht kein HTTP/2, und der Browser
+   erlaubt nur sechs gleichzeitige Verbindungen je Gegenstelle. Mit einer
+   Leitung je Pfad war die siebte dauerhaft am Verhungern — »verbindet…«
+   für immer, und nichts auf der Seite wurde je wieder frisch. Das war
+   die Wurzel des zähen ersten Testtags.
+
+   Deshalb horcht genau EINE Verbindung auf die Wurzel des Paares, und
+   ein Verteiler reicht jedes Ereignis an die angemeldeten Interessenten
+   weiter — mit Pfaden relativ zu ihrem Anliegen, sodass sich für die
+   Aufrufer nichts ändert. */
+
+Ablage._interessen = new Map();   // pfad -> Set von Rückrufen
+Ablage._stamm = null;             // { quelle, zuletzt }
+
+function _verteilen(vollPfad, wert) {
+  for (const [pfad, rueckrufe] of Ablage._interessen) {
+    const wurzelAnker = '/' + pfad;
+
+    let relativ = null;
+    let nutzwert;
+
+    if (vollPfad === '/' || wurzelAnker === vollPfad || wurzelAnker.startsWith(vollPfad + '/')) {
+      /* Das Ereignis liegt ÜBER dem Anliegen (oder ist die Wurzel):
+         den passenden Teil herausziehen. */
+      const rest = wurzelAnker.slice(vollPfad === '/' ? 1 : vollPfad.length + 1);
+      let zeiger = wert;
+      if (rest) {
+        for (const teil of rest.split('/')) {
+          zeiger = zeiger && typeof zeiger === 'object' ? zeiger[teil] : undefined;
+        }
+      }
+      relativ = '/';
+      nutzwert = zeiger === undefined ? null : zeiger;
+    } else if (vollPfad.startsWith(wurzelAnker + '/')) {
+      /* Das Ereignis liegt UNTER dem Anliegen: relativen Pfad reichen. */
+      relativ = vollPfad.slice(wurzelAnker.length);
+      nutzwert = wert;
+    }
+
+    if (relativ !== null) {
+      for (const fn of rueckrufe) {
+        try { fn(relativ, nutzwert); } catch { /* ein Zeichenfehler darf den Strom nicht reißen */ }
+      }
+    }
+  }
+}
+
+/* Der Bau der Leitung ist asynchron (erst der Ausweis, dann die Quelle).
+   Ohne Wächter riefen die sechs Horcher beim Start je einmal hier an,
+   sahen alle noch keinen Stamm — und öffneten SECHS Leitungen. Fünf
+   Waisen, das Verbindungslimit voll, und jeder weitere Anruf zur Ablage
+   verhungerte. Deshalb: Es baut immer nur einer, alle anderen warten
+   auf denselben Bau. */
+let _stammImBau = null;
+
+function _stammStarten() {
+  if (Ablage._stamm) return Promise.resolve();
+  if (_stammImBau) return _stammImBau;
+
+  _stammImBau = (async () => {
+    try {
+      const marke = await _marke();
+      if (Ablage._stamm) return;   // inzwischen von anderer Seite gebaut
+
+      const quelle = new EventSource(_adresse('') + '?auth=' + marke);
+      const eintrag = { quelle, zuletzt: Date.now() };
+      Ablage._stamm = eintrag;
+
+      const lebt = () => { eintrag.zuletzt = Date.now(); };
+      quelle.addEventListener('open', lebt);
+      quelle.addEventListener('keep-alive', lebt);
+      quelle.addEventListener('auth_revoked', () => { quelle.close(); _marke(); });
+
+      const beiNachricht = (e) => {
+        lebt();
+        try {
+          const d = JSON.parse(e.data);
+          if (d && d.path !== undefined) _verteilen(d.path, d.data);
+        } catch { /* Herzschläge und leere Zeilen übergehen */ }
+      };
+      quelle.addEventListener('put', beiNachricht);
+      quelle.addEventListener('patch', beiNachricht);
+    } finally {
+      _stammImBau = null;
+    }
+  })();
+  return _stammImBau;
+}
 
 async function ablageHorch(pfad, beiAenderung) {
-  const marke = await _marke();
-  const quelle = new EventSource(_adresse(pfad) + '?auth=' + marke);
+  const sauber = String(pfad).replace(/^\/+|\/+$/g, '');
+  if (!Ablage._interessen.has(sauber)) Ablage._interessen.set(sauber, new Set());
+  Ablage._interessen.get(sauber).add(beiAenderung);
 
-  const beiNachricht = (e) => {
-    try {
-      const d = JSON.parse(e.data);
-      if (d && d.path !== undefined) beiAenderung(d.path, d.data);
-    } catch { /* Herzschläge und leere Zeilen einfach übergehen */ }
-  };
-
-  quelle.addEventListener('put', beiNachricht);
-  quelle.addEventListener('patch', beiNachricht);
-  quelle.addEventListener('auth_revoked', () => { quelle.close(); _marke(); });
-
-  /* EventSource verbindet nach einem Fehler von selbst neu — und zwar
-     unbegrenzt und im Sekundentakt. Ist die Ablage dauerhaft nicht
-     erreichbar, wird daraus eine Schleife, die nur Akku kostet. Nach ein
-     paar Fehlversuchen wird deshalb aufgelegt; das Zurückkommen aus dem
-     Hintergrund und das online-Ereignis legen die Leitung wieder neu. */
-  let fehlversuche = 0;
-  quelle.addEventListener('open', () => { fehlversuche = 0; });
-  quelle.addEventListener('error', () => {
-    if (quelle.readyState === EventSource.CLOSED) return;
-    if (++fehlversuche >= 4) quelle.close();
-  });
-
-  /* Auf denselben Pfad zweimal zu horchen, ohne die alte Leitung zu
-     schließen, hinterlässt bei jedem Seitenwechsel eine offene Verbindung
-     mehr. Nach ein paar Minuten Hin und Her wären es Dutzende. */
-  const vorige = Ablage._horcher.get(pfad);
-  if (vorige) vorige.quelle.close();
-
-  const eintrag = { quelle, pfad, beiAenderung };
-  Ablage._horcher.set(pfad, eintrag);
+  if (!Ablage._stamm) await _stammStarten();
 
   return () => {
-    quelle.close();
-    Ablage._horcher.delete(pfad);
+    const menge = Ablage._interessen.get(sauber);
+    if (menge) {
+      menge.delete(beiAenderung);
+      if (!menge.size) Ablage._interessen.delete(sauber);
+    }
   };
 }
 
-/* Nach einem neuen Ausweis müssen alle Leitungen frisch gelegt werden —
-   die alten tragen den abgelaufenen mit sich. */
+/* Nach einem neuen Ausweis oder einem erkannten Riss: die eine Leitung
+   frisch legen. Die Interessen bleiben, wo sie sind. */
 function _horcherNeuAufbauen() {
-  const alte = [...Ablage._horcher.values()];
-  Ablage._horcher.clear();
-  alte.forEach((h) => h.quelle.close());
-  alte.forEach((h) => ablageHorch(h.pfad, h.beiAenderung).catch(() => {}));
+  if (Ablage._stamm) Ablage._stamm.quelle.close();
+  Ablage._stamm = null;
+  if (Ablage._interessen.size) _stammStarten().catch(() => {});
 }
 
+/* Der Wachhund: Die Ablage schickt alle dreißig Sekunden ein
+   Lebenszeichen über die Leitung. Bleibt es fünfzig Sekunden aus, ist
+   die Verbindung nur noch dem Browser bekannt — zu und neu. Genau diese
+   stillen Leichen gab es nach Standby und Netzwechsel. */
+setInterval(() => {
+  if (!Ablage.bereit || !Ablage._stamm) return;
+  const s = Ablage._stamm;
+  if (Date.now() - s.zuletzt > 50000 || s.quelle.readyState === 2) {
+    _horcherNeuAufbauen();
+  }
+}, 15000);
+
 function ablageStill() {
-  Ablage._horcher.forEach((h) => h.quelle.close());
-  Ablage._horcher.clear();
+  if (Ablage._stamm) Ablage._stamm.quelle.close();
+  Ablage._stamm = null;
 }
 
 /* --- Netz ----------------------------------------------------------------- */

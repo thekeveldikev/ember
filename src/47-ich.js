@@ -78,6 +78,7 @@ SEITEN.ich = function (seite) {
       zeile('Nach einer neuen Fassung sehen', 'Du hast ' + APP_VERSION, () => sucheAppUpdate(true)),
       zeile('Sichtwechsel', 'Dieses Gerät als ' + nameVon(andereRolle()) + ' sehen', () => sichtWechseln()),
       zeile('Nachts leiser ab', Gerät.lies('spaetAb', 22) + ':00 Uhr', () => spaetSetzen()),
+      zeile('Letzte Fehler', (Gerät.lies('fehlerlog', []).length || 'keine') + ' notiert', () => fehlerlogZeigen()),
       istDomme() ? zeile('Kopplungscode zeigen', 'Für ein weiteres Gerät', () => kopplungscodeNochmal()) : null,
       zeile('Diesen Raum vom Gerät nehmen', 'Alles Gemeinsame bleibt in der Ablage', () => geraetLeeren(), true)
     )
@@ -180,6 +181,26 @@ function boteEintragen() {
         },
       }, 'Eintragen')
     )
+  );
+}
+
+function fehlerlogZeigen() {
+  const liste = Gerät.lies('fehlerlog', []);
+  const b = blatt(
+    el('h2', {}, 'Letzte Fehler'),
+    el('p', { class: 'leise klein', style: { margin: '7px 0 14px' } },
+      liste.length ? 'Das Neueste zuoberst. Hilft beim Jagen.' : 'Nichts notiert — gut so.'),
+    ...liste.slice().reverse().map((f) => el('div', {
+      class: 'karte', style: { padding: '10px 13px', marginTop: '8px' },
+    },
+      el('p', { class: 'winzig still', style: { marginBottom: '3px' } },
+        new Date(f.wann).toLocaleString('de-DE')),
+      el('div', { class: 'klein', style: { wordBreak: 'break-word' } }, f.text)
+    )),
+    liste.length ? el('button', {
+      class: 'knopf leer breit', style: { marginTop: '14px' },
+      onclick: () => { Gerät.loesch('fehlerlog'); b.schliessen(); zeigeSeite('ich'); },
+    }, 'Leeren') : null
   );
 }
 

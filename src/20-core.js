@@ -274,6 +274,29 @@ const Gerät = {
   },
 };
 
+/* --- Das Fehlerprotokoll --------------------------------------------------- */
+
+/* Auf dem Handy sieht niemand eine Konsole. Was schiefgeht, landet
+   deshalb hier — die letzten fünfundzwanzig Fehler, nachlesbar unter
+   Ich → Letzte Fehler. Ohne das bleibt jeder iPhone-Fehler ein Rätsel. */
+
+function fehlerNotieren(text) {
+  try {
+    const liste = Gerät.lies('fehlerlog', []);
+    liste.push({ wann: Date.now(), text: String(text).slice(0, 220) });
+    Gerät.schreib('fehlerlog', liste.slice(-25));
+  } catch {}
+}
+
+function fehlerWacheStarten() {
+  window.addEventListener('error', (e) => {
+    fehlerNotieren((e.message || 'Fehler') + ' @' + String(e.filename || '').split('/').pop() + ':' + (e.lineno || ''));
+  });
+  window.addEventListener('unhandledrejection', (e) => {
+    fehlerNotieren('Unbehandelt: ' + String(e.reason && e.reason.message || e.reason).slice(0, 180));
+  });
+}
+
 /* --- Der laufende Zustand ------------------------------------------------- */
 
 /* D hält alles, was die Oberfläche gerade zeigt. Was hier steht, kommt

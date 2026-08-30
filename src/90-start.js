@@ -57,6 +57,7 @@ async function appStarten() {
   knopfHorcherStarten();
   ampelHorcherStarten();
   sperreHorcherStarten();
+  fotoHorcherStarten();
   regelWachePruefen();
   leisteAuffrischen();
 
@@ -108,6 +109,7 @@ function regelWachePruefen() {
   /* Vor allem anderen: In welchem Raum sind wir? Ohne dieses Vorzeichen
      läse jeder Griff zum Gerät die falsche Welt. */
   raumMigration();
+  fehlerWacheStarten();
 
   stimmungSetzen();
   dienstAnmelden();

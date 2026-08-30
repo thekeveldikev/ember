@@ -114,7 +114,7 @@ async function sperreKarte(platz) {
   const takt = setInterval(() => {
     if (!karte.isConnected) { clearInterval(takt); return; }
     setzeZeile2();
-  }, 30000);
+  }, 1000);
 
   if (istDomme()) {
     if (bitte && !bitte.antwort) {
@@ -186,6 +186,7 @@ function sperreBitten() {
     hinweis: 'Denk daran: Fragen kann den Preis erhöhen.',
     platzhalter: 'Etwas dazu? Muss nicht.',
     mehrzeilig: true,
+    leerErlaubt: true,
     jaText: 'Bitten',
   }, async (text) => {
     await datenSchreib('sperrebitte', { text, antwort: null });

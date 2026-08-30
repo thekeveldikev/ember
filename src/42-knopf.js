@@ -129,6 +129,7 @@ function bitteBlatt() {
     hinweis: 'Sie sieht, dass du gefragt hast. Wann sie antwortet, entscheidet sie.',
     platzhalter: 'Etwas dazu? Muss nicht.',
     mehrzeilig: true,
+    leerErlaubt: true,
     jaText: 'Fragen',
   }, async (text) => {
     await datenSchreib('knopf/aktuell', {

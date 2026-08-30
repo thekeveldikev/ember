@@ -62,7 +62,11 @@ export function ladeApp({ rolle = 'domme', dateien, ablage = baueAblage() } = {}
   const raum = {
     console,
     crypto,
-    setTimeout, clearTimeout, setInterval, clearInterval,
+    setTimeout, clearTimeout, clearInterval,
+    /* Dauertakte der App (der Leitungs-Wachhund) dürfen den Testlauf
+       nicht am Leben halten — sonst endet node --test nie. unref lässt
+       Node trotz laufendem Takt beenden. */
+    setInterval: (fn, ms) => { const t = setInterval(fn, ms); if (t.unref) t.unref(); return t; },
     TextEncoder, TextDecoder,
     btoa: (s) => Buffer.from(s, 'binary').toString('base64'),
     atob: (s) => Buffer.from(s, 'base64').toString('binary'),

@@ -115,7 +115,7 @@ function leerlauf(zier, text) {
 }
 
 /* Ein Textfeld in einem Blatt — für alles, was schnell erfasst wird. */
-function eingabeBlatt({ titel, hinweis, platzhalter, mehrzeilig, wert, jaText = 'Sichern' }, fertig) {
+function eingabeBlatt({ titel, hinweis, platzhalter, mehrzeilig, wert, jaText = 'Sichern', leerErlaubt = false }, fertig) {
   const feld = mehrzeilig
     ? el('textarea', { class: 'feld', rows: 4, placeholder: platzhalter || '' }, wert || '')
     : el('input', { class: 'feld', placeholder: platzhalter || '', value: wert || '' });
@@ -130,7 +130,9 @@ function eingabeBlatt({ titel, hinweis, platzhalter, mehrzeilig, wert, jaText = 
         class: 'knopf glut',
         onclick: () => {
           const text = feld.value.trim();
-          if (!text) return meldung('Da steht noch nichts.');
+          /* „Freiwillig" muss auch leer heißen dürfen — sonst lügt der
+             Platzhalter. */
+          if (!text && !leerErlaubt) return meldung('Da steht noch nichts.');
           b.schliessen();
           fertig(text);
         },
