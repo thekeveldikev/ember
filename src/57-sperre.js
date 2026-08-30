@@ -177,7 +177,7 @@ async function sperreKarte(platz) {
     }
   }
 
-  platz.append(karte);
+  sanftEinfuegen(platz, karte);
 }
 
 function sperreBitten() {
@@ -189,7 +189,10 @@ function sperreBitten() {
     leerErlaubt: true,
     jaText: 'Bitten',
   }, async (text) => {
-    await datenSchreib('sperrebitte', { text, antwort: null });
+    /* `wann` gehört in den Wert selbst: datenLies gibt nur den Wert
+       zurück, nicht die Hülle — ohne dieses Feld stand auf ihrer Karte
+       „Invalid Date". */
+    await datenSchreib('sperrebitte', { text, wann: jetzt(), antwort: null });
     pushSenden('domme', 'bitte', 'Er bittet.');
     puls('bitte');
     meldung('Gefragt.');

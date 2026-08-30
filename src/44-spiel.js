@@ -63,14 +63,16 @@ function spielKachel(titel, unter, ziel) {
 function deckZeichnen(platz, karten) {
   platz.innerHTML = '';
 
-  if (!karten.length) {
+  const vorratDecks = vorratDeckListe();
+
+  if (!karten.length && !vorratDecks.length) {
     platz.append(leerlauf('Leere Decks',
       istDomme() ? 'Leg die erste Karte an — dann gibt es etwas zu ziehen.'
         : 'Noch nichts drin. Das entscheidet sie.'));
     return;
   }
 
-  /* Die Fächer entstehen aus den Karten selbst, nicht aus einer Liste. */
+  /* Die eigenen Fächer entstehen aus den Karten selbst, nicht aus einer Liste. */
   const faecher = {};
   karten.forEach((k) => {
     const f = k.fach || 'Ohne Fach';
@@ -97,6 +99,30 @@ function deckZeichnen(platz, karten) {
     if (istDomme()) langerDruck(stapel, () => fachVerwalten(name, drin));
     platz.append(stapel);
   });
+
+  /* Der Vorrat: fertig gefüllte Decks, gefiltert nach ihrer Obergrenze.
+     Sie stehen unter den eigenen — das Eigene hat immer den Vortritt. */
+  if (vorratDecks.length) {
+    if (karten.length) {
+      platz.append(el('p', { class: 'winzig still', style: { margin: '18px 0 8px 2px' } }, 'Aus dem Vorrat'));
+    }
+    const gitter = el('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' } });
+    vorratDecks.forEach((deck) => {
+      gitter.append(el('button', {
+        class: 'karte',
+        style: { textAlign: 'left', padding: '13px 14px' },
+        onclick: () => karteZiehen(deck.name, deck.karten.map((k) => ({
+          titel: null, text: k.text, stufe: k.intensitaet, dauer: k.dauer_min, vorrat: true,
+        }))),
+      },
+        el('div', { style: { fontSize: '19px', marginBottom: '3px' } }, deck.icon || '🂠'),
+        el('div', { class: 'zier', style: { fontSize: '16px' } }, deck.name),
+        el('div', { class: 'still klein', style: { marginTop: '1px' } },
+          deck.karten.length + ' · ' + deck.beschreibung)
+      ));
+    });
+    platz.append(gitter);
+  }
 }
 
 /* --- Ziehen --------------------------------------------------------------- */
@@ -124,9 +150,20 @@ function karteZiehen(fach, karten) {
       animation: 'einblenden .34s ease',
     },
   },
-    el('p', { class: 'winzig still', style: { marginBottom: '11px' } }, fach + (karte.stufe ? ' · Stufe ' + karte.stufe : '')),
-    el('div', { class: 'zier', style: { fontSize: '23px', lineHeight: '1.3', marginBottom: '10px' } }, karte.titel),
-    karte.text ? el('p', { class: 'leise', style: { whiteSpace: 'pre-wrap' } }, karte.text) : null
+    el('p', { class: 'winzig still', style: { marginBottom: '11px' } },
+      fach + (karte.stufe ? ' · ' + '🔥'.repeat(karte.stufe) : '') +
+      (karte.dauer ? ' · ~' + karte.dauer + ' Min' : '')),
+    karte.titel
+      ? el('div', { class: 'zier', style: { fontSize: '23px', lineHeight: '1.3', marginBottom: '10px' } }, karte.titel)
+      : null,
+    karte.text ? el('p', {
+      class: karte.titel ? 'leise' : 'zier',
+      style: {
+        whiteSpace: 'pre-wrap',
+        fontSize: karte.titel ? '' : '20px',
+        lineHeight: karte.titel ? '' : '1.35',
+      },
+    }, karte.text) : null
   );
 
   const b = blatt(ruecken, vorne, el('div', { class: 'knopfreihe', style: { marginTop: '16px' } },
@@ -136,7 +173,8 @@ function karteZiehen(fach, karten) {
       onclick: async () => {
         b.schliessen();
         await datenAnhaengen('auftraege', {
-          titel: karte.titel, text: karte.text, fach, art: 'dare', erledigt: false, bestaetigt: false,
+          titel: karte.titel || karte.text, text: karte.titel ? karte.text : '',
+          fach, art: 'dare', erledigt: false, bestaetigt: false,
         });
         pushSenden(istDomme() ? 'sub' : 'domme', 'auftrag');
         meldung('Liegt bei den Aufträgen.');
@@ -151,6 +189,7 @@ function karteZiehen(fach, karten) {
     setTimeout(() => {
       ruecken.style.display = 'none';
       vorne.style.display = 'block';
+      tonSpielen('papier');
     }, 320);
   }, 480);
 }

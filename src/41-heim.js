@@ -32,16 +32,30 @@ SEITEN.heim = function (seite) {
   const sperrplatz = el('div');
   const fotoplatz = el('div');
   const tagesplatz = el('div');
+  const aufgabenplatz = el('div');
   const knopfplatz = el('div');
   const untenplatz = el('div');
-  seite.append(sperrplatz, fotoplatz, tagesplatz, knopfplatz, untenplatz);
+  seite.append(sperrplatz, fotoplatz, tagesplatz, aufgabenplatz, knopfplatz, untenplatz);
 
   knopfBuehneBauen(knopfplatz);
   sperreKarte(sperrplatz);
   fotoAuftragKarte(fotoplatz);
   tagesNachrichtLaden(tagesplatz);
+  tagesaufgabeKarte(aufgabenplatz);
   untenBauen(untenplatz);
 };
+
+/* Karten, die verspätet aus dem Netz kommen, klappen sanft auf, statt den
+   Knopf ruckartig nach unten zu schieben. Der Kniff: ein Gitter, dessen
+   einzige Zeile von 0fr auf 1fr wächst — Höhe wird animierbar, ohne dass
+   jemand messen muss. */
+function sanftEinfuegen(platz, knoten) {
+  const huelle = el('div', { class: 'aufklapp' },
+    el('div', { style: { minHeight: '0' } }, knoten));
+  platz.append(huelle);
+  requestAnimationFrame(() => requestAnimationFrame(() => huelle.classList.add('offen')));
+  return huelle;
+}
 
 /* --- Die Nachricht des Tages ---------------------------------------------- */
 
@@ -73,7 +87,7 @@ async function tagesNachrichtLaden(platz) {
         onclick: () => tagesNachrichtSetzen(platz),
       }, 'Ändern'));
     }
-    platz.append(karte);
+    sanftEinfuegen(platz, karte);
 
     /* Beim ersten Öffnen des Tages einmal groß, danach nur noch als Karte. */
     if (!istDomme() && Gerät.lies('tagGesehen') !== heute) {
@@ -186,50 +200,5 @@ function untenBauen(platz) {
   gluecksKeksLaden(keksplatz);
 }
 
-/* --- Das Glückskeks ------------------------------------------------------- */
-
-/* Einer je Tag, und beide sehen denselben. Deshalb wird nicht gewürfelt,
-   sondern aus dem Datum gerechnet — ohne dass jemand etwas speichern muss. */
-
-async function gluecksKeksLaden(platz) {
-  const sprueche = await datenListe('keks');
-  platz.innerHTML = '';
-
-  if (!sprueche.length) {
-    if (istDomme()) {
-      platz.append(el('button', {
-        class: 'winzig still', style: { display: 'block', margin: '0 auto', padding: '10px' },
-        onclick: () => keksSchreiben(platz),
-      }, 'Sprüche anlegen'));
-    }
-    return;
-  }
-
-  const heute = tagstempel();
-  let summe = 0;
-  for (const z of heute) summe = (summe * 31 + z.charCodeAt(0)) >>> 0;
-  const spruch = sprueche[summe % sprueche.length];
-
-  const karte = el('div', {
-    class: 'karte',
-    style: { textAlign: 'center', background: 'transparent', border: '1px dashed var(--kante-stark)', boxShadow: 'none' },
-  },
-    el('p', { class: 'zier leise', style: { fontSize: '16px', fontStyle: 'italic', lineHeight: '1.45' } }, spruch.text)
-  );
-
-  if (istDomme()) langerDruck(karte, () => keksSchreiben(platz));
-  platz.append(karte);
-}
-
-function keksSchreiben(platz) {
-  eingabeBlatt({
-    titel: 'Ein Spruch',
-    hinweis: 'Einer je Tag, zufällig gewählt. Beide sehen denselben.',
-    platzhalter: '…',
-    mehrzeilig: true,
-  }, async (text) => {
-    await datenAnhaengen('keks', { text });
-    meldung('Liegt im Glas.');
-    gluecksKeksLaden(platz);
-  });
-}
+/* Das Glückskeks wohnt jetzt in 61-keks.js — mit echtem Keks, Bruch und
+   aufgefaltetem Zettel statt einer stillen Karte. */

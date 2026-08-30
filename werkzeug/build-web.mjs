@@ -20,6 +20,9 @@ const schreib = (p, inhalt) => writeFileSync(join(wurzel, p), inhalt);
    Grundlagen vor ihren Benutzern stehen. Neue Bereiche kommen ans Ende,
    kurz vor 90-start.js. */
 const jsDateien = [
+  'src/15-vorrat.js',
+  'src/16-toene.js',
+  'src/17-vorrathilfen.js',
   'src/20-core.js',
   'src/21-krypto.js',
   'src/22-firebase.js',
@@ -57,6 +60,8 @@ const jsDateien = [
   'src/58-boss.js',
   'src/59-quiz.js',
   'src/60-funken.js',
+  'src/61-keks.js',
+  'src/62-tagesaufgabe.js',
   'src/90-start.js',
 ];
 

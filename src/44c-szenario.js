@@ -23,9 +23,20 @@ SEITEN.szenario = function (seite) {
     el('button', { class: 'winzig still', onclick: () => zeigeSeite('spiel') }, 'Zurück')
   ));
 
+  const generatorplatz = el('div', { class: 'abschnitt' });
   const wuerfelplatz = el('div', { class: 'abschnitt' });
   const faecherplatz = el('div', { class: 'abschnitt' });
-  seite.append(wuerfelplatz, faecherplatz);
+  seite.append(generatorplatz, wuerfelplatz, faecherplatz);
+
+  /* Der Generator aus dem Vorrat: ganze Sätze statt Stichworte. */
+  if (vorratAn() && vorratSzenario()) {
+    generatorplatz.append(el('div', { class: 'karte glimmt', style: { textAlign: 'center', padding: '18px 16px' } },
+      el('p', { class: 'winzig still', style: { marginBottom: '4px' } }, 'Der Generator'),
+      el('p', { class: 'leise klein', style: { marginBottom: '13px' } },
+        'Würfelt ein ganzes Szenario — über eine Milliarde Möglichkeiten.'),
+      el('button', { class: 'knopf glut breit', onclick: szenarioGenerieren }, 'Würfeln')
+    ));
+  }
 
   const stopp = datenHorch('bausteine', (steine) => {
     wuerfelplatz.innerHTML = '';
@@ -89,6 +100,68 @@ function bausteinAnlegen(fach) {
     await datenAnhaengen('bausteine', { fach: fach.id, text });
     meldung('Liegt drin.');
   });
+}
+
+/* --- Der Generator aus dem Vorrat ------------------------------------------ */
+
+function szenarioGenerieren() {
+  let aktuell = vorratSzenario();
+  if (!aktuell) return meldung('Der Vorrat gibt gerade nichts her.');
+
+  const anzeige = el('p', {
+    class: 'zier',
+    style: { fontSize: '19px', lineHeight: '1.45', padding: '4px 4px 8px', animation: 'einblenden .3s ease' },
+  }, aktuell.text);
+  puls('hinweis');
+  tonSpielen('tick');
+
+  const b = blatt(
+    el('p', { class: 'winzig still', style: { marginBottom: '10px' } }, 'Gewürfelt'),
+    anzeige,
+    el('div', { class: 'knopfreihe', style: { marginTop: '16px' } },
+      el('button', {
+        class: 'knopf leer',
+        onclick: () => {
+          const neu = vorratSzenario();
+          if (!neu) return;
+          aktuell = neu;
+          anzeige.textContent = neu.text;
+          anzeige.style.animation = 'none';
+          requestAnimationFrame(() => { anzeige.style.animation = 'einblenden .3s ease'; });
+          puls('hinweis');
+          tonSpielen('tick');
+        },
+      }, 'Noch mal'),
+      el('button', {
+        class: 'knopf glut',
+        onclick: async () => {
+          b.schliessen();
+          await datenAnhaengen('auftraege', {
+            titel: aktuell.text, text: '', fach: 'Generator',
+            art: 'szenario', erledigt: false, bestaetigt: false,
+          });
+          pushSenden(istDomme() ? 'sub' : 'domme', 'auftrag');
+          meldung('Liegt bei den Aufträgen.');
+        },
+      }, istDomme() ? 'Nehmen' : 'Vorschlagen')
+    ),
+    istDomme() ? el('button', {
+      class: 'winzig still', style: { display: 'block', margin: '14px auto 0' },
+      onclick: () => {
+        b.schliessen();
+        eingabeBlatt({
+          titel: 'Vorher ändern', mehrzeilig: true, wert: aktuell.text, jaText: 'Nehmen',
+        }, async (text) => {
+          await datenAnhaengen('auftraege', {
+            titel: text, text: '', fach: 'Generator',
+            art: 'szenario', erledigt: false, bestaetigt: false,
+          });
+          pushSenden('sub', 'auftrag');
+          meldung('Liegt bei ihm.');
+        });
+      },
+    }, 'Erst ändern') : null
+  );
 }
 
 /* --- Würfeln -------------------------------------------------------------- */

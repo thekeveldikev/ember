@@ -628,6 +628,201 @@ textarea.feld { resize: none; line-height: 1.5; }
   50% { transform: scale(1.18); opacity: 1 }
 }
 
+/* --- Sanftes Aufklappen ----------------------------------------------------
+   Karten, die verspätet aus dem Netz kommen, schieben den Inhalt nicht
+   ruckartig weg, sondern wachsen weich in ihre Höhe. Das Gitter mit einer
+   Zeile von 0fr auf 1fr ist der einzige Weg, Höhe ohne Messen zu
+   animieren. */
+
+.aufklapp {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows .4s cubic-bezier(.2, .7, .3, 1), opacity .32s ease .06s;
+}
+
+.aufklapp > * { min-height: 0; overflow: hidden; }
+.aufklapp.offen { grid-template-rows: 1fr; opacity: 1; }
+
+/* --- Blätter: der Abgang --------------------------------------------------- */
+
+.deckel.geht {
+  animation: none;
+  opacity: 0;
+  transition: opacity .26s ease;
+  pointer-events: none;
+}
+
+.blatt.geht {
+  animation: blattRunter .26s cubic-bezier(.5, 0, .8, .5) forwards;
+}
+
+@keyframes blattRunter {
+  to { transform: translateY(105%); opacity: .7; }
+}
+
+/* --- Der Haltering am Knopf ------------------------------------------------
+   Solange der Finger liegt, läuft ein Bogen einmal um den Knopf. Voll
+   heißt: gesendet. */
+
+.haltering {
+  position: absolute;
+  inset: -9px;
+  pointer-events: none;
+}
+
+.haltering svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+
+.haltering circle {
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.haltering .spur { stroke: rgba(232, 168, 124, .14); }
+
+.haltering .lauf {
+  stroke: var(--glut-hell);
+  stroke-dasharray: 298.5;
+  stroke-dashoffset: 298.5;
+  filter: drop-shadow(0 0 6px var(--schein));
+}
+
+.haltering.laeuft .lauf {
+  transition: stroke-dashoffset .85s linear;
+  stroke-dashoffset: 0;
+}
+
+.derknopf.gezuendet {
+  animation: zuendung .5s cubic-bezier(.2, .7, .3, 1);
+}
+
+@keyframes zuendung {
+  0% { transform: scale(.94); box-shadow: 0 0 0 0 rgba(232, 168, 124, .55), 0 14px 44px -12px rgba(196, 120, 90, .55); }
+  40% { transform: scale(1.05); }
+  100% { transform: scale(1); box-shadow: 0 0 0 46px rgba(232, 168, 124, 0), 0 14px 44px -12px rgba(196, 120, 90, .55); }
+}
+
+/* --- Der Glückskeks -------------------------------------------------------- */
+
+.keks {
+  display: block;
+  margin: 14px auto 0;
+  text-align: center;
+  padding: 6px 20px 2px;
+}
+
+.keksbild {
+  width: 118px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, .5));
+}
+
+.keks:active .keksbild { transform: scale(.96); }
+.keksbild { transition: transform .15s ease; }
+
+.keks-links, .keks-rechts { transform-origin: 70px 60px; }
+
+.bricht-links { animation: keksBruchLinks .62s cubic-bezier(.3, .6, .3, 1) forwards; }
+.bricht-rechts { animation: keksBruchRechts .62s cubic-bezier(.3, .6, .3, 1) forwards; }
+
+@keyframes keksBruchLinks {
+  25% { transform: translate(-2px, 0) rotate(-3deg); }
+  100% { transform: translate(-15px, 5px) rotate(-15deg); }
+}
+
+@keyframes keksBruchRechts {
+  25% { transform: translate(2px, 0) rotate(3deg); }
+  100% { transform: translate(15px, 5px) rotate(15deg); }
+}
+
+.kruemel {
+  position: fixed;
+  z-index: 950;
+  width: 4px;
+  height: 4px;
+  border-radius: 40% 60% 55% 45%;
+  background: #c98d4e;
+  pointer-events: none;
+  animation: kruemelFall .8s cubic-bezier(.2, .5, .6, 1) forwards;
+}
+
+@keyframes kruemelFall {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0); }
+  100% { opacity: 0; transform: translate(var(--kx, 0), var(--ky, 60px)) rotate(240deg); }
+}
+
+.kekszettel {
+  position: absolute;
+  bottom: 26px;
+  left: 50%;
+  width: 46px;
+  margin-left: -23px;
+  padding: 3px 0 2px;
+  background: linear-gradient(175deg, #f6eddd, #e8dcc4);
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .45);
+  color: #a08a60;
+  font-size: 8px;
+  letter-spacing: .2em;
+  text-align: center;
+  transform: rotate(-4deg);
+}
+
+.kekszettel.taucht-auf { animation: zettelTaucht .5s cubic-bezier(.2, .7, .3, 1) .25s both; }
+
+@keyframes zettelTaucht {
+  from { opacity: 0; transform: rotate(-4deg) translateY(12px); }
+  to { opacity: 1; transform: rotate(-4deg) translateY(0); }
+}
+
+.keksoffen {
+  margin: 14px auto 0;
+  max-width: 340px;
+  padding: 16px 20px 15px;
+  text-align: center;
+  background:
+    linear-gradient(184deg, rgba(255, 255, 255, .06), transparent 40%),
+    linear-gradient(175deg, #f3e9d6, #e4d6ba);
+  border-radius: 4px;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, .45), inset 0 0 22px rgba(150, 110, 50, .12);
+  transform: rotate(-.6deg);
+}
+
+.keksoffen.faltet-auf {
+  animation: zettelFaltung .55s cubic-bezier(.2, .7, .3, 1);
+  transform-origin: 50% 0;
+}
+
+@keyframes zettelFaltung {
+  0% { opacity: 0; transform: rotate(-.6deg) perspective(500px) rotateX(-68deg) scaleY(.5); }
+  60% { opacity: 1; transform: rotate(-.6deg) perspective(500px) rotateX(8deg) scaleY(1.01); }
+  100% { transform: rotate(-.6deg) perspective(500px) rotateX(0) scaleY(1); }
+}
+
+/* --- Der Vorhang, zweiter Anlauf ------------------------------------------- */
+
+#vorhang .wortmarke {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% + 34px);
+  text-align: center;
+  font-family: 'Playfair', Georgia, serif;
+  font-size: 15px;
+  letter-spacing: .55em;
+  text-indent: .55em;
+  color: var(--schrift-still);
+  animation: wortmarkeAn 1.4s ease .15s both;
+}
+
+@keyframes wortmarkeAn {
+  from { opacity: 0; letter-spacing: .3em; }
+  to { opacity: .85; letter-spacing: .55em; }
+}
+
 /* --- Rücksicht ------------------------------------------------------------ */
 
 @media (prefers-reduced-motion: reduce) {

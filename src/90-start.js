@@ -54,6 +54,10 @@ async function appStarten() {
   await ampelLaden().catch(() => {});
   stimmungSetzen();
 
+  /* Der Vorrat: erst die Einstellung, dann die Tagesaufgabe des Tages. */
+  await vorratLaden().catch(() => {});
+  tagesaufgabenStart().catch(() => {});
+
   knopfHorcherStarten();
   ampelHorcherStarten();
   sperreHorcherStarten();

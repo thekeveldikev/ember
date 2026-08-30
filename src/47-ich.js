@@ -78,6 +78,11 @@ SEITEN.ich = function (seite) {
       zeile('Nach einer neuen Fassung sehen', 'Du hast ' + APP_VERSION, () => sucheAppUpdate(true)),
       zeile('Sichtwechsel', 'Dieses Gerät als ' + nameVon(andereRolle()) + ' sehen', () => sichtWechseln()),
       zeile('Nachts leiser ab', Gerät.lies('spaetAb', 22) + ':00 Uhr', () => spaetSetzen()),
+      zeile('Töne', toeneAn() ? 'An — Keks, Rad und Knopf klingen leise' : 'Aus', () => {
+        Gerät.schreib('toene', !toeneAn());
+        if (toeneAn()) tonSpielen('weich');
+        zeigeSeite('ich');
+      }),
       zeile('Letzte Fehler', (Gerät.lies('fehlerlog', []).length || 'keine') + ' notiert', () => fehlerlogZeigen()),
       istDomme() ? zeile('Kopplungscode zeigen', 'Für ein weiteres Gerät', () => kopplungscodeNochmal()) : null,
       zeile('Diesen Raum vom Gerät nehmen', 'Alles Gemeinsame bleibt in der Ablage', () => geraetLeeren(), true)
@@ -335,6 +340,15 @@ SEITEN.verwaltung = function (seite) {
 
   seite.append(kopfzeile('Verwaltung',
     el('button', { class: 'winzig still', onclick: () => zeigeSeite('ich') }, 'Zurück')));
+
+  seite.append(
+    el('div', { class: 'abschnitt' },
+      el('p', { class: 'winzig still', style: { margin: '0 0 9px 2px' } }, 'Der Inhalt'),
+      zeile('Der Vorrat',
+        vorratAn() ? 'An · bis Stufe ' + vorratStufe() + (vorratGetrennt() ? ' · getrennt' : '') : 'Aus',
+        () => vorratBlatt())
+    )
+  );
 
   const zoegernplatz = el('div', { class: 'abschnitt' });
   seite.append(zoegernplatz);

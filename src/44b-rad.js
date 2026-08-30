@@ -21,13 +21,67 @@ SEITEN.rad = function (seite) {
   beimVerlassen(stopp);
 };
 
+/* Ein Vorrat-Rad hat oft zwanzig und mehr Segmente — auf der Scheibe wäre
+   das Gekrissel. Für jede Drehung wird eine lesbare Handvoll gezogen; der
+   Treffer bleibt gleich zufällig, nur eben aus einer frischen Auswahl. */
+function _vorratRadFuerDrehung(rad) {
+  const segmente = rad.segmente.slice();
+  for (let i = segmente.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [segmente[i], segmente[j]] = [segmente[j], segmente[i]];
+  }
+  return { name: rad.name, felder: segmente.slice(0, 12).map((s) => s.text) };
+}
+
 function raederZeichnen(platz, raeder) {
   platz.innerHTML = '';
 
-  if (!raeder.length) {
+  const vorrat = vorratRaeder();
+  const kombis = vorratRadKombis();
+
+  if (!raeder.length && !vorrat.length) {
     platz.append(leerlauf('Noch kein Rad',
       istDomme() ? 'Ein Rad ist eine Handvoll Felder. Beschrifte sie, wie du magst.'
         : 'Sie hat noch keins gebaut.'));
+  }
+
+  /* Die Kombinationen zuerst — sie sind der schnellste Weg zu etwas Gutem. */
+  if (kombis.length) {
+    platz.append(el('p', { class: 'winzig still', style: { margin: '0 0 8px 2px' } }, 'Kombinationen'));
+    const reihe = el('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '16px' } });
+    kombis.forEach((k) => {
+      const beteiligte = k.raeder
+        .map((key) => vorrat.find((r) => r.key === key))
+        .filter(Boolean);
+      if (!beteiligte.length) return;
+      reihe.append(el('button', {
+        class: 'karte',
+        style: { textAlign: 'left', padding: '12px 13px' },
+        onclick: () => radDrehen(beteiligte.map(_vorratRadFuerDrehung)),
+      },
+        el('div', { class: 'zier', style: { fontSize: '15.5px' } }, k.name),
+        el('div', { class: 'still klein', style: { marginTop: '1px' } },
+          k.beschreibung + ' · ' + beteiligte.length + (beteiligte.length === 1 ? ' Rad' : ' Räder'))
+      ));
+    });
+    platz.append(reihe);
+  }
+
+  if (vorrat.length) {
+    platz.append(el('p', { class: 'winzig still', style: { margin: '0 0 8px 2px' } }, 'Einzelne Räder'));
+    const gitter = el('div', { style: { display: 'flex', flexWrap: 'wrap', gap: '7px', marginBottom: '16px' } });
+    vorrat.forEach((rad) => {
+      gitter.append(el('button', {
+        class: 'knopf leer',
+        style: { minHeight: '40px', padding: '8px 13px', fontSize: '13.5px' },
+        onclick: () => radDrehen([_vorratRadFuerDrehung(rad)]),
+      }, (rad.icon ? rad.icon + ' ' : '') + rad.name));
+    });
+    platz.append(gitter);
+  }
+
+  if (raeder.length) {
+    platz.append(el('p', { class: 'winzig still', style: { margin: '0 0 8px 2px' } }, 'Eure eigenen'));
   }
 
   raeder.forEach((rad) => {
@@ -100,6 +154,7 @@ function radDrehen(raeder) {
       uebernehmen.style.display = '';
       nochmal.style.display = '';
       puls('antwortJa');
+      tonSpielen('weich');
       return;
     }
     const rad = raeder[nummer++];
@@ -219,7 +274,7 @@ function einRadDrehen(platz, rad, fertig) {
   });
 
   puls('hinweis');
-  setTimeout(() => fertig(felder[treffer]), 3500);
+  setTimeout(() => { tonSpielen('tick'); fertig(felder[treffer]); }, 3500);
 }
 
 /* Erst wählen, welche Räder mitlaufen sollen. */

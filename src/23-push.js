@@ -122,15 +122,19 @@ async function pushAbmelden() {
    ein Rhythmus. Kein Inhalt, keine Namen. Was gemeint ist, steht in der
    verschlüsselten Ablage und wird erst in der geöffneten App sichtbar. */
 
+/* Der Titel trägt die Stimme, der Text bleibt vage. „von Ember" hängt
+   iOS von sich aus an jede Meldung einer installierten App — das lässt
+   sich nicht abstellen, also soll wenigstens der Rest nicht auch noch
+   „Ember" sagen. */
 const PUSH_HUELLEN = {
-  befehl: { titel: 'Ember', text: 'Jetzt.', puls: PULS.befehl },
-  bitte: { titel: 'Ember', text: 'Eine Bitte wartet.', puls: PULS.bitte },
-  antwort: { titel: 'Ember', text: 'Eine Antwort ist da.', puls: PULS.antwortJa },
-  plausch: { titel: 'Ember', text: 'Eine Nachricht.', puls: PULS.hinweis },
-  denkAnDich: { titel: 'Ember', text: '·', puls: PULS.denkAnDich },
-  auftrag: { titel: 'Ember', text: 'Etwas liegt für dich bereit.', puls: PULS.hinweis },
-  regel: { titel: 'Ember', text: 'Etwas hat sich geändert.', puls: PULS.hinweis },
-  hinweis: { titel: 'Ember', text: 'Etwas wartet auf dich.', puls: PULS.hinweis },
+  befehl: { titel: 'Sofort.', text: 'Lass alles stehen.', puls: PULS.befehl },
+  bitte: { titel: 'Eine Bitte', text: 'Jemand fragt leise an.', puls: PULS.bitte },
+  antwort: { titel: 'Entschieden', text: 'Sieh nach, wie.', puls: PULS.antwortJa },
+  plausch: { titel: 'Für dich', text: 'Da liegt etwas Neues.', puls: PULS.hinweis },
+  denkAnDich: { titel: '· · ·', text: 'Jemand denkt an dich.', puls: PULS.denkAnDich },
+  auftrag: { titel: 'Es liegt bereit', text: 'Öffne mich, dann weißt du es.', puls: PULS.hinweis },
+  regel: { titel: 'Neu ab jetzt', text: 'Etwas hat sich geändert.', puls: PULS.hinweis },
+  hinweis: { titel: 'Ein Glimmen', text: 'Etwas wartet auf dich.', puls: PULS.hinweis },
 };
 
 async function pushSenden(anRolle, art = 'hinweis', eigenerText) {

@@ -79,6 +79,29 @@ TEXT „null" in die Seite — bedingte Kinder immer über `el()` oder
 iOS schlicht nicht; alle `puls()`-Aufrufe sind dort wirkungslos, die
 Rhythmen kommen nur über Push an. Das ist Apples Grenze, kein Fehler.
 
+**V4 — der Vorrat (0.5.0):** Fünf Content-Dateien in `inhalt/` (241
+Dare-Karten in 15 Decks, 12 Glücksräder mit 254 Segmenten plus 10
+Kombinationen, ein Szenario-Generator mit 152 Bausteinen und 7
+Satz-Templates, 115 Tagesaufgaben, 118 Kekssprüche) werden mit
+`node werkzeug/vorrat-bauen.mjs` zu `src/15-vorrat.js` gebacken und
+wandern mit in die index.html — offline komplett dabei, nichts muss
+gesät werden, jeder Raum hat den Vorrat von allein. Sie steuert alles
+unter **Verwaltung → Der Vorrat**: an/aus, Intensitäts-Obergrenze 1–5,
+zusammen/getrennt. Die Ampel drückt zusätzlich (Gelb deckelt bei 3, Rot
+bei 1 bzw. beim Ruhe-Pool). Eigene Einträge werden überall dazugemischt
+und ersetzt nie etwas.
+
+Dazu neu: der **Glückskeks** als echter Keks unten auf dem Heim (tippen
+bricht ihn mit Krümeln und Knacken, der Zettel faltet sich beim zweiten
+Tipp auf; eigene Sprüche per langem Druck, sie zählen doppelt und tragen
+den Absender), die **Tagesaufgabe** für beide Rollen (seine nach Stufe
+gestaffelt, mit Serie und Veto/Tauschen für sie; ihre aus dem eigenen
+Topf), **Töne** aus purem WebAudio (Ich → Die App, je Gerät), der
+**SEX-Knopf** (Tippen öffnet das Blatt mit Worten und Frist, Halten
+schickt sofort — mit Ring, der sich in 0,85 s schließt) und das sanfte
+Aufklappen nachgeladener Heim-Karten (`grid-template-rows: 0fr → 1fr`
+— der einzige Weg, Höhe ohne Messen zu animieren).
+
 **Was aus dem ursprünglichen Entwurf noch fehlt:** Seasons, gemeinsames
 Schreiben, Playlist, KI-Anbindung, Voting.
 

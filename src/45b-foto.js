@@ -224,5 +224,5 @@ async function fotoAuftragKarte(platz) {
     );
   }
 
-  platz.append(karte);
+  sanftEinfuegen(platz, karte);
 }

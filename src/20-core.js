@@ -98,6 +98,8 @@ function dauerText(ms) {
 }
 
 function vorZeit(zeit) {
+  /* Ein fehlender Stempel darf nie „Invalid Date" auf den Schirm bringen. */
+  if (!zeit || isNaN(zeit)) return 'gerade eben';
   const d = Math.max(0, Date.now() - zeit);
   if (d < 60e3) return 'gerade eben';
   if (d < 3600e3) return Math.floor(d / 60e3) + ' Min';
@@ -184,8 +186,14 @@ function blatt(...inhalt) {
   }, b);
 
   function schliessen() {
-    deckel.style.animation = 'deckelAn .2s ease reverse';
-    setTimeout(() => deckel.remove(), 190);
+    /* Das Blatt gleitet nach unten hinaus, der Deckel blendet aus —
+       vorher verschwand beides nur über die Deckkraft, und das sah nach
+       Abbruch aus, nicht nach Schließen. Doppelt schließen ist erlaubt
+       und tut nichts. */
+    if (deckel.classList.contains('geht')) return;
+    deckel.classList.add('geht');
+    b.classList.add('geht');
+    setTimeout(() => deckel.remove(), 270);
     document.removeEventListener('keydown', beiTaste);
   }
 

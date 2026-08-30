@@ -22,11 +22,18 @@ function knopfBuehneBauen(platz) {
   platz.append(buehne);
 
   if (istDomme()) {
-    const knopf = el('button', { class: 'derknopf', onclick: () => befehlBlatt() }, 'Jetzt');
-    langerDruck(knopf, () => befehlBlatt(true));
+    /* Tippen öffnet das Blatt (Worte, Zeitraum). Halten schickt sofort —
+       ohne ein einziges Wort, dafür mit dem Ring, der sich schließt. */
+    const ring = el('div', { class: 'haltering', html:
+      '<svg viewBox="0 0 100 100"><circle class="spur" cx="50" cy="50" r="47.5"/>' +
+      '<circle class="lauf" cx="50" cy="50" r="47.5"/></svg>' });
+    const knopf = el('button', { class: 'derknopf' }, ring, el('span', {}, 'SEX'));
+    knopfHaltenBinden(knopf, ring,
+      () => befehlBlatt(),
+      () => befehlSofort());
     buehne.append(knopf);
     buehne.append(el('p', { class: 'still klein mitte', style: { marginTop: '14px' } },
-      'Tippen für sofort · Halten für einen Zeitraum'));
+      'Tippen für Worte und Zeit · Halten schickt sofort'));
     offeneBitteZeigen(platz);
   } else {
     const knopf = el('button', { class: 'derknopf bitte', onclick: () => bitteBlatt() }, 'Bitte');
@@ -37,7 +44,51 @@ function knopfBuehneBauen(platz) {
 
 /* --- Sie: der Befehl ------------------------------------------------------ */
 
-function befehlBlatt(mitZeit = false) {
+/* Halten mit sichtbarem Fortschritt: Der Ring füllt sich, solange der
+   Finger liegt. Voll heißt gesendet. Loslassen vorher heißt: nur getippt. */
+function knopfHaltenBinden(knopf, ring, beiTipp, beiVoll, ms = 850) {
+  let uhr = null;
+  let ausgeloest = false;
+
+  const anfangen = () => {
+    ausgeloest = false;
+    ring.classList.add('laeuft');
+    uhr = setTimeout(() => {
+      ausgeloest = true;
+      ring.classList.remove('laeuft');
+      knopf.classList.add('gezuendet');
+      setTimeout(() => knopf.classList.remove('gezuendet'), 500);
+      beiVoll();
+    }, ms);
+  };
+  const abbrechen = () => {
+    clearTimeout(uhr);
+    ring.classList.remove('laeuft');
+  };
+
+  knopf.addEventListener('pointerdown', anfangen);
+  knopf.addEventListener('pointerup', abbrechen);
+  knopf.addEventListener('pointerleave', abbrechen);
+  knopf.addEventListener('pointercancel', abbrechen);
+  knopf.addEventListener('contextmenu', (e) => e.preventDefault());
+  knopf.addEventListener('click', (e) => {
+    if (ausgeloest) { e.preventDefault(); e.stopPropagation(); return; }
+    beiTipp();
+  });
+}
+
+/* Der Sofort-Weg: kein Blatt, kein Text — der Knopf selbst ist die Nachricht. */
+async function befehlSofort() {
+  tonSpielen('tief');
+  puls('befehl');
+  await datenSchreib('knopf/aktuell', {
+    art: 'befehl', text: '', bis: null, wann: jetzt(), quittiert: false,
+  });
+  pushSenden('sub', 'befehl');
+  meldung('Er weiß Bescheid.');
+}
+
+function befehlBlatt() {
   const feld = el('textarea', { class: 'feld', rows: 2, placeholder: 'Ohne Worte, oder mit.' });
   const minuten = el('input', {
     class: 'feld', type: 'number', inputmode: 'numeric', min: '1', max: '720',
@@ -45,14 +96,14 @@ function befehlBlatt(mitZeit = false) {
   });
 
   const b = blatt(
-    el('h2', {}, 'Jetzt'),
+    el('h2', {}, 'SEX'),
     el('p', { class: 'leise klein', style: { margin: '7px 0 14px' } },
       'Sein Bildschirm gehört dir, sobald du drückst.'),
     feld,
-    mitZeit ? el('div', {},
-      el('p', { class: 'winzig still', style: { marginTop: '15px' } }, 'Er hat …'),
+    el('div', {},
+      el('p', { class: 'winzig still', style: { marginTop: '15px' } }, 'Er hat … (leer = keine Frist)'),
       minuten
-    ) : null,
+    ),
     el('div', { class: 'knopfreihe', style: { marginTop: '18px' } },
       el('button', { class: 'knopf leer', onclick: () => b.schliessen() }, 'Doch nicht'),
       el('button', { class: 'knopf glut', onclick: (e) => senden(e.target) }, 'Senden')
@@ -62,7 +113,7 @@ function befehlBlatt(mitZeit = false) {
   async function senden(knopf) {
     if (knopf) knopf.disabled = true;
     const text = feld.value.trim();
-    const frist = mitZeit ? parseInt(minuten.value, 10) : 0;
+    const frist = parseInt(minuten.value, 10) || 0;
     b.schliessen();
 
     await datenSchreib('knopf/aktuell', {
@@ -73,7 +124,7 @@ function befehlBlatt(mitZeit = false) {
       quittiert: false,
     });
 
-    pushSenden('sub', 'befehl', text ? undefined : 'Jetzt.');
+    pushSenden('sub', 'befehl');
     puls('befehl');
     meldung('Angekommen.');
   }
@@ -255,7 +306,7 @@ function befehlZeigen(befehl) {
   const uhr = el('div', { class: 'uhr' });
   const schirm = el('div', { class: 'befehl' },
     el('div', { class: 'wort' }, nameVon('domme')),
-    el('div', { class: 'text' }, befehl.text || 'Jetzt.'),
+    el('div', { class: 'text' }, befehl.text || 'SEX.'),
     befehl.bis ? uhr : null,
     el('button', {
       class: 'knopf glut',
