@@ -26,7 +26,7 @@ SEITEN.grenzen = function (seite) {
   ));
 
   seite.append(el('p', { class: 'leise klein', style: { marginBottom: '18px', lineHeight: '1.5' } },
-    'Jeder trägt für sich ein. Nebeneinander seht ihr, wo ihr euch trefft — und wo nicht.'));
+    'Jeder trägt für sich ein. Nebeneinander sehen wir, wo wir uns treffen — und wo nicht.'));
 
   const platz = el('div');
   seite.append(platz);

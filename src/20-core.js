@@ -175,6 +175,18 @@ function entprellt(fn, ms = 300) {
 
 const zufall = (liste) => liste[Math.floor(Math.random() * liste.length)];
 
+/* Fisher-Yates statt sort(random): Das Sortier-Mischen ist messbar
+   schief — im Quiz stand die richtige Antwort öfter an derselben
+   Stelle, und wer das Muster spürt, rät besser als er weiß. */
+function mischen(liste) {
+  const raus = liste.slice();
+  for (let i = raus.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [raus[i], raus[j]] = [raus[j], raus[i]];
+  }
+  return raus;
+}
+
 /* Nutzerinhalte wandern grundsätzlich als Text in den Baum, nie als HTML.
    Wo doch einmal HTML nötig ist, geht es hier durch. */
 const sicher = (s) => String(s == null ? '' : s)
@@ -183,7 +195,15 @@ const sicher = (s) => String(s == null ? '' : s)
 
 /* --- Meldungen ------------------------------------------------------------ */
 
+/* In der Tarnung ist die App eine Notizliste — und eine Notizliste
+   meldet nichts, vibriert nicht, klingt nicht und legt keine Blätter
+   auf. Diese eine Frage stellt jeder laute Weg, bevor er losgeht. */
+function istGetarnt() {
+  return typeof _getarnt !== 'undefined' && _getarnt;
+}
+
 function meldung(text, ms = 3200) {
+  if (istGetarnt()) return el('div');
   const m = el('div', { class: 'meldung' }, text);
   $('#meldungen').append(m);
   setTimeout(() => {
@@ -194,6 +214,7 @@ function meldung(text, ms = 3200) {
 }
 
 function meldungMitTat(text, tatText, tat, ms = 8000) {
+  if (istGetarnt()) return el('div');
   const m = el('div', { class: 'meldung' },
     el('span', { style: { flex: '1' } }, text),
     el('button', {
@@ -217,6 +238,10 @@ function meldungMitTat(text, tatText, tat, ms = 8000) {
 const BLATT_FEST = { __blattFest: true };
 
 function blatt(...inhalt) {
+  if (istGetarnt()) {
+    const leer = el('div');
+    return { deckel: leer, schliessen() {} };
+  }
   let fest = false;
   if (inhalt[0] && inhalt[0].__blattFest) { fest = true; inhalt.shift(); }
 
@@ -282,6 +307,7 @@ const PULS = {
 };
 
 function puls(art = 'hinweis') {
+  if (istGetarnt()) return;
   try {
     if (navigator.vibrate) navigator.vibrate(PULS[art] || PULS.hinweis);
   } catch { /* manche Browser mögen das nicht — dann eben still */ }
@@ -375,6 +401,9 @@ function nameVon(rolle) {
 /* Spät am Abend wird die App von selbst leiser. Rot überschreibt alles. */
 function stimmungSetzen(erzwungen) {
   let s = erzwungen;
+  /* Die Tarnung schlägt jede Stimmung — sonst malte der nächste
+     stimmungSetzen-Aufruf die Notizliste wieder dunkel. */
+  if (!s && (istGetarnt() || Gerät.lies('getarnt'))) s = 'tarnung';
   if (!s) {
     if (D.ruhe) s = 'ruhe';
     else {

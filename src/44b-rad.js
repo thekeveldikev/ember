@@ -25,12 +25,7 @@ SEITEN.rad = function (seite) {
    das Gekrissel. Für jede Drehung wird eine lesbare Handvoll gezogen; der
    Treffer bleibt gleich zufällig, nur eben aus einer frischen Auswahl. */
 function _vorratRadFuerDrehung(rad) {
-  const segmente = rad.segmente.slice();
-  for (let i = segmente.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [segmente[i], segmente[j]] = [segmente[j], segmente[i]];
-  }
-  return { name: rad.name, felder: segmente.slice(0, 12).map((s) => s.text) };
+  return { name: rad.name, felder: mischen(rad.segmente).slice(0, 12).map((s) => s.text) };
 }
 
 function raederZeichnen(platz, raeder) {

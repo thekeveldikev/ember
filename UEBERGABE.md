@@ -231,6 +231,29 @@ und Timer-Enden. Härtung: Rahmenbrecher gegen iframe-Einbettung
 (frame-ancestors geht auf Pages nicht), das Boten-Geheimnis ist ein
 Passwortfeld.
 
+**0.7.3 — die Tarnwand (77 Prüfungen):** Der größte Fund der dritten
+Welle: Die Tarnung war eine KULISSE. Die Live-Horcher liefen weiter —
+eine eintreffende Meldung („Sie hat geantwortet.") poppte ÜBER der
+Notizliste auf, Töne klangen, ein Vollbild-Befehl hätte alles gesprengt,
+und ein simples Neuladen warf die Tarnung ab und zeigte EMBER. Jetzt ist
+sie eine WAND: istGetarnt() schaltet meldung, meldungMitTat, blatt,
+puls, tonSpielen, zeigeSeite, befehlZeigen und denkAnDichZeigen stumm;
+die Tarnung persistiert im Gerät und bootet ab dem ERSTEN Frame als
+Notizliste (Tarnstil deckt auch Vorhang, Wortmarke und Zitat);
+stimmungSetzen kann sie nicht mehr übermalen; beim Enttarnen kommt ein
+liegengebliebener Befehl von selbst hoch. Alles im Browser gegen echte
+Angriffe bewiesen und als Prüfung „in der Tarnung dringt nichts durch"
+verewigt. Weitere Funde: Der Quiz-Shuffle war sort(random) — messbar
+schief, die richtige Antwort stand zu oft an derselben Stelle; jetzt
+mischen() (Fisher-Yates) mit Verteilungsprüfung über 3000 Läufe. Beim
+Vertrag konnte die STALE Render-Kopie die zwischenzeitliche Unterschrift
+des anderen überschreiben — vor dem Schreiben wird frisch gelesen; bei
+beiden Unterschriften Konfetti und Schimmer. Der Tresor zeigt ihr jetzt
+per Schloss-Marke, welche Kacheln für ihn noch zu sind. Statik-Wache
+neu: die Pfad-Tippfehler-Wache (jeder gelesene Ablage-Pfad hat einen
+Schreiber). Audio: eingehende Chat-Nachrichten ploppen AUFwärts,
+gesendete abwärts. Wir-Stimme-Nachzügler in Grenzen und Ritualen.
+
 ## Was in der Bugjagd zutage kam
 
 Sieben Fehler, alle vor der Veröffentlichung gefunden. Sie stehen hier,

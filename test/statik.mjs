@@ -118,6 +118,27 @@ test('die Deck-Sinnbild-Karte deckt jedes Vorrat-Deck ab', () => {
   }
 });
 
+test('jeder gelesene Ablage-Pfad hat irgendwo einen Schreiber — Tippfehler-Wache', () => {
+  const schreiber = new Set([
+    ...sammle(/datenSchreib\('([\w/]+)'/g),
+    ...sammle(/datenAnhaengen\('([\w/]+)'/g),
+    ...sammle(/datenAendern\('([\w/]+)'/g),
+  ]);
+  const leser = [
+    ...sammle(/datenLies\('([\w/]+)'/g),
+    ...sammle(/datenListe\('([\w/]+)'/g),
+    ...sammle(/datenHorch\('([\w/]+)'/g),
+    ...sammle(/ablageHorch\('([\w/]+)'/g),
+  ];
+
+  const passt = (r) => [...schreiber].some((w) =>
+    w === r || w.startsWith(r + '/') || r.startsWith(w + '/'));
+
+  for (const r of new Set(leser)) {
+    assert.ok(passt(r), `'${r}' wird gelesen, aber nirgends geschrieben — Tippfehler?`);
+  }
+});
+
 test('kein nacktes append mit bedingtem null-Kind', () => {
   /* Das rohe append(null) schreibt den TEXT „null" auf den Schirm —
      genau so stand er einmal unter „Hinweise einschalten". */

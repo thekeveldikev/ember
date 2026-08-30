@@ -127,6 +127,64 @@ test('_aufgabeZiel erkennt App-Bezüge und schweigt sonst', () => {
   assert.equal(raum._aufgabeZiel({ text: 'Küss sie fünfmal.' }), null, 'Küssen braucht keine App-Seite');
 });
 
+/* --- Die Tarnwand ------------------------------------------------------------ */
+
+test('in der Tarnung dringt nichts durch: kein Blatt, keine Meldung, kein Puls, keine Seite', () => {
+  const { raum } = ladeApp({
+    dateien: ['src/20-core.js', 'src/21-krypto.js', 'src/22-firebase.js', 'src/24-daten.js',
+      'src/25-raeume.js', 'src/40-huelle.js', 'src/52-tarnung.js'],
+  });
+
+  let vibriert = 0;
+  raum.navigator.vibrate = () => { vibriert++; return true; };
+  let blattAngehaengt = 0;
+  raum.document.body.append = () => { blattAngehaengt++; };
+  let seiteGemalt = 0;
+  raum.SEITEN.heim = () => { seiteGemalt++; };
+  raum.D.seite = 'plausch';
+
+  raum.__tarnung(true);
+  assert.equal(raum.istGetarnt(), true);
+
+  const m = raum.meldung('Sie hat geantwortet.');
+  assert.ok(m && !m.kinder?.length, 'die Meldung ist eine leere Hülse');
+  raum.meldungMitTat('Er fragt.', 'Ansehen', () => {});
+  raum.puls('befehl');
+  const b = raum.blatt('geheim');
+  b.schliessen();
+  raum.zeigeSeite('heim');
+
+  assert.equal(vibriert, 0, 'keine Vibration verrät die App');
+  assert.equal(blattAngehaengt, 0, 'kein Blatt legt sich über die Notizen');
+  assert.equal(seiteGemalt, 0, 'keine Seite malt in die Tarnung');
+
+  /* Und danach geht alles wieder — mit einer echten Bühne im Mini-DOM. */
+  const buehne = raum.document.createElement('main');
+  raum.document.querySelector = (w) => (w === '#buehne' ? buehne : null);
+  raum.__tarnung(false);
+  raum.zeigeSeite('heim');
+  assert.equal(seiteGemalt, 1);
+});
+
+/* --- Ehrliches Mischen -------------------------------------------------------- */
+
+test('mischen() ist unverzerrt genug und verliert nie ein Element', () => {
+  const { raum } = ladeApp();
+
+  const zaehlung = [0, 0, 0];
+  for (let i = 0; i < 3000; i++) {
+    const raus = raum.mischen(['a', 'b', 'c']);
+    assert.equal(raus.length, 3);
+    assert.deepEqual(rein([...raus].sort()), ['a', 'b', 'c']);
+    zaehlung[raus.indexOf('a')]++;
+  }
+  /* Bei sort(random) läge „a" zu ~50 % auf Platz 1 — Fisher-Yates
+     bleibt für jede Position nahe einem Drittel. */
+  for (const n of zaehlung) {
+    assert.ok(n > 800 && n < 1200, 'Position ' + zaehlung.indexOf(n) + ': ' + n + '/3000');
+  }
+});
+
 /* --- Volumen ----------------------------------------------------------------- */
 
 test('zweihundert Nachrichten bleiben vollständig und in Ordnung', async () => {

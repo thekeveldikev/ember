@@ -217,6 +217,10 @@ export function ladeApp({ rolle = 'domme', dateien, ablage = baueAblage() } = {}
         ? { raumMigration, raumAnlegen, raumEntfernen, raeumeLies, raumVorzeichenSetzen, geraetKey } : {}),
       ...(typeof istAbgelaufen === 'function' ? { istAbgelaufen } : {}),
       ...(typeof _aufgabeZiel === 'function' ? { _aufgabeZiel } : {}),
+      ...(typeof _getarnt !== 'undefined'
+        ? { istGetarnt, __tarnung: (an) => { _getarnt = an; } } : {}),
+      ...(typeof mischen === 'function' ? { mischen } : {}),
+      ...(typeof zeigeSeite === 'function' ? { SEITEN, zeigeSeite } : {}),
     };
   `;
 

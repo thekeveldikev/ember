@@ -307,8 +307,9 @@ function knopfHorcherStarten() {
 function befehlZeigen(befehl) {
   /* Rot heißt: nichts geht weiter. Auch kein neuer Befehl — er bleibt
      liegen und kommt hoch, wenn die Ruhe vorbei ist und der Horcher das
-     nächste Mal hinsieht. */
-  if (D.ruhe) return;
+     nächste Mal hinsieht. Und über einer getarnten Notizliste hat ein
+     Vollbild-Befehl erst recht nichts verloren. */
+  if (D.ruhe || istGetarnt()) return;
 
   if (_befehlOffen) _befehlOffen.remove();
   puls('befehl');
@@ -364,6 +365,7 @@ function befehlSchliessen() {
 /* --- Denk an dich --------------------------------------------------------- */
 
 function denkAnDichZeigen() {
+  if (istGetarnt()) return;
   const funke = el('div', {
     style: {
       position: 'fixed', inset: '0', zIndex: '760', display: 'grid', placeItems: 'center',

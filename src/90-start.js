@@ -28,6 +28,10 @@ async function appStarten() {
   zeigeSeite('heim');
   $('#vorhang').classList.add('weg');
 
+  /* SOFORT, nicht erst nach dem Netz: Wer getarnt weggelegt hat, darf
+     beim Zurückkommen keine Sekunde EMBER aufblitzen sehen. */
+  if (Gerät.lies('getarnt')) tarnungAn();
+
   if (Gerät.lies('schuetteln')) schuettelnHorchen();
 
   try {
@@ -145,6 +149,14 @@ function regelWachePruefen() {
 
   raumMigration();
   fehlerWacheStarten();
+
+  /* Getarnt gestartet heißt: schon der VORHANG ist eine Notiz-Seite —
+     kein Glutpunkt, keine Wortmarke, kein Zitat, kein dunkler Grund. */
+  if (Gerät.lies('getarnt')) {
+    tarnStilAnbringen();
+    document.title = 'Notizen';
+    document.documentElement.setAttribute('data-stimmung', 'tarnung');
+  }
 
   stimmungSetzen();
   dienstAnmelden();

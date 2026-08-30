@@ -60,6 +60,9 @@ function leisteAuffrischen() {
 }
 
 function zeigeSeite(id) {
+  /* Solange die Tarnung steht, malt hier niemand — auch kein verspäteter
+     Netz-Nachzügler, der sonst mitten in die Notizliste zeichnete. */
+  if (istGetarnt()) return;
   if (!SEITEN[id]) id = 'heim';
 
   /* Offene Blätter gehören zur alten Seite. Bleiben sie stehen, liegen

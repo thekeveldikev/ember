@@ -125,7 +125,7 @@ SEITEN.plausch = function (seite) {
     }
     if (nachrichten.length > letzteAnzahl && letzteAnzahl > 0) {
       const neu = nachrichten[nachrichten.length - 1];
-      if (neu && neu.von !== D.rolle) { puls('hinweis'); tonSpielen('plopp'); }
+      if (neu && neu.von !== D.rolle) { puls('hinweis'); tonSpielen('ploppRein'); }
     }
     letzteAnzahl = nachrichten.length;
   });

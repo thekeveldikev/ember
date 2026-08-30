@@ -84,7 +84,18 @@ function tresorZeichnen(platz, bilder) {
           background: 'linear-gradient(to top, rgba(0,0,0,.8), transparent)',
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         },
-      }, b.titel) : null
+      }, b.titel) : null,
+      /* Ihr Blick sieht alles — aber sie soll SEHEN, was für ihn noch
+         zu ist. Ohne die Marke wirkte hier alles gleich offen. */
+      istDomme() && !b.frei && !(b.ab && b.ab <= jetzt())
+        ? el('div', {
+            style: {
+              position: 'absolute', top: '5px', right: '5px', width: '24px', height: '24px',
+              borderRadius: '8px', display: 'grid', placeItems: 'center',
+              background: 'rgba(10,8,6,.72)', color: 'var(--glut-hell)',
+            },
+          }, sinnbild('schloss', 13))
+        : null
     );
     if (istDomme()) langerDruck(kachel, () => tresorVerwalten(b));
     return kachel;

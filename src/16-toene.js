@@ -93,8 +93,10 @@ function _rauschQuelle(raum, schleife = false) {
 
 function tonSpielen(art) {
   if (!toeneAn()) return;
-  /* Nach Rot ist Ruhe — dann schweigt auch die App. */
+  /* Nach Rot ist Ruhe — dann schweigt auch die App. Und eine getarnte
+     Notizliste hat erst recht keinen Klang. */
   if (typeof D !== 'undefined' && D.ruhe) return;
+  if (typeof istGetarnt === 'function' && istGetarnt()) return;
   const raum = _klang();
   if (!raum) return;
   const t = raum.currentTime;
@@ -203,12 +205,14 @@ function tonSpielen(art) {
       laut.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
       o.connect(laut).connect(_klangSumme);
       o.start(t); o.stop(t + 0.06);
-    } else if (art === 'plopp') {
-      /* Eine Nachricht geht oder kommt: ein weicher Tropfen. */
+    } else if (art === 'plopp' || art === 'ploppRein') {
+      /* Ein weicher Tropfen: abwärts heißt gesendet, aufwärts heißt
+         angekommen — nach zwei Tagen unterscheidet das Ohr von selbst. */
+      const rein = art === 'ploppRein';
       const o = raum.createOscillator();
       o.type = 'sine';
-      o.frequency.setValueAtTime(640, t);
-      o.frequency.exponentialRampToValueAtTime(310, t + 0.09);
+      o.frequency.setValueAtTime(rein ? 310 : 640, t);
+      o.frequency.exponentialRampToValueAtTime(rein ? 640 : 310, t + 0.09);
       const laut = raum.createGain();
       laut.gain.setValueAtTime(0.0001, t);
       laut.gain.exponentialRampToValueAtTime(0.11, t + 0.012);

@@ -205,7 +205,7 @@ function countdownsZeichnen(platz, liste) {
 }
 
 function countdownAnlegen() {
-  const titel = el('input', { class: 'feld', placeholder: 'Worauf freut ihr euch?' });
+  const titel = el('input', { class: 'feld', placeholder: 'Worauf freuen wir uns?' });
   const wann = el('input', { class: 'feld', type: 'datetime-local', style: { marginTop: '9px' } });
 
   const b = blatt(

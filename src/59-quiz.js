@@ -100,7 +100,7 @@ function quizFrageAnlegen() {
 /* --- Die Runde ------------------------------------------------------------ */
 
 function quizRunde(fragen) {
-  const reihe = fragen.slice().sort(() => Math.random() - 0.5).slice(0, 10);
+  const reihe = mischen(fragen).slice(0, 10);
   let stelle = 0;
   let richtig = 0;
 
@@ -109,7 +109,7 @@ function quizRunde(fragen) {
   function naechsteFrage() {
     if (stelle >= reihe.length) return auswertung();
     const f = reihe[stelle];
-    const antworten = [f.richtig, ...(f.falsche || [])].sort(() => Math.random() - 0.5);
+    const antworten = mischen([f.richtig, ...(f.falsche || [])]);
 
     const b = blatt(
       el('p', { class: 'winzig still mitte' }, (stelle + 1) + ' von ' + reihe.length),
@@ -124,7 +124,9 @@ function quizRunde(fragen) {
           puls(stimmt ? 'antwortJa' : 'antwortNein');
           b.schliessen();
 
+          tonSpielen(stimmt ? 'tick' : 'tief');
           const rueck = blatt(
+            BLATT_FEST,
             el('div', { class: 'mitte', style: { padding: '8px 0' } },
               el('div', { style: { fontSize: '38px' } }, stimmt ? '✓' : '✗'),
               el('p', { class: 'zier', style: { fontSize: '19px', marginTop: '8px', color: stimmt ? 'var(--gruen)' : 'var(--rot)' } },
@@ -160,6 +162,9 @@ function quizRunde(fragen) {
       }
     }
     paarXp(10);
+    if (quote >= 0.8) { tonSpielen('schimmer'); if (typeof konfetti === 'function') konfetti(); }
+    else if (verloren) tonSpielen('tief');
+    else tonSpielen('weich');
 
     blatt(
       el('div', { class: 'mitte', style: { padding: '10px 0 4px' } },

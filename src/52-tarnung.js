@@ -25,6 +25,9 @@ const TARN_NOTIZEN = [
 function tarnungAn() {
   if (_getarnt) return;
   _getarnt = true;
+  /* Die Tarnung übersteht auch ein Neuladen — wer die Seite auffrischt,
+     sieht wieder Notizen, nicht plötzlich EMBER. */
+  Gerät.schreib('getarnt', true);
 
   /* Die echte Bühne wird beiseitegelegt, nicht versteckt. Ein neugieriger
      Blick in die Entwicklerwerkzeuge fände sonst alles noch vor. */
@@ -73,6 +76,7 @@ function tarnungAn() {
 function tarnungAus() {
   if (!_getarnt) return;
   _getarnt = false;
+  Gerät.loesch('getarnt');
 
   const stil = $('#tarnstil'); if (stil) stil.remove();
   $('#huelle').innerHTML = _echteBuehne || '';
@@ -91,6 +95,14 @@ function tarnungAus() {
   if (D.offen) {
     baueFussleiste();
     zeigeSeite(D.seite || 'heim');
+    /* Was während der Tarnung still liegen blieb, kommt jetzt hoch —
+       allen voran ein unquittierter Befehl. */
+    setTimeout(async () => {
+      const aktuell = await datenLies('knopf/aktuell').catch(() => null);
+      if (aktuell && aktuell.art === 'befehl' && !aktuell.quittiert && !istDomme()) {
+        befehlZeigen(aktuell);
+      }
+    }, 400);
   } else if (istEingerichtet()) {
     zeigeSchloss();
   } else {
@@ -106,6 +118,8 @@ function tarnStilAnbringen() {
     body::after { display: none !important; }
     html[data-stimmung='tarnung'], html[data-stimmung='tarnung'] body { background: #f7f7f7 !important; }
     #meldungen { display: none !important; }
+    #vorhang { background: #f7f7f7 !important; }
+    #vorhang .funke, #vorhang .wortmarke, #vorhang .vorhangzitat { display: none !important; }
   `));
   const marke = document.querySelector('meta[name=theme-color]');
   if (marke) marke.setAttribute('content', '#f7f7f7');

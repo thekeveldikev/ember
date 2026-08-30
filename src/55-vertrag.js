@@ -218,13 +218,25 @@ function unterschreiben(fassung) {
         onclick: async () => {
           if (!etwasDa) return meldung('Da ist noch nichts.');
           b.schliessen();
-          const unter = { ...(fassung.unterschriften || {}) };
+
+          /* FRISCH lesen, nicht den Stand vom Zeichnen der Seite nehmen:
+             Hat der andere inzwischen unterschrieben, würde die alte
+             Kopie seine Unterschrift sonst stillschweigend überschreiben. */
+          const alle = await datenListe('vertrag').catch(() => []);
+          const frisch = alle.find((x) => x.id === fassung.id) || fassung;
+          const unter = { ...(frisch.unterschriften || {}) };
           unter[D.rolle] = { zug: tafel.toDataURL('image/png'), wann: jetzt() };
           await datenAendern('vertrag', fassung.id, { unterschriften: unter });
 
           const beide = unter.domme && unter.sub;
           pushSenden(andereRolle(), 'hinweis', beide ? 'Es steht.' : 'Eine Unterschrift fehlt noch.');
           puls('antwortJa');
+          if (beide) {
+            tonSpielen('schimmer');
+            if (typeof konfetti === 'function') konfetti();
+          } else {
+            tonSpielen('weich');
+          }
           meldung(beide ? 'Es steht.' : 'Unterschrieben. Eine fehlt noch.');
         },
       }, 'Unterschreiben')
