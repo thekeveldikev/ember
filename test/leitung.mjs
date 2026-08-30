@@ -186,3 +186,44 @@ test('datenLies mit Ersatzwert greift bei Fehlendem und bei Netzausfall', async 
   ablage.aussetzen = true;
   assert.deepEqual(rein(await raum.datenLies('gibtsAuchNicht', 'ersatz')), 'ersatz');
 });
+
+/* --- Die tote Marke --------------------------------------------------------
+   Eine Marke kann auch VOR ihrem Ablauf ungültig werden. Weil die App nur
+   auf die Uhr sah, versuchte sie es danach bis zu einer Stunde lang mit
+   demselben toten Ausweis — im Prüflauf zweimal erlebt: Die halbe App
+   stand still, obwohl das Netz da war. */
+
+test('eine abgewiesene Marke wird sofort erneuert, nicht ausgesessen', async () => {
+  const { raum, ablage } = app();
+  await anmelden(raum);
+  await raum.ablageSchreib('probe', { g: 'wert' });
+
+  /* Die Uhr sagt: noch lange gültig. Der Server sagt: 401. */
+  raum.Ablage._marke_bis = Date.now() + 9e6;
+  ablage.weistAbNoch = 1;
+
+  const gelesen = await raum.ablageLies('probe');
+  assert.deepEqual(rein(gelesen), { g: 'wert' }, 'die Lesung kommt trotzdem durch');
+  assert.equal(ablage.abgewiesen, 1, 'genau einmal abgewiesen, dann frisch geholt');
+});
+
+test('auch das Schreiben holt sich nach 401 einen frischen Ausweis', async () => {
+  const { raum, ablage } = app();
+  await anmelden(raum);
+
+  raum.Ablage._marke_bis = Date.now() + 9e6;
+  ablage.weistAbNoch = 1;
+
+  await raum.ablageSchreib('probe2', { g: 'zwei' });
+  assert.deepEqual(rein(await raum.ablageLies('probe2')), { g: 'zwei' });
+});
+
+test('bleibt die Ablage stur, wird der Fehler ehrlich gemeldet — kein stilles Nichts', async () => {
+  const { raum, ablage } = app();
+  await anmelden(raum);
+
+  raum.Ablage._marke_bis = Date.now() + 9e6;
+  ablage.weistAbNoch = 99;
+
+  await assert.rejects(() => raum.ablageLies('probe3'), /401/);
+});

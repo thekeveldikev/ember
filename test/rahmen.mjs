@@ -22,6 +22,10 @@ export function baueAblage() {
   const ablage = {
     inhalt,
     aussetzen: false,
+    /* Wie oft die nächsten Zugriffe mit 401 abgewiesen werden — damit
+       lässt sich die tote-Marke-Lage nachstellen. */
+    weistAbNoch: 0,
+    abgewiesen: 0,
     schreibZaehler: 0,
 
     _zerlege(pfad) {
@@ -151,6 +155,13 @@ export function ladeApp({ rolle = 'domme', dateien, ablage = baueAblage() } = {}
     if (ablage.aussetzen) throw Object.assign(new Error('kein Netz'), { name: 'TypeError' });
 
     const u = new URL(adresse);
+    /* Die Anmeldung selbst läuft immer durch — abgewiesen wird nur der
+       Zugriff mit der toten Marke. */
+    if (ablage.weistAbNoch > 0 && !/identitytoolkit|securetoken/.test(String(adresse))) {
+      ablage.weistAbNoch--;
+      ablage.abgewiesen++;
+      return { ok: false, status: 401, json: async () => null, text: async () => 'abgewiesen' };
+    }
     const pfad = u.pathname.replace(/\.json$/, '');
     const art = (einst.method || 'GET').toUpperCase();
     const last = einst.body ? JSON.parse(einst.body) : undefined;

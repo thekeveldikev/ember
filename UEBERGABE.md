@@ -447,6 +447,42 @@ Bestandsgeräten — gewollt. (3) farbweltAnwenden/appSymbolAnwenden
 laufen jetzt im Boot VOR der Einrichtungs-/Schloss-Weiche — auch
 das Schloss steht in der gewählten Farbwelt.
 
+**0.9.3 — die Tastatur, die tote Marke, die Daumen (105):**
+DER Fund am Tag der Einrichtung, per Screenshot gemeldet: Beim
+Schreiben im Chat rutschte die ganze App nach oben aus dem Bild.
+Ursache: iOS schiebt beim Öffnen der Tastatur das LAYOUT-Fenster
+hoch, damit das Feld sichtbar wird — eine `position: fixed`-Hülle
+wandert stur mit hinaus. `--vvh` maß nur die Höhe, nicht den
+Versatz. Jetzt schreibt 90-start auch `--vvt` (visualViewport
+.offsetTop, per resize UND scroll) und `--vvb` (Abstand Sichtkante
+→ Layout-Boden); #huelle, .deckel und .befehl folgen mit
+top/height, #meldungen und .hilfeknopf mit bottom: calc(var(--vvb)
++ …), der Notausgang mit top: calc(var(--vvt) + …). focusout zieht
+zusätzlich window.scrollTo(0,0) nach (zweimal, iOS meldet
+verzögert). Beim Tippen blendet body.tippt den Hilfe-Knopf aus, und
+der Plausch zieht beim Fokus dreifach ans Listenende nach.
+
+ZWEITER, größerer Fund (im Prüflauf zweimal erlebt): Eine
+Ablage-Marke kann VOR ihrem Ablauf ungültig werden. Die App sah nur
+auf die Uhr — und versuchte es danach bis zu 55 Minuten lang mit
+demselben toten Ausweis, 401 für 401. Jetzt wirft _mitFrischerMarke
+in 22-firebase bei 401/403 die Marke weg, holt einmal frisch und
+wiederholt genau einmal; drei Regressionstests in test/leitung.mjs
+(Lesen, Schreiben, und: bleibt die Ablage stur, wird der Fehler
+ehrlich gemeldet). Der Prüfstand kann das nachstellen
+(ablage.weistAbNoch / ablage.abgewiesen).
+
+Drittens, Daumen-Maß: Über 30 kleine Textknöpfe („Zurück", „+ Neu",
+„Serie wählen") waren nur 18px hoch. `button.winzig::after` mit
+inset: -11px -8px vergrößert die Trefferfläche auf ~40px, ohne dass
+sich am Layout ein Pixel bewegt. Waagerechter Überlauf: auf allen
+31 Seiten × 2 Rollen im 375px-Fenster geprüft — keiner.
+
+Merke: Ein Sweep, der 62 Seiten im 60ms-Takt durchhetzt, baut die
+Horcher schneller auf und ab, als Firebase mag — das kann hängen,
+ohne dass die App etwas hat. Im Zweifel datenLies + datenHorch
+einzeln prüfen (beide antworteten in Millisekunden).
+
 ## Was in der Bugjagd zutage kam
 
 Sieben Fehler, alle vor der Veröffentlichung gefunden. Sie stehen hier,

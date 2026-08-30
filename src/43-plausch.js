@@ -33,6 +33,14 @@ SEITEN.plausch = function (seite) {
   const feld = el('textarea', {
     class: 'feld', rows: 1, placeholder: 'Schreib …',
     style: { flex: '1', minHeight: '46px', maxHeight: '120px', padding: '12px 14px' },
+    /* Beim Hineintippen zieht die Liste ans Ende nach — sonst steht man
+       nach dem Aufgehen der Tastatur mitten im alten Gespräch. Mehrfach,
+       weil iOS die neue Höhe verzögert meldet. */
+    onfocus: () => {
+      [60, 260, 520].forEach((ms) => setTimeout(() => {
+        if (liste.isConnected) liste.scrollTop = liste.scrollHeight;
+      }, ms));
+    },
     oninput: (e) => {
       e.target.style.height = 'auto';
       e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
@@ -101,7 +109,11 @@ SEITEN.plausch = function (seite) {
       requestAnimationFrame(() => { liste.scrollTop = liste.scrollHeight; });
     };
     window.visualViewport.addEventListener('resize', nachziehen);
-    beimVerlassen(() => window.visualViewport.removeEventListener('resize', nachziehen));
+    window.visualViewport.addEventListener('scroll', nachziehen);
+    beimVerlassen(() => {
+      window.visualViewport.removeEventListener('resize', nachziehen);
+      window.visualViewport.removeEventListener('scroll', nachziehen);
+    });
   }
 
   async function senden() {

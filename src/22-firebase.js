@@ -128,20 +128,34 @@ function _adresse(pfad) {
 
 /* --- Lesen und Schreiben -------------------------------------------------- */
 
+/* Die Uhr allein genügt NICHT: Eine Marke kann auch vor ihrem Ablauf
+   ungültig werden — dann antwortet die Ablage mit 401, und weil die Uhr
+   noch Gültigkeit meldet, versucht die App es endlos mit demselben toten
+   Ausweis. Bis zu einer Stunde lang ging so gar nichts mehr (zweimal im
+   Prüflauf erlebt). Deshalb: Bei 401/403 die Marke wegwerfen, einmal
+   frisch holen, einmal wiederholen. */
+async function _mitFrischerMarke(versuch) {
+  let antwort = await versuch(await _marke());
+  if (antwort.status === 401 || antwort.status === 403) {
+    Ablage._marke = null;
+    Ablage._marke_bis = 0;
+    antwort = await versuch(await _marke());
+  }
+  return antwort;
+}
+
 async function ablageLies(pfad) {
-  const marke = await _marke();
-  const antwort = await hole(_adresse(pfad) + '?auth=' + marke);
+  const antwort = await _mitFrischerMarke((marke) => hole(_adresse(pfad) + '?auth=' + marke));
   if (!antwort.ok) throw new Error('Lesen fehlgeschlagen (' + antwort.status + ')');
   return antwort.json();
 }
 
 async function _senden(pfad, art, wert) {
-  const marke = await _marke();
-  const antwort = await hole(_adresse(pfad) + '?auth=' + marke, {
+  const antwort = await _mitFrischerMarke((marke) => hole(_adresse(pfad) + '?auth=' + marke, {
     method: art,
     headers: { 'Content-Type': 'application/json' },
     body: wert === undefined ? undefined : JSON.stringify(wert),
-  });
+  }));
   if (!antwort.ok) {
     const text = await antwort.text().catch(() => '');
     throw new Error('Schreiben abgelehnt (' + antwort.status + ') ' + text.slice(0, 160));

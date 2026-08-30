@@ -18,7 +18,9 @@ function notausAnbringen() {
     'aria-label': 'Notausgang',
     style: {
       position: 'fixed',
-      top: 'calc(env(safe-area-inset-top) + 10px)',
+      /* Mit dem sichtbaren Ausschnitt wandern — der Notausgang muss
+         auch bei offener Tastatur erreichbar bleiben. */
+      top: 'calc(var(--vvt, 0px) + env(safe-area-inset-top) + 10px)',
       right: '12px',
       zIndex: '850',
       width: '34px',

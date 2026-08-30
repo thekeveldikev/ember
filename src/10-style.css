@@ -191,7 +191,10 @@ h3 { font-size: 18px; }
 
 #huelle {
   position: fixed;
-  top: 0;
+  /* Nicht stur bei null: --vvt ist der Versatz, um den iOS das Fenster
+     beim Öffnen der Tastatur hochschiebt. Ohne das Mitgehen wandert die
+     ganze App nach oben aus dem Bild. */
+  top: var(--vvt, 0px);
   left: 0;
   right: 0;
   /* Nicht bis zum Boden, sondern bis zur Sichtkante: --vvh ist die Höhe
@@ -476,7 +479,10 @@ textarea.feld { resize: none; line-height: 1.5; }
 
 .befehl {
   position: fixed;
-  inset: 0;
+  top: var(--vvt, 0px);
+  left: 0;
+  right: 0;
+  height: var(--vvh, 100%);
   z-index: 800;
   display: flex;
   flex-direction: column;
@@ -525,7 +531,13 @@ textarea.feld { resize: none; line-height: 1.5; }
 
 .deckel {
   position: fixed;
-  inset: 0;
+  /* Wie die Hülle: dem sichtbaren Ausschnitt folgen. Sonst sitzt jedes
+     Blatt mit Eingabefeld (Auftrag anlegen, Raum umbenennen …) bei
+     offener Tastatur halb außerhalb des Bildes. */
+  top: var(--vvt, 0px);
+  left: 0;
+  right: 0;
+  height: var(--vvh, 100%);
   z-index: 700;
   background: var(--deck);
   backdrop-filter: blur(5px);
@@ -568,7 +580,7 @@ textarea.feld { resize: none; line-height: 1.5; }
   position: fixed;
   left: 0;
   right: 0;
-  bottom: calc(env(safe-area-inset-bottom) + 84px);
+  bottom: calc(var(--vvb, 0px) + env(safe-area-inset-bottom) + 84px);
   z-index: 900;
   display: flex;
   flex-direction: column;
@@ -968,7 +980,7 @@ textarea.feld { resize: none; line-height: 1.5; }
 .hilfeknopf {
   position: fixed;
   right: calc(env(safe-area-inset-right) + 14px);
-  bottom: calc(env(safe-area-inset-bottom) + 76px);
+  bottom: calc(var(--vvb, 0px) + env(safe-area-inset-bottom) + 76px);
   z-index: 640;
   width: 34px;
   height: 34px;
@@ -1086,3 +1098,19 @@ html[data-thema='mitternacht'] {
   transition: transform .16s ease, border-color .3s ease;
 }
 .schnellknopf:active .rund { transform: scale(.9); border-color: var(--glut); }
+
+/* Beim Tippen tritt der Hilfe-Knopf beiseite — über der Tastatur säße
+   er mitten im Bild und verdeckte, was man gerade schreibt. */
+body.tippt .hilfeknopf { opacity: 0; pointer-events: none; transform: scale(.8); }
+
+/* --- Trefferflächen --------------------------------------------------------
+   Die kleinen Textknöpfe („Zurück", „+ Neu", „Serie wählen") sind nur
+   18 Pixel hoch — schön im Bild, aber mit dem Daumen kaum zu treffen.
+   Ein unsichtbares Feld darüber vergrößert die Fläche auf Fingermaß,
+   ohne dass sich am Layout ein Pixel bewegt. */
+button.winzig { position: relative; }
+button.winzig::after {
+  content: '';
+  position: absolute;
+  inset: -11px -8px;
+}

@@ -206,14 +206,48 @@ function regelWachePruefen() {
      verlässliche Weg, von der Tastatur zu erfahren: Das Layout bleibt
      gleich groß, nur der sichtbare Ausschnitt schrumpft. */
   if (window.visualViewport) {
+    const vv = window.visualViewport;
     const messen = () => {
-      document.documentElement.style.setProperty('--vvh', window.visualViewport.height + 'px');
+      /* Die Höhe allein reicht NICHT. Geht die Tastatur auf, schiebt iOS
+         das ganze Layout-Fenster nach oben, damit das Feld sichtbar wird —
+         und eine fixierte Hülle wandert stur mit hinaus. Sichtbar bleibt
+         dann nur der obere Rand: Eingabezeile und Fußleiste kleben oben,
+         darunter Schwarz. Deshalb wird auch der Versatz mitgeschrieben
+         und die Hülle darum zurückgeschoben. */
+      document.documentElement.style.setProperty('--vvh', vv.height + 'px');
+      document.documentElement.style.setProperty('--vvt', (vv.offsetTop || 0) + 'px');
+      /* Was von unten misst (Meldungen, Hilfe-Knopf), braucht den Abstand
+         zwischen Sichtkante und Layout-Boden — sonst liegt es unter der
+         Tastatur. */
+      const unten = Math.max(0, window.innerHeight - ((vv.offsetTop || 0) + vv.height));
+      document.documentElement.style.setProperty('--vvb', unten + 'px');
     };
-    window.visualViewport.addEventListener('resize', messen);
+    vv.addEventListener('resize', messen);
+    vv.addEventListener('scroll', messen);
     messen();
-    /* Nach dem Schließen der Tastatur meldet iOS die Höhe gern verspätet. */
-    window.addEventListener('focusout', () => setTimeout(messen, 250));
+    /* Nach dem Schließen der Tastatur meldet iOS die Höhe gern verspätet —
+       und lässt das Fenster gern verschoben stehen. Beides geradeziehen. */
+    window.addEventListener('focusout', () => {
+      setTimeout(() => { window.scrollTo(0, 0); messen(); }, 60);
+      setTimeout(() => { window.scrollTo(0, 0); messen(); }, 320);
+    });
   }
+
+  /* Solange getippt wird, hat der schwebende Hilfe-Knopf nichts über der
+     Tastatur zu suchen — er säße sonst mitten im Bild. */
+  document.addEventListener('focusin', (e) => {
+    if (e.target && e.target.matches && e.target.matches('input, textarea, [contenteditable]')) {
+      document.body.classList.add('tippt');
+    }
+  });
+  document.addEventListener('focusout', () => {
+    setTimeout(() => {
+      const a = document.activeElement;
+      if (!a || !a.matches || !a.matches('input, textarea, [contenteditable]')) {
+        document.body.classList.remove('tippt');
+      }
+    }, 80);
+  });
 
   /* Der Vorhang geht nach einem Wimpernschlag auf, ganz gleich, was das
      Netz gerade treibt. Sonst starrt man bei zähem Empfang minutenlang
