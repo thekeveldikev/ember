@@ -309,6 +309,25 @@ meldungMitTat() sind halter-defensiv (Prüfstand-Fund). Neuer Klang
 Browser verifiziert: eröffnen → kaufen → einlösen anfragen → sie löst
 ein → Bußgeld — das Buch stimmt Zeile für Zeile mit Saldo.
 
+**0.8.1 — Bausteine-Schalter und die Automatik unter Prüfung (98):**
+Verwaltung → BAUSTEINE: Laden, Tagesaufgaben, Frage des Tages,
+Glückskeks und Wenn—Dann sind einzeln abschaltbar — abschalten heißt
+ruhen (einst/aufgaben, einst/frage, einst/keks, konto.an,
+maschine/an), alle Stände bleiben. Guards sitzen in den Modulen
+selbst. Laden-Funde derselben Runde: der Spar-Ausdruck war Unsinn
+(`!konto.spar !== undefined` ist immer wahr), Sparen ist jetzt nur auf
+Glut-Ware möglich (Siegel kann man nicht ansparen — auch die
+Heim-Anzeige ignoriert Siegel-Sparziele aus Altdaten), zu teure
+Artikel sagen jetzt WARUM nichts passiert („Noch nicht genug Glut.
+Halt gedrückt, um darauf zu sparen."), und ein Kauf klingt nach
+Münzen statt nach Strafe (still buchen, selbst klimpern). Neue
+Prüfungen: der letzte fällige Sonntag (Sonntag, 20 Uhr, nie Zukunft,
+höchstens eine Woche her), Zahltag zahlt einmal und verzinst
+Schulden — und läuft NIE doppelt, der Monatswechsel nimmt Glutverlust
+und bucht Abos ab oder kündigt Unbezahlbares, bei Rot Gehalt ja/Zins
+nein. Statik: doppelt definierte SEITEN fallen jetzt auf. Audio:
+Keks-Knack mit Zufallshöhe (kein Bruch klingt wie der andere).
+
 ## Was in der Bugjagd zutage kam
 
 Sieben Fehler, alle vor der Veröffentlichung gefunden. Sie stehen hier,

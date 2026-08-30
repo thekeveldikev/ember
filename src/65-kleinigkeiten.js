@@ -185,6 +185,7 @@ const CHECKIN_FRAGEN = [
 ];
 
 async function checkinZeile(platz) {
+  if (!(await datenLies('einst/frage', true).catch(() => true))) return;
   const heute = tagstempel();
   let summe = 0;
   for (const z of heute) summe = (summe * 31 + z.charCodeAt(0)) >>> 0;

@@ -418,6 +418,11 @@ SEITEN.verwaltung = function (seite) {
     )
   );
 
+  /* --- Die Bausteine: jedes große Modul einzeln abschaltbar ------------- */
+  const bausteinplatz = el('div', { class: 'abschnitt' });
+  seite.append(bausteinplatz);
+  bausteineBauen(bausteinplatz);
+
   const zoegernplatz = el('div', { class: 'abschnitt' });
   seite.append(zoegernplatz);
 
@@ -471,6 +476,48 @@ SEITEN.verwaltung = function (seite) {
     )
   );
 };
+
+/* Die großen Bausteine, jeder mit eigenem Schalter. Abschalten heißt
+   ruhen lassen: Stände, Bücher und Einträge bleiben liegen und sind
+   beim Wiedereinschalten unverändert da. */
+async function bausteineBauen(platz) {
+  platz.innerHTML = '';
+  platz.append(el('p', { class: 'winzig still', style: { margin: '0 0 9px 2px' } }, 'Bausteine'));
+
+  const konto = await datenLies('konto').catch(() => null);
+  const maschineAn = await datenLies('maschine/an', false).catch(() => false);
+  const frageAn = await datenLies('einst/frage', true).catch(() => true);
+  const keksAn = await datenLies('einst/keks', true).catch(() => true);
+  const aufgabenAn = await datenLies('einst/aufgaben', true).catch(() => true);
+
+  const schalter = (titel, an, unterAn, unterAus, tat) =>
+    zeile(titel, (an ? 'An — ' + unterAn : 'Aus — ' + unterAus) + '. Antippen schaltet um.', async () => {
+      await tat(!an);
+      bausteineBauen(platz);
+      tonSpielen('tick');
+    });
+
+  platz.append(
+    schalter('Der Laden', !!(konto && konto.an),
+      'Glut, Siegel, Preise, Zahltag', 'alles ruht, nichts geht verloren',
+      async (neu) => {
+        if (!konto && neu) return zeigeSeite('laden');   // Ersteröffnung mit Startguthaben
+        await datenSchreib('konto', { ...konto, an: neu });
+      }),
+    schalter('Die Tagesaufgaben', aufgabenAn,
+      'jeden Tag eine für jeden', 'die Zeilen verschwinden vom Heim',
+      (neu) => datenSchreib('einst/aufgaben', neu)),
+    schalter('Die Frage des Tages', frageAn,
+      'eine ehrliche Frage, beide antworten', 'die Zeile verschwindet vom Heim',
+      (neu) => datenSchreib('einst/frage', neu)),
+    schalter('Der Glückskeks', keksAn,
+      'einer wartet unten auf dem Heim', 'kein Keks, kein Zettel',
+      (neu) => datenSchreib('einst/keks', neu)),
+    schalter('Wenn — Dann', maschineAn,
+      'Regeln feuern von selbst', 'keine Regel rührt sich',
+      (neu) => datenSchreib('maschine/an', neu))
+  );
+}
 
 function namenAendern() {
   const namen = Gerät.lies('namen', {});

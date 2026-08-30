@@ -31,6 +31,7 @@ function _keksZiehen(eigene) {
 
 async function gluecksKeksLaden(platz) {
   platz.innerHTML = '';
+  if (!(await datenLies('einst/keks', true).catch(() => true))) return;
   const heute = tagstempel();
 
   const eigene = await datenListe('keks').catch(() => []);

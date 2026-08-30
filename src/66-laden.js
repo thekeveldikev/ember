@@ -229,7 +229,8 @@ async function heimKontoZeile(platz) {
   const konto = _konto || await kontoLaden();
   if (!konto || !konto.an) return;
 
-  const spar = konto.spar ? VORRAT.laden.find((a) => a.id === konto.spar) : null;
+  const sparRoh = konto.spar ? VORRAT.laden.find((a) => a.id === konto.spar) : null;
+  const spar = sparRoh && sparRoh.waehrung !== 'siegel' ? sparRoh : null;
   const sparPreis = spar ? ladenPreisVon(spar, konto.preise || {}) : 0;
 
   const zeile = el('button', {
@@ -425,16 +426,23 @@ function artikelKarte(a, konto, kaeufe, stufe, zeichnen) {
       )
     ),
     ausverkauft ? el('p', { class: 'winzig still', style: { marginTop: '4px' } }, 'Gerade nicht zu haben. Vielleicht wieder — vielleicht nicht.') : null,
-    rest ? el('p', { class: 'winzig still', style: { marginTop: '4px' } }, 'Wieder in ' + dauerText(rest)) : null
+    rest ? el('p', { class: 'winzig still', style: { marginTop: '4px' } }, 'Wieder in ' + dauerText(rest)) : null,
+    /* Zu teuer ist kein stummer Zustand — er soll wissen, WARUM nichts
+       passiert, wenn er tippt. Und worauf es sich zu sparen lohnt. */
+    !istDomme() && !ausverkauft && !rest && !gesperrtDurchSchulden && zuTeuer
+      ? el('p', { class: 'winzig still', style: { marginTop: '4px' } },
+          siegelWare ? 'Dafür fehlen dir Siegel.' : 'Noch nicht genug Glut. Halt gedrückt, um darauf zu sparen.')
+      : null
   );
 
   if (kaufbar) {
     karte.style.cursor = 'pointer';
     karte.addEventListener('click', () => kaufBlatt(a, preis, zeichnen));
   }
-  if (!istDomme() && !ausverkauft && !konto.spar !== undefined) {
+  /* Sparen ergibt nur bei Glut-Ware Sinn — Siegel kann man nicht ansparen. */
+  if (!istDomme() && !ausverkauft && !siegelWare) {
     langerDruck(karte, async () => {
-      const will = await frage('Darauf sparen?', a.artikel + ' — ' + preis + (siegelWare ? ' ✦' : ' ●'), 'Sparen');
+      const will = await frage('Darauf sparen?', a.artikel + ' — ' + preis + ' ●', 'Sparen');
       if (will) {
         await datenSchreib('konto', { ...(await datenLies('konto')), spar: a.id });
         meldung('Der Balken auf dem Heim gehört jetzt diesem Ziel.');
@@ -462,7 +470,10 @@ function kaufBlatt(a, preis, zeichnen) {
         onclick: async (e) => {
           e.target.disabled = true;
           b.schliessen();
-          await kontoBuchen(-preis, a.waehrung, 'Gekauft: ' + a.artikel);
+          /* Ein Kauf klingt nach Münzen, nicht nach Strafe — deshalb
+             still buchen und selbst klimpern. */
+          await kontoBuchen(-preis, a.waehrung, 'Gekauft: ' + a.artikel, true);
+          tonSpielen('muenze');
           await datenAnhaengen('kaeufe', { artikelId: a.id, artikel: a.artikel, preis, waehrung: a.waehrung, eingeloest: false });
           if (_konto && _konto.spar === a.id) {
             await datenSchreib('konto', { ...(await datenLies('konto')), spar: null });

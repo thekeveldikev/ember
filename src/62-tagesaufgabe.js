@@ -12,6 +12,7 @@
 
 async function tagesaufgabeSichern(rolle) {
   if (!vorratAn()) return null;
+  if (!(await datenLies('einst/aufgaben', true).catch(() => true))) return null;
   const pfad = 'tag/' + tagstempel() + '/aufgabe_' + rolle;
   const da = await datenLies(pfad).catch(() => null);
   if (da) return da;
@@ -47,6 +48,7 @@ async function tagesaufgabeKarte(platz, ruhig = false) {
   if (!platz) return;
   platz.innerHTML = '';
   if (!vorratAn()) return;
+  if (!(await datenLies('einst/aufgaben', true).catch(() => true))) return;
 
   const heute = tagstempel();
   const eigene = await datenLies('tag/' + heute + '/aufgabe_' + D.rolle).catch(() => null)

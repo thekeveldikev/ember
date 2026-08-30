@@ -143,6 +143,82 @@ test('bei Rot wird kein Bußgeld berechnet — fest verdrahtet', async () => {
   assert.equal((await raum.datenListe('kontobuch')).length, 0);
 });
 
+/* --- Die Automatik ------------------------------------------------------------ */
+
+test('der letzte fällige Sonntag ist ein Sonntag um 20 Uhr in der Vergangenheit', () => {
+  const { raum } = app();
+  const s = raum._letzterFaelligerSonntag();
+  const d = new Date(s);
+  assert.equal(d.getDay(), 0, 'ein Sonntag');
+  assert.equal(d.getHours(), 20, 'um 20 Uhr');
+  assert.ok(s <= Date.now(), 'nie in der Zukunft');
+  assert.ok(Date.now() - s < 8 * 86400000, 'höchstens eine Woche her');
+});
+
+test('Zahltag zahlt einmal, verzinst Schulden — und läuft nie doppelt', async () => {
+  const { raum } = app();
+  await anmelden(raum);
+  raum.D.ampel = { domme: 'gruen', sub: 'gruen' };
+
+  await raum.datenSchreib('konto', {
+    an: true, karma: -20, siegel: 0, gehalt: 10,
+    gehaltZuletzt: Date.now() - 9 * 86400000,
+    glutMonat: new Date().toISOString().slice(0, 7),
+  });
+  await raum.kontoLaden();
+
+  await raum.ladenPflegen();
+  let konto = await raum.datenLies('konto');
+  /* -20 + 10 Gehalt = -10, darauf 10 % Zins = -1 → -11. */
+  assert.equal(konto.karma, -11);
+
+  const buch = await raum.datenListe('kontobuch');
+  assert.deepEqual(rein(buch.map((b) => b.quelle)), ['Wochengehalt', 'Zinsen auf Schulden']);
+
+  /* Der zweite Lauf desselben Tages rührt nichts an. */
+  await raum.ladenPflegen();
+  konto = await raum.datenLies('konto');
+  assert.equal(konto.karma, -11, 'kein Doppel-Zahltag');
+  assert.equal((await raum.datenListe('kontobuch')).length, 2);
+});
+
+test('der Monatswechsel nimmt den Glutverlust und bucht Abos ab — oder kündigt sie', async () => {
+  const { raum } = app();
+  await anmelden(raum);
+  raum.D.ampel = { domme: 'gruen', sub: 'gruen' };
+
+  await raum.datenSchreib('konto', {
+    an: true, karma: 100, siegel: 0, gehalt: 0,
+    gehaltZuletzt: Date.now(),
+    glutMonat: 'vor-langer-zeit',
+    abos: [{ name: 'Kleiderwahl', kosten: 5 }, { name: 'Unbezahlbar', kosten: 9000 }],
+  });
+  await raum.kontoLaden();
+
+  await raum.ladenPflegen();
+  const konto = await raum.datenLies('konto');
+  /* 100 − 5 Verlust − 5 Abo = 90; das Unbezahlbare fliegt raus. */
+  assert.equal(konto.karma, 90);
+  assert.deepEqual(rein(konto.abos.map((a) => a.name)), ['Kleiderwahl'],
+    'wer nicht zahlen kann, verliert das Privileg');
+});
+
+test('bei Rot zahlt der Zahltag aus, aber verzinst nicht', async () => {
+  const { raum } = app();
+  await anmelden(raum);
+  raum.D.ampel = { domme: 'gruen', sub: 'rot' };
+
+  await raum.datenSchreib('konto', {
+    an: true, karma: -20, siegel: 0, gehalt: 10,
+    gehaltZuletzt: Date.now() - 9 * 86400000,
+    glutMonat: new Date().toISOString().slice(0, 7),
+  });
+  await raum.kontoLaden();
+  await raum.ladenPflegen();
+
+  assert.equal((await raum.datenLies('konto')).karma, -10, 'Gehalt ja, Zins nein');
+});
+
 /* --- Das Sortiment ----------------------------------------------------------- */
 
 test('das Sortiment ist vollständig und sauber', () => {

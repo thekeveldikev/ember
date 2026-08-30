@@ -224,7 +224,8 @@ export function ladeApp({ rolle = 'domme', dateien, ablage = baueAblage() } = {}
       ...(typeof maschineFeuern === 'function' ? { maschineFeuern } : {}),
       ...(typeof kontoBuchen === 'function'
         ? { kontoBuchen, kontoVerdienst, kontoBussgeld, kontoLaden, ladenAn,
-            schuldenStufe, zinsenAuf, inflationAuf, ladenPreisVon, ladenCooldownRest } : {}),
+            schuldenStufe, zinsenAuf, inflationAuf, ladenPreisVon, ladenCooldownRest,
+            ladenPflegen, _letzterFaelligerSonntag } : {}),
     };
   `;
 

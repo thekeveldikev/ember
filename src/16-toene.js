@@ -134,7 +134,9 @@ function tonSpielen(art) {
         const r = _rauschQuelle(raum);
         const filter = raum.createBiquadFilter();
         filter.type = 'bandpass';
-        filter.frequency.value = i ? 1700 : 2700;
+        /* Kein Bruch klingt wie der andere — ein Hauch Zufall in der
+           Höhe macht aus dem Sample einen Keks. */
+        filter.frequency.value = (i ? 1700 : 2700) * (0.92 + Math.random() * 0.16);
         filter.Q.value = 0.8;
         const laut = raum.createGain();
         laut.gain.setValueAtTime(0.55, t + versatz);

@@ -31,8 +31,11 @@ const sammle = (muster, text = alles) => {
 
 /* --- Seiten: jeder Link führt irgendwohin ---------------------------------- */
 
-test('jede wörtlich verlinkte Seite ist auch definiert', () => {
-  const definiert = new Set(sammle(/SEITEN\.(\w+)\s*=/g));
+test('jede wörtlich verlinkte Seite ist auch definiert — und keine doppelt', () => {
+  const alle = sammle(/SEITEN\.(\w+)\s*=/g);
+  const definiert = new Set(alle);
+  assert.equal(alle.length, definiert.size,
+    'doppelt definierte Seite: ' + alle.filter((s, i) => alle.indexOf(s) !== i).join(','));
   assert.ok(definiert.size >= 25, definiert.size + ' Seiten definiert');
 
   for (const ziel of sammle(/zeigeSeite\('([\w-]+)'\)/g)) {
