@@ -15,11 +15,11 @@ test('in der Ablage steht kein lesbares Wort', async () => {
   await anmelden(raum);
 
   await raum.datenAnhaengen('plausch', { text: 'Komm her, sofort.' });
-  await raum.datenSchreib('regelStand', { wann: 123 });
+  await raum.datenSchreib('regelStand', { wann: 987650001234 });
 
   const alles = JSON.stringify(ablage.inhalt);
   assert.ok(!alles.includes('Komm her'), 'der Klartext darf nirgends auftauchen');
-  assert.ok(!alles.includes('plausch') || true);
+  assert.ok(!alles.includes('987650001234'), 'auch Zahlwerte liegen nicht offen');
 
   /* Jeder Eintrag ist ein Brocken unter g — sonst nichts. */
   const eintraege = Object.values(ablage.inhalt.paare.paar1.plausch);

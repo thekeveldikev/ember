@@ -88,20 +88,41 @@ export function ladeApp({ rolle = 'domme', dateien, ablage = baueAblage() } = {}
     navigator: { onLine: true, vibrate: () => true, userAgent: 'Prüfstand' },
     location: { protocol: 'https:', search: '', reload: () => {} },
 
-    /* Die Oberfläche wird hier nicht gebraucht — was sie anfassen würde,
-       ist harmlos abgefangen. */
+    /* Ein Mini-Baum statt eines Browsers: Elemente merken sich ihre
+       Kinder und Merkmale — genug, um zu prüfen, WAS gebaut wird,
+       ohne einen echten Browser zu brauchen. */
     document: {
       querySelector: () => null,
       querySelectorAll: () => [],
       addEventListener: () => {},
-      createElement: () => ({ style: {}, append: () => {}, addEventListener: () => {} }),
+      createTextNode: (t) => ({ nodeType: 3, text: String(t) }),
+      createElement: (art) => ({
+        nodeType: 1, art, kinder: [], merkmale: {}, style: {},
+        append(...k) { this.kinder.push(...k); },
+        setAttribute(n, w) { this.merkmale[n] = w; },
+        getAttribute(n) { return this.merkmale[n]; },
+        addEventListener: () => {},
+        set innerHTML(_) { this.kinder = []; },
+        get innerHTML() { return ''; },
+      }),
+      createElementNS: (ns, art) => ({
+        nodeType: 1, art, setAttribute: () => {},
+        set innerHTML(_) {}, get innerHTML() { return ''; },
+      }),
       documentElement: { setAttribute: () => {}, getAttribute: () => null, style: { setProperty: () => {} } },
       body: { append: () => {} },
       visibilityState: 'visible',
     },
     window: { addEventListener: () => {}, matchMedia: () => ({ matches: false }) },
-    EventSource: class { constructor() { this.readyState = 0; } close() { this.readyState = 2; } addEventListener() {} },
+    /* Zählt seine Geschöpfe — der Sechs-Waisen-Fehler darf nie zurück. */
+    EventSource: class {
+      constructor(url) { this.url = url; this.readyState = 0; this.constructor.gebaut++; }
+      close() { this.readyState = 2; }
+      addEventListener() {}
+      static gebaut = 0;
+    },
     Notification: { permission: 'default' },
+    performance: { now: () => Date.now() },
     SEITEN: {},
   };
 
@@ -167,6 +188,16 @@ export function ladeApp({ rolle = 'domme', dateien, ablage = baueAblage() } = {}
       ...(typeof normalform === 'function' ? { normalform, woerter, stamm, meinenDasselbe } : {}),
       ...(typeof serieAus === 'function' ? { serieAus } : {}),
       ...(typeof stufeAus === 'function' ? { stufeAus } : {}),
+      ...(typeof anfuegen === 'function' ? { anfuegen } : {}),
+      ...(typeof glutPunkte === 'function' ? { glutPunkte } : {}),
+      ...(typeof boteAdresse === 'function' ? { boteAdresse } : {}),
+      ...(typeof _verteilen === 'function' ? { _verteilen, _stammStarten } : {}),
+      ...(typeof _regieStand === 'function' ? { _regieStand } : {}),
+      ...(typeof vorratWup === 'function'
+        ? { VORRAT, vorratWup, vorratLosZiehen, _seltenheitWuerfeln, vorratKekse,
+            vorratTagesaufgabe, vorratSzenario, vorratWirksameStufe, vorratDeckListe } : {}),
+      ...(typeof _bibliothekUebersetzen === 'function' ? { _bibliothekUebersetzen, _bedingungOk } : {}),
+      ...(typeof tonSpielen === 'function' ? { tonSpielen } : {}),
     };
   `;
 

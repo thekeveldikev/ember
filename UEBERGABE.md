@@ -187,7 +187,28 @@ Ton-Entsperrung beim allerersten Tipp (iOS-Autoplay); steht der
 Klingelschalter auf lautlos, bleibt Web-Audio auf dem iPhone stumm —
 Apples Regel. „Schokolade"-Karte (oral-012) auf Wunsch entfernt.
 
----
+**0.7.1 — die adversariale Runde:** Die Prüfsuite wuchs von 21 auf 58
+Prüfungen (test/kern.mjs, test/leitung.mjs, test/vorrat.mjs): kaputte
+Zeitstempel, Bit-Kipper in GCM-Brocken, Müll-Kopplungscodes, der
+Verteiler in allen Pfad-Lagen, das Sechs-Waisen-Wettrennen (EventSource
+zählt im Prüfstand seine Geschöpfe), vergammelte Warteschlangen,
+Seltenheits-Würfel, Filterketten, der Regie-Taktgeber mit Pause und
+Versatz, 300 Szenarien ohne Platzhalter-Reste, Wir-Stimme als
+Invariante. DABEI GEFUNDEN: eine echte Wettlauf-Lücke in datenHorch —
+die langsamere Spiegel-Lieferung konnte die frische Server-Lieferung
+ÜBERHOLEN und den Geist zurückbringen. Jede Lieferung trägt jetzt eine
+Folgenummer, Veraltetes wird verworfen. Der Prüfstand bekam dafür einen
+Mini-DOM (createElement mit Kinder-Gedächtnis, createTextNode) und den
+EventSource-Zähler.
+
+Dazu: CSP als Haustür (default-src 'none', nur die vier bekannten
+Gegenstellen, keine Frames/Objekte/Formulare), PIN-Bremse, die den
+Neustart überlebt (ab dem 5. Fehlversuch 30 s, verdoppelnd bis 15 min,
+persistiert in Gerät), Blätter messen sich an --vvh statt 88vh (sonst
+lagen Knöpfe unter der iOS-Tastatur). Audio: gemeinsame Echoschleife
+(160 ms, tief gedämpft, 13 % beigemischt) macht aus Piepsern Raumklang;
+neu „plopp" (Chat ein/aus) und „wusch" (Blätter); nach Rot schweigt
+alles — D.ruhe gilt auch für Töne.
 
 ## Was in der Bugjagd zutage kam
 

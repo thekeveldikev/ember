@@ -27,6 +27,24 @@ function _klang() {
     _klangSumme = _klangRaum.createGain();
     _klangSumme.gain.value = 0.9;
     _klangSumme.connect(presser).connect(_klangRaum.destination);
+
+    /* Ein Hauch Raum: dieselbe Summe läuft zusätzlich durch eine kurze
+       Echoschleife (160 ms, gedämpft, leise beigemischt). Dadurch klingen
+       die Töne nach einem Zimmer statt nach einem Piezo-Piepser. */
+    try {
+      const echo = _klangRaum.createDelay(0.5);
+      echo.delayTime.value = 0.16;
+      const rueck = _klangRaum.createGain();
+      rueck.gain.value = 0.32;
+      const daempfer = _klangRaum.createBiquadFilter();
+      daempfer.type = 'lowpass';
+      daempfer.frequency.value = 2400;
+      const nass = _klangRaum.createGain();
+      nass.gain.value = 0.13;
+      _klangSumme.connect(echo);
+      echo.connect(daempfer).connect(rueck).connect(echo);
+      daempfer.connect(nass).connect(presser);
+    } catch { /* dann eben trocken */ }
   }
   /* iOS legt den Klangraum schlafen, bis eine Geste ihn weckt. */
   if (_klangRaum.state === 'suspended') _klangRaum.resume().catch(() => {});
@@ -61,6 +79,8 @@ function _rauschQuelle(raum, schleife = false) {
 
 function tonSpielen(art) {
   if (!toeneAn()) return;
+  /* Nach Rot ist Ruhe — dann schweigt auch die App. */
+  if (typeof D !== 'undefined' && D.ruhe) return;
   const raum = _klang();
   if (!raum) return;
   const t = raum.currentTime;
@@ -153,6 +173,32 @@ function tonSpielen(art) {
       laut.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
       o.connect(laut).connect(_klangSumme);
       o.start(t); o.stop(t + 0.06);
+    } else if (art === 'plopp') {
+      /* Eine Nachricht geht oder kommt: ein weicher Tropfen. */
+      const o = raum.createOscillator();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(640, t);
+      o.frequency.exponentialRampToValueAtTime(310, t + 0.09);
+      const laut = raum.createGain();
+      laut.gain.setValueAtTime(0.0001, t);
+      laut.gain.exponentialRampToValueAtTime(0.11, t + 0.012);
+      laut.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+      o.connect(laut).connect(_klangSumme);
+      o.start(t); o.stop(t + 0.16);
+    } else if (art === 'wusch') {
+      /* Ein Blatt gleitet herauf: kaum mehr als ein Luftzug. */
+      const r = _rauschQuelle(raum);
+      const filter = raum.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(700, t);
+      filter.frequency.exponentialRampToValueAtTime(2100, t + 0.16);
+      filter.Q.value = 0.7;
+      const laut = raum.createGain();
+      laut.gain.setValueAtTime(0.0001, t);
+      laut.gain.exponentialRampToValueAtTime(0.05, t + 0.05);
+      laut.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+      r.connect(filter).connect(laut).connect(_klangSumme);
+      r.start(t); r.stop(t + 0.22);
     } else if (art === 'ratsche') {
       /* Der Zeiger schnappt über einen Stift — hölzern, mit leichtem
          Zufall in der Höhe, damit zwanzig davon lebendig klingen. */

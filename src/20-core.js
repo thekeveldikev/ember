@@ -247,6 +247,7 @@ function blatt(...inhalt) {
   };
   document.addEventListener('keydown', beiTaste);
   document.body.append(deckel);
+  if (typeof tonSpielen === 'function') tonSpielen('wusch');
   return { deckel, schliessen };
 }
 

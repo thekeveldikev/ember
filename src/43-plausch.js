@@ -112,6 +112,7 @@ SEITEN.plausch = function (seite) {
     await datenAnhaengen('plausch', ablauf === null ? { text } : { text, ablauf });
     ablauf = null;
     ablaufKnopf.className = 'knopf leer';
+    tonSpielen('plopp');
     pushSenden(andereRolle(), 'plausch');
   }
 
@@ -124,7 +125,7 @@ SEITEN.plausch = function (seite) {
     }
     if (nachrichten.length > letzteAnzahl && letzteAnzahl > 0) {
       const neu = nachrichten[nachrichten.length - 1];
-      if (neu && neu.von !== D.rolle) puls('hinweis');
+      if (neu && neu.von !== D.rolle) { puls('hinweis'); tonSpielen('plopp'); }
     }
     letzteAnzahl = nachrichten.length;
   });

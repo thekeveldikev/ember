@@ -177,10 +177,19 @@ async function datenEintragLoeschen(pfad, id) {
 function datenHorch(pfad, beiListe) {
   let bestand = spiegelHolen(pfad) || {};
 
+  /* Jede Lieferung trägt eine Folgenummer: Das Entschlüsseln dauert
+     unterschiedlich lange, und ohne die Nummer konnte eine ALTE Liste
+     (aus dem Spiegel) nach der frischen ankommen und sie überdecken —
+     der Geist wäre zurück. Nur die jüngste Lieferung erreicht den
+     Aufrufer. */
+  let folge = 0;
   const senden = async () => {
+    const meine = ++folge;
     /* Auch hier gilt: Was noch aussteht, bleibt sichtbar. */
     bestand = spiegelSammlungSetzen(pfad, bestand);
-    beiListe(await sammlungOeffnen(bestand));
+    const liste = await sammlungOeffnen(bestand);
+    if (meine !== folge) return;
+    beiListe(liste);
   };
 
   /* Immer einmal sofort zeichnen, auch wenn der Spiegel leer ist: sonst

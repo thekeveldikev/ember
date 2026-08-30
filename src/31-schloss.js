@@ -59,25 +59,38 @@ function zeigeSchloss() {
     async function pruefen() {
       const pin = feld.value.trim();
       if (pin.length < 4) return;
+
+      /* Die Bremse überlebt den Neustart: Ab dem fünften Fehlversuch
+         verdoppelt sich die Wartezeit (30 s, 1 min, 2 min … höchstens
+         15 min) — und ein Neuladen der Seite setzt sie NICHT zurück.
+         Vier Ziffern durchzuprobieren soll sich schlicht nicht lohnen. */
+      const fehl = Gerät.lies('pinFehl', { n: 0, wann: 0 });
+      if (fehl.n >= 5) {
+        const sperre = Math.min(15 * 60000, Math.pow(2, fehl.n - 5) * 30000);
+        const uebrig = fehl.wann + sperre - Date.now();
+        if (uebrig > 0) {
+          feld.value = '';
+          return meldung('Zu oft daneben. Warte noch ' + Math.ceil(uebrig / 1000) + ' Sekunden.', 4000);
+        }
+      }
+
       knopf.disabled = true;
       knopf.textContent = 'Einen Moment …';
 
       const roh = await schluesselAufschliessen(schrank, pin);
       if (!roh) {
+        Gerät.schreib('pinFehl', { n: (fehl.n || 0) + 1, wann: Date.now() });
         _fehlversuche++;
         feld.value = '';
-        knopf.disabled = false;
         knopf.textContent = 'Öffnen';
-        /* Nach jedem Fehlversuch wird das Warten länger. Vier Ziffern
-           durchzuprobieren soll sich nicht lohnen. */
         const strafe = Math.min(_fehlversuche * 400, 4000);
-        knopf.disabled = true;
         meldung(_fehlversuche > 2 ? 'Nicht die richtige.' : 'Falsch.');
         setTimeout(() => { knopf.disabled = false; feld.focus(); }, strafe);
         puls('antwortNein');
         return;
       }
 
+      Gerät.loesch('pinFehl');
       _fehlversuche = 0;
       await schluesselLaden(roh);
       appStarten();
