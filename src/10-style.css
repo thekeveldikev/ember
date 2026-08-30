@@ -131,17 +131,18 @@ body {
 }
 
 /* Ein feines Korn nimmt den Flächen das Digitale.
-   soft-light statt overlay: auf einem fast schwarzen Grund verhält sich
-   overlay wie ein Multiplizieren und legt einen Schleier über die ganze
-   App — Text eingeschlossen. soft-light gibt die Textur, ohne zu dimmen. */
+   Ohne Misch-Modus: mix-blend-mode zwang die GPU, bei JEDEM Bild den
+   ganzen Schirm zu verrechnen — auf einem iPhone 12 ruckelte davon
+   jede Animation. Dieselbe Textur in niedriger Deckkraft kostet fast
+   nichts und sieht auf dem dunklen Grund praktisch gleich aus. */
 body::after {
   content: '';
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 9999;
-  opacity: var(--korn);
-  mix-blend-mode: soft-light;
+  opacity: calc(var(--korn) * 0.11);
+  transform: translateZ(0);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
 }
 
@@ -241,8 +242,8 @@ h3 { font-size: 18px; }
   gap: 2px;
   padding: 6px 8px calc(env(safe-area-inset-bottom) + 6px);
   background: linear-gradient(to top, var(--grund) 62%, rgba(10, 10, 10, .86));
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(11px);
+  -webkit-backdrop-filter: blur(11px);
   border-top: 1px solid var(--kante);
 }
 
@@ -523,8 +524,8 @@ textarea.feld { resize: none; line-height: 1.5; }
   inset: 0;
   z-index: 700;
   background: var(--deck);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -837,6 +838,61 @@ textarea.feld { resize: none; line-height: 1.5; }
   100% { transform: rotate(-.6deg) perspective(500px) rotateX(0) scaleY(1); }
 }
 
+/* --- Rad, Lose, Keks: die großen Momente ----------------------------------- */
+
+@keyframes siegerGluehen {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  45% { opacity: .25; }
+  65% { opacity: .9; }
+  100% { opacity: 0; }
+}
+
+/* Der wandernde Lichtstreifen auf unberührtem Rubbel-Metall. */
+.losglanz {
+  position: absolute;
+  top: -30%;
+  bottom: -30%;
+  width: 34%;
+  left: -40%;
+  transform: rotate(18deg);
+  background: linear-gradient(90deg, transparent, rgba(255,236,200,.34), transparent);
+  animation: losglanzZug 2.6s ease-in-out infinite;
+}
+
+@keyframes losglanzZug {
+  0% { left: -45%; }
+  60%, 100% { left: 115%; }
+}
+
+@keyframes losBlitz {
+  0% { opacity: 0; transform: scale(.6); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.25); }
+}
+
+@keyframes staubwolke {
+  0% { opacity: 0; transform: scale(.5); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.7) translateY(8px); }
+}
+
+/* Der ungeknackte Keks lockt: ein langsames Wiegen mit warmem Schein. */
+.keks-lockt {
+  animation: keksLockt 3.4s ease-in-out infinite;
+}
+
+@keyframes keksLockt {
+  0%, 100% { transform: rotate(-2deg); filter: drop-shadow(0 6px 16px rgba(0,0,0,.5)); }
+  50% { transform: rotate(2.5deg) translateY(-3px); filter: drop-shadow(0 10px 22px rgba(196,120,90,.45)); }
+}
+
+@keyframes herzFlug {
+  0% { opacity: 0; transform: scale(.4) translateY(0); }
+  25% { opacity: 1; transform: scale(1.25) translateY(-14px); }
+  100% { opacity: 0; transform: scale(.9) translateY(-70px); }
+}
+
 /* --- Der Vorhang, zweiter Anlauf ------------------------------------------- */
 
 #vorhang .wortmarke {
@@ -857,6 +913,22 @@ textarea.feld { resize: none; line-height: 1.5; }
   from { opacity: 0; letter-spacing: .3em; }
   to { opacity: .85; letter-spacing: .55em; }
 }
+
+#vorhang .vorhangzitat {
+  position: absolute;
+  left: 32px;
+  right: 32px;
+  top: calc(50% + 66px);
+  text-align: center;
+  font-family: 'Playfair', Georgia, serif;
+  font-style: italic;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--schrift-still);
+  animation: wortmarkeZitat 1.8s ease .5s both;
+}
+
+@keyframes wortmarkeZitat { from { opacity: 0 } to { opacity: .75 } }
 
 /* --- Rücksicht ------------------------------------------------------------ */
 

@@ -281,7 +281,7 @@ function _bibliothekUebersetzen(roh) {
     karma_aendern: (x) => ({ typ: 'karma', wert: x.wert }),
     strafe_hinzufuegen: (x) => ({ typ: 'strafe', text: x.text }),
     strafe_streichen: () => ({ typ: 'strafe_weg' }),
-    timer_starten: (x) => ({ typ: 'uhr', minuten: Math.round((x.dauer || 60)) }),
+    timer_starten: (x) => ({ typ: 'uhr', minuten: parseInt(x.dauer, 10) || 60 }),
     domme_alarm: (x) => ({ typ: 'push_domme', text: x.text }),
     vibration: () => null,   // läuft als Beiwerk der Nachricht mit
   };

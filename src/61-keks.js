@@ -84,6 +84,7 @@ function _keksSvg() {
 
 function keksGanzZeigen(platz, stand) {
   const svg = _keksSvg();
+  svg.classList.add('keks-lockt');
   const halter = el('button', { class: 'keks' },
     svg,
     el('p', { class: 'winzig still', style: { marginTop: '4px' } }, 'Ein Glückskeks für dich')
@@ -96,21 +97,41 @@ function keksGanzZeigen(platz, stand) {
 
     tonSpielen('knack');
     puls('hinweis');
+    svg.classList.remove('keks-lockt');
     svg.querySelector('.keks-riss').style.opacity = '1';
     svg.querySelector('.keks-links').classList.add('bricht-links');
     svg.querySelector('.keks-rechts').classList.add('bricht-rechts');
 
-    /* Krümel stieben aus der Bruchstelle. */
     const kiste = halter.getBoundingClientRect();
-    for (let i = 0; i < 9; i++) {
+    const mx = kiste.left + kiste.width / 2;
+    const my = kiste.top + kiste.height / 2 - 10;
+
+    /* Eine kleine Staubwolke aus der Bruchstelle … */
+    const staub = el('div', {
+      style: {
+        position: 'fixed', zIndex: '940', pointerEvents: 'none',
+        left: (mx - 30) + 'px', top: (my - 22) + 'px',
+        width: '60px', height: '44px', borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(220,170,110,.4), transparent 68%)',
+        animation: 'staubwolke .55s ease-out forwards',
+      },
+    });
+    document.body.append(staub);
+    setTimeout(() => staub.remove(), 600);
+
+    /* … und Krümel in allen Größen, die sich drehend verstreuen. */
+    for (let i = 0; i < 15; i++) {
       const kruemel = el('div', { class: 'kruemel' });
-      kruemel.style.left = (kiste.left + kiste.width / 2 + (Math.random() * 16 - 8)) + 'px';
-      kruemel.style.top = (kiste.top + kiste.height / 2 - 10) + 'px';
-      kruemel.style.setProperty('--kx', (Math.random() * 90 - 45) + 'px');
-      kruemel.style.setProperty('--ky', (30 + Math.random() * 50) + 'px');
-      kruemel.style.animationDelay = (Math.random() * 0.08) + 's';
+      kruemel.style.left = (mx + (Math.random() * 20 - 10)) + 'px';
+      kruemel.style.top = my + 'px';
+      kruemel.style.width = kruemel.style.height = (2 + Math.random() * 5) + 'px';
+      kruemel.style.background = ['#c98d4e', '#8f5a2b', '#e0b071'][i % 3];
+      kruemel.style.setProperty('--kx', (Math.random() * 110 - 55) + 'px');
+      kruemel.style.setProperty('--ky', (26 + Math.random() * 60) + 'px');
+      kruemel.style.animationDelay = (Math.random() * 0.1) + 's';
+      kruemel.style.animationDuration = (0.6 + Math.random() * 0.4) + 's';
       document.body.append(kruemel);
-      setTimeout(() => kruemel.remove(), 900);
+      setTimeout(() => kruemel.remove(), 1100);
     }
 
     setTimeout(() => {

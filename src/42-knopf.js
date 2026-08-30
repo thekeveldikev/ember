@@ -247,6 +247,15 @@ function knopfHorcherStarten() {
     const ersterDurchlauf = _letzterKnopf === null;
     _letzterKnopf = stempel;
 
+    /* Die Zahl am App-Symbol: Ein unquittierter Befehl zählt eins, sonst
+       null. iOS kann das ab 16.4 für installierte Apps — wo nicht, tut
+       der Versuch einfach nichts. */
+    try {
+      const offenerBefehl = aktuell && aktuell.art === 'befehl' && !aktuell.quittiert && !istDomme();
+      if (navigator.setAppBadge && offenerBefehl) navigator.setAppBadge(1);
+      else if (navigator.clearAppBadge) navigator.clearAppBadge();
+    } catch { /* dann eben ohne Zahl */ }
+
     if (!aktuell) {
       if (_befehlOffen) befehlSchliessen();
       return;

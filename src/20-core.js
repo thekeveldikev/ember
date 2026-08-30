@@ -178,11 +178,19 @@ function meldungMitTat(text, tatText, tat, ms = 8000) {
 
 /* --- Blätter (Eingaben von unten) ----------------------------------------- */
 
+/* Als erstes Kind übergeben, macht es ein Blatt unumgehbar: kein
+   Wegtippen über den Hintergrund, kein Escape. Für die Momente der
+   Einrichtung, in denen ein versehentliches Schließen teuer wäre. */
+const BLATT_FEST = { __blattFest: true };
+
 function blatt(...inhalt) {
+  let fest = false;
+  if (inhalt[0] && inhalt[0].__blattFest) { fest = true; inhalt.shift(); }
+
   const b = el('div', { class: 'blatt' }, el('div', { class: 'blattgriff' }), ...inhalt);
   const deckel = el('div', {
     class: 'deckel',
-    onclick: (e) => { if (e.target === deckel) schliessen(); },
+    onclick: (e) => { if (e.target === deckel && !fest) schliessen(); },
   }, b);
 
   function schliessen() {
@@ -202,7 +210,7 @@ function blatt(...inhalt) {
        Seitenwechsel —, räumt sich auch der Horcher weg, statt für immer
        an der Tastatur zu hängen. */
     if (!deckel.isConnected) { document.removeEventListener('keydown', beiTaste); return; }
-    if (e.key === 'Escape') schliessen();
+    if (e.key === 'Escape' && !fest) schliessen();
   };
   document.addEventListener('keydown', beiTaste);
   document.body.append(deckel);

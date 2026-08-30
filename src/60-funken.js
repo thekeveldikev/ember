@@ -82,6 +82,8 @@ async function paarXp(punkte) {
       pushSenden(andereRolle(), 'hinweis', 'Wir sind weiter.');
       meldung('Wir beide: Stufe ' + nachher + '.');
       puls('antwortJa');
+      tonSpielen('weich');
+      if (typeof konfetti === 'function') konfetti();
     }
   } catch { /* Das Level ist Beiwerk — nichts hängt daran. */ }
 }

@@ -412,6 +412,8 @@ function xpVergeben(stand) {
 /* Ein Aufstieg soll sich nach etwas anfühlen — auch für die, die vergibt. */
 function stufeAufFeiern(stufe, rang) {
   puls('befehl');
+  tonSpielen('weich');
+  if (typeof konfetti === 'function') konfetti();
   const schirm = el('div', {
     style: {
       position: 'fixed', inset: '0', zIndex: '790', display: 'grid', placeItems: 'center',

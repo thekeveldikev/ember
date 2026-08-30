@@ -214,12 +214,46 @@ function plauschZeichnen(liste, alleNachrichten) {
       }, n.reaktion));
     }
 
-    /* Langer Druck auf eine fremde Nachricht: eine Reaktion daraufsetzen. */
-    if (!meins) langerDruck(blase, () => reaktionWaehlen(n.id));
-    else langerDruck(blase, () => nachrichtWegnehmen(n.id));
+    /* Langer Druck auf eine fremde Nachricht: eine Reaktion daraufsetzen.
+       Der Doppeltipp ist die Abkürzung: sofort ein Herz, mit kleinem
+       Aufstieg — wie man es aus jedem Chat im Daumen hat. */
+    if (!meins) {
+      langerDruck(blase, () => reaktionWaehlen(n.id));
+      let letzterTipp = 0;
+      blase.addEventListener('click', () => {
+        const nun = Date.now();
+        if (nun - letzterTipp < 340) {
+          letzterTipp = 0;
+          herzAufsteigen(blase);
+          if (n.reaktion !== '❤️') datenAendern('plausch', n.id, { reaktion: '❤️' });
+        } else {
+          letzterTipp = nun;
+        }
+      });
+    } else {
+      langerDruck(blase, () => nachrichtWegnehmen(n.id));
+    }
 
     liste.append(blase);
   });
+}
+
+/* Ein Herz steigt aus der Blase auf und verglüht. */
+function herzAufsteigen(blase) {
+  const kiste = blase.getBoundingClientRect();
+  const herz = el('div', {
+    style: {
+      position: 'fixed', zIndex: '950', pointerEvents: 'none',
+      left: (kiste.left + kiste.width / 2 - 14) + 'px',
+      top: (kiste.top + kiste.height / 2 - 14) + 'px',
+      fontSize: '28px',
+      animation: 'herzFlug 0.9s cubic-bezier(.2,.6,.4,1) forwards',
+    },
+  }, '❤️');
+  document.body.append(herz);
+  puls('denkAnDich');
+  tonSpielen('tick');
+  setTimeout(() => herz.remove(), 950);
 }
 
 function bildGross(quelle) {

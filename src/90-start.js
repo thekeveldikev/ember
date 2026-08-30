@@ -121,6 +121,15 @@ function regelWachePruefen() {
   stimmungSetzen();
   dienstAnmelden();
 
+  /* Ein leiser Satz unter dem Schriftzug, solange der Vorhang steht —
+     aus dem harmlosesten Teil des Keks-Vorrats. Nie etwas, das auf einem
+     fremden Blick peinlich wäre. */
+  try {
+    const zitate = VORRAT.kekse.filter((k) =>
+      ['warm', 'nachdenklich', 'motivation'].includes(k.kategorie) && (k.intensitaet || 1) <= 1);
+    if (zitate.length) $('#vorhang').append(el('div', { class: 'vorhangzitat' }, zufall(zitate).text));
+  } catch { /* dann eben ohne */ }
+
   /* Die sichtbare Höhe mitschreiben. Auf dem iPhone ist das der einzige
      verlässliche Weg, von der Tastatur zu erfahren: Das Layout bleibt
      gleich groß, nur der sichtbare Ausschnitt schrumpft. */

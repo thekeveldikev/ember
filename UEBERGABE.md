@@ -135,6 +135,34 @@ auf den gelesenen Zettel bringt den nächsten. „Wir" heißt „Chat".
 Ich-Seite in Klartext erklärt. Vorrat-Texte in Wir-Stimme („wir beide"
 statt „ihr beide" — wirStimme() im Generator).
 
+**0.6.1 — die Sinnes-Runde plus ein Beinahe-Desaster:** Der schwerste
+Fund: Der Raum-Schlüssel wurde erst am ENDE der PIN-Wahl gespeichert —
+wer zwischen Kopplungscode und PIN die App wechselte (AirDrop!), verlor
+den frisch eingerichteten Raum unwiederbringlich. Jetzt wird er sofort
+nach der Einrichtung gesichert (beide Wege), und die drei
+Einrichtungs-Blätter sind BLATT_FEST (kein Wegtippen über den Deckel).
+Der komplette Weg für den echten Wir-Raum — Startpaket → Einrichten →
+Kopplungscode → zweites Gerät → Rolle → PIN — wurde einmal Ende-zu-Ende
+gegen die echte Ablage durchgespielt (Testpaar danach restlos gelöscht).
+
+Sinnes-Overhaul: Ton-Engine mit gemeinsamem Begrenzer, Schimmer-
+Arpeggio, Ratschen-Ton und einer echten Kratz-Spur (Dauerrauschen,
+dessen Pegel an der Fingergeschwindigkeit hängt). Das Rad dreht jetzt
+von Hand (rAF + easeOutCubic), damit jede Feldgrenze hörbar ratscht und
+der Zeiger zuckt; dazu Goldrand (radial-mask mit closest-side — sonst
+fingerdick!), stehendes Licht, glühendes Siegerfeld, Feder-Stopp. Lose:
+wandernder Metallglanz bis zum ersten Kratzer, Kupferflocken am Finger,
+Enthüllungs-Blitz + Glanzstreich, Jackpot mit Schimmer und doppeltem
+Konfetti; getImageData nur noch alle 320 ms (Ruckler-Quelle). Keks:
+lockendes Wiegen, Staubwolke, 15 Krümel in drei Tönen. Performance: Das
+Korn verlor seinen mix-blend-mode (der GANZE Schirm wurde pro Frame
+verrechnet — DAS Ruckeln auf dem iPhone 12), Backdrop-Blurs gedrosselt.
+Boni: Herz per Doppeltipp im Chat (mit Flug-Animation), App-Icon-Badge
+bei offenem Befehl, Konfetti bei Stufenaufstiegen, Vorhang-Zitat aus dem
+harmlosen Keks-Pool, „Überrasch mich" im Spiel. Wir-Stimme jetzt
+wirklich im Build (der Generator war vor der Regel gelaufen), inklusive
+kuratierter Verb-Fälle.
+
 ---
 
 ## Was in der Bugjagd zutage kam

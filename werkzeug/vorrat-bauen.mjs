@@ -40,12 +40,29 @@ const vorrat = {
 function wirStimme(s) {
   if (typeof s !== 'string') return s;
   return s
+    /* Erst die Sätze, bei denen auch das Verb mitmuss — dann das Generische. */
+    .replace(/ihr beide es wollt/g, 'wir beide es wollen')
+    .replace(/Was ihr macht\b/g, 'Was wir machen')
+    .replace(/solange ihr auch außerhalb davon redet/g, 'solange wir auch außerhalb davon reden')
+    .replace(/Ihr habt euch das ausgesucht/g, 'Wir haben uns das ausgesucht')
+    .replace(/ihr könnt es\b/g, 'wir können es')
+    .replace(/sagt es euch\b/g, 'sagen wir es')
+    .replace(/Ihr müsst\b/g, 'Wir müssen')
+    .replace(/seid ihr zwei\b/g, 'sind wir zwei')
+    .replace(/Schaut euch heute an, was ihr vor einem Jahr gemacht habt\. Und macht es nochmal\./g,
+      'Schauen wir uns heute an, was wir vor einem Jahr gemacht haben. Und dann: nochmal.')
+    .replace(/während ihr einen Film schaut/g, 'während wir einen Film schauen')
+    .replace(/Auch wenn ihr nur auf dem Sofa sitzt/g, 'Auch wenn wir nur auf dem Sofa sitzen')
+    .replace(/Egal wo ihr seid/g, 'Egal wo wir sind')
+    .replace(/Der erste von euch\b/g, 'Der erste von uns')
+    .replace(/über euch als eure Freunde/g, 'über uns als unsere Freunde')
     .replace(/\bIhr beide\b/g, 'Wir beide')
     .replace(/\bihr beide\b/g, 'wir beide')
     .replace(/\bIhr zwei\b/g, 'Wir zwei')
     .replace(/\bihr zwei\b/g, 'wir zwei')
     .replace(/\bIhr habt\b/g, 'Wir haben')
     .replace(/\bihr habt\b/g, 'wir haben')
+    .replace(/\bhabt ihr\b/g, 'haben wir')
     .replace(/\bZwischen euch\b/g, 'Zwischen uns')
     .replace(/\bnur ihr zwei\b/g, 'nur wir zwei');
 }

@@ -154,7 +154,9 @@ function radDrehen(raeder) {
       uebernehmen.style.display = '';
       nochmal.style.display = '';
       puls('antwortJa');
-      tonSpielen('weich');
+      /* Drei und mehr Räder verdienen das Glitzern, eins den warmen Klang. */
+      tonSpielen(raeder.length >= 3 ? 'schimmer' : 'weich');
+      if (raeder.length >= 4 && typeof konfetti === 'function') konfetti();
       return;
     }
     const rad = raeder[nummer++];
@@ -170,7 +172,12 @@ function radDrehen(raeder) {
   naechstes();
 }
 
-/* Ein einzelnes Rad als Scheibe, die ausläuft. Der Zeiger steht oben. */
+/* Ein einzelnes Rad als Scheibe, die ausläuft. Der Zeiger steht oben.
+
+   Gedreht wird von Hand, Bild für Bild: Nur so weiß die App in jedem
+   Moment, wo die Scheibe steht — und kann den Zeiger bei jeder
+   Feldgrenze hörbar über den Stift schnappen lassen. Eine CSS-Kurve
+   könnte hübsch auslaufen, aber sie könnte nicht ratschen. */
 function einRadDrehen(platz, rad, fertig) {
   const felder = (rad.felder || []).filter(Boolean);
   if (!felder.length) return fertig('—');
@@ -179,29 +186,31 @@ function einRadDrehen(platz, rad, fertig) {
   const proFeld = 360 / felder.length;
 
   /* Der Zeiger steht oben; das Feld muss also unter ihn gedreht werden.
-     Ein paar volle Umdrehungen davor, damit es nach Schwung aussieht. */
+     Fünf volle Umdrehungen plus ein Zufallshauch, damit keine zwei
+     Drehungen gleich aussehen. */
   const ziel = 360 * 5 - (treffer * proFeld + proFeld / 2);
 
   platz.innerHTML = '';
   const scheibe = el('div', {
     style: {
       position: 'absolute', inset: '0', borderRadius: '50%',
-      transition: 'transform 3.4s cubic-bezier(.16, .84, .28, 1)',
       transform: 'rotate(0deg)',
-      boxShadow: '0 0 0 2px rgba(232,168,124,.28), 0 10px 40px -12px var(--schein)',
+      boxShadow: '0 10px 40px -12px var(--schein)',
       overflow: 'hidden',
+      willChange: 'transform',
     },
   });
 
-  /* Die Felder als Tortenstücke — abwechselnd zwei Tiefen, damit die
-     Grenzen sichtbar sind, ohne dass es bunt wird. */
-  const stuecke = felder.map((_, i) => {
+  /* Die Felder als Tortenstücke, getrennt von haarfeinen Goldlinien. */
+  const stuecke = [];
+  felder.forEach((_, i) => {
     const von = i * proFeld;
     const bis = (i + 1) * proFeld;
-    const farbe = i % 2 ? 'rgba(196,120,90,.82)' : 'rgba(122,63,42,.9)';
-    return `${farbe} ${von}deg ${bis}deg`;
-  }).join(', ');
-  scheibe.style.background = `conic-gradient(${stuecke})`;
+    const farbe = i % 2 ? 'rgba(196,120,90,.86)' : 'rgba(122,63,42,.92)';
+    stuecke.push(`${farbe} ${von}deg ${Math.max(von, bis - 0.9)}deg`);
+    stuecke.push(`rgba(240,214,170,.55) ${Math.max(von, bis - 0.9)}deg ${bis}deg`);
+  });
+  scheibe.style.background = `conic-gradient(${stuecke.join(', ')})`;
 
   /* Die Beschriftung läuft vom Mittelpunkt nach außen. In der unteren
      Hälfte stünde sie dabei auf dem Kopf — dort wird sie gewendet und
@@ -248,33 +257,111 @@ function einRadDrehen(platz, rad, fertig) {
     scheibe.append(speiche);
   });
 
+  /* Der Goldrand und ein stehendes Licht von oben links — beides dreht
+     sich nicht mit, dadurch wirkt die Scheibe wie unter einer Lampe. */
+  const rand = el('div', {
+    style: {
+      position: 'absolute', inset: '-5px', borderRadius: '50%', zIndex: '1',
+      pointerEvents: 'none',
+      background: 'conic-gradient(from 210deg, #8f5a2b, #e8b071, #9c6533, #f0d0a0, #8f5a2b)',
+      /* closest-side, sonst misst der Verlauf zur Ecke und der Ring
+         gerät fingerdick statt haarfein. */
+      WebkitMask: 'radial-gradient(circle closest-side, transparent calc(100% - 7px), #000 calc(100% - 6px))',
+      mask: 'radial-gradient(circle closest-side, transparent calc(100% - 7px), #000 calc(100% - 6px))',
+    },
+  });
+  const licht = el('div', {
+    style: {
+      position: 'absolute', inset: '0', borderRadius: '50%', zIndex: '1',
+      pointerEvents: 'none',
+      background: 'radial-gradient(circle at 32% 24%, rgba(255,236,210,.28), transparent 55%)',
+    },
+  });
+
   const zeiger = el('div', {
     style: {
-      position: 'absolute', left: '50%', top: '-7px', marginLeft: '-9px',
-      width: '0', height: '0', zIndex: '2',
-      borderLeft: '9px solid transparent',
-      borderRight: '9px solid transparent',
-      borderTop: '17px solid var(--glut-hell)',
+      position: 'absolute', left: '50%', top: '-9px', marginLeft: '-10px',
+      width: '0', height: '0', zIndex: '3',
+      borderLeft: '10px solid transparent',
+      borderRight: '10px solid transparent',
+      borderTop: '19px solid var(--glut-hell)',
       filter: 'drop-shadow(0 2px 5px rgba(0,0,0,.6))',
+      transformOrigin: '50% 0',
+      transition: 'transform .06s ease-out',
     },
   });
 
   const nabe = el('div', {
     style: {
-      position: 'absolute', left: '50%', top: '50%', width: '34px', height: '34px',
-      margin: '-17px 0 0 -17px', borderRadius: '50%', zIndex: '2',
-      background: 'var(--flaeche)', border: '1px solid var(--kante-stark)',
+      position: 'absolute', left: '50%', top: '50%', width: '36px', height: '36px',
+      margin: '-18px 0 0 -18px', borderRadius: '50%', zIndex: '3',
+      background: 'radial-gradient(circle at 36% 32%, #3a2a20, #17100c 70%)',
+      border: '1px solid rgba(232,168,124,.4)',
+      boxShadow: 'inset 0 1px 6px rgba(232,168,124,.25), 0 2px 8px rgba(0,0,0,.5)',
+      display: 'grid', placeItems: 'center',
     },
-  });
+  }, el('div', {
+    style: {
+      width: '9px', height: '9px', borderRadius: '50%',
+      background: 'var(--verlauf)', boxShadow: '0 0 8px var(--schein)',
+    },
+  }));
 
-  platz.append(scheibe, zeiger, nabe);
+  platz.append(scheibe, rand, licht, zeiger, nabe);
 
-  requestAnimationFrame(() => {
-    scheibe.style.transform = `rotate(${ziel}deg)`;
-  });
+  /* Der Schwung: von Hand ausgerollt (easeOutCubic), damit jede
+     überfahrene Feldgrenze ein Schnappen bekommt — Ton, Zeiger-Zucken,
+     alle paar Stifte ein Puls. Gegen Ende wird das Ratschen langsamer
+     und schwerer: Man HÖRT die Entscheidung näher kommen. */
+  const dauer = 3600 + Math.random() * 500;
+  const start = performance.now();
+  let letzteGrenze = 0;
+  let letzterTon = 0;
 
   puls('hinweis');
-  setTimeout(() => { tonSpielen('tick'); fertig(felder[treffer]); }, 3500);
+
+  const rollen = (nun) => {
+    const anteil = Math.min(1, (nun - start) / dauer);
+    const eased = 1 - Math.pow(1 - anteil, 3);
+    const winkel = ziel * eased;
+    scheibe.style.transform = `rotate(${winkel}deg)`;
+
+    const grenze = Math.floor(winkel / proFeld);
+    if (grenze !== letzteGrenze) {
+      letzteGrenze = grenze;
+      if (nun - letzterTon > 42) {
+        letzterTon = nun;
+        tonSpielen('ratsche');
+        zeiger.style.transform = 'rotate(-11deg)';
+        setTimeout(() => { zeiger.style.transform = ''; }, 55);
+        if (grenze % 6 === 0) puls('hinweis');
+      }
+    }
+
+    if (anteil < 1) { requestAnimationFrame(rollen); return; }
+
+    /* Stillstand: Das Siegerfeld — es liegt jetzt oben unterm Zeiger —
+       leuchtet dreimal auf, die Scheibe federt kurz. */
+    const sieger = el('div', {
+      style: {
+        position: 'absolute', inset: '0', borderRadius: '50%', zIndex: '2',
+        pointerEvents: 'none',
+        background: `conic-gradient(from ${-proFeld / 2}deg, rgba(255,220,170,.5) 0deg ${proFeld}deg, transparent ${proFeld}deg)`,
+        animation: 'siegerGluehen 1.1s ease-out',
+      },
+    });
+    platz.append(sieger);
+    setTimeout(() => sieger.remove(), 1150);
+
+    scheibe.style.transition = 'transform .35s cubic-bezier(.3,1.6,.5,1)';
+    scheibe.style.transform = `rotate(${ziel}deg) scale(1.015)`;
+    setTimeout(() => { scheibe.style.transform = `rotate(${ziel}deg) scale(1)`; }, 200);
+
+    tonSpielen('tick');
+    puls('antwortJa');
+    fertig(felder[treffer]);
+  };
+  requestAnimationFrame(rollen);
 }
 
 /* Erst wählen, welche Räder mitlaufen sollen. */

@@ -153,6 +153,13 @@ function einrichtungErstes() {
     if (bote) Gerät.schreib('bote', bote);
     Gerät.schreib('rolle', 'domme');
 
+    /* Den Schlüssel SOFORT sichern — nicht erst nach der PIN-Wahl. Wer
+       zwischen Kopplungscode und PIN die App wechselt (etwa um den Code
+       per AirDrop zu schicken!), verlöre sonst den ganzen Raum: iOS
+       wirft die Seite weg, der Schlüssel lebte nur im Speicher. Die
+       PIN-Wahl ersetzt das Offene später durch den Schrank. */
+    Gerät.schreib('schluessel', roheZuB64(roh));
+
     await datenSchreib('paar', { namen, begonnen: jetzt() });
 
     /* Den Boten auch in die Ablage legen — verschlüsselt wie alles.
@@ -167,6 +174,7 @@ function einrichtungErstes() {
 
 function zeigeKopplungscode(code, roh) {
   blatt(
+    BLATT_FEST,
     el('h2', {}, 'Der Code für das andere Gerät'),
     el('p', { class: 'leise klein', style: { margin: '8px 0 14px' } },
       'Er enthält euren Schlüssel. Nur direkt aufs andere Gerät — nicht per WhatsApp, nicht per Mail.'),
@@ -239,6 +247,9 @@ function einrichtungCode() {
     Gerät.schreib('paarId', paarId);
     Gerät.schreib('rolle', 'sub');
     if (gelesen.bote) Gerät.schreib('bote', gelesen.bote);
+    /* Wie beim ersten Gerät: Schlüssel sofort sichern, sonst hängt der
+       Raum am Ausgang der PIN-Wahl — und die kann unterbrochen werden. */
+    Gerät.schreib('schluessel', roheZuB64(gelesen.roh));
 
     b.schliessen();
     rolleWaehlenBeimEinrichten(gelesen.roh, gelesen.namen);
@@ -249,6 +260,7 @@ function einrichtungCode() {
    später in den Einstellungen ändern. */
 function rolleWaehlenBeimEinrichten(roh, namen) {
   const b = blatt(
+    BLATT_FEST,
     el('h2', {}, 'Wer bist du?'),
     el('p', { class: 'leise klein', style: { margin: '8px 0 16px' } }, 'Auf diesem Gerät.'),
     el('div', { class: 'knopfreihe' },
@@ -285,6 +297,7 @@ function pinFragen(roh, fertig) {
   });
 
   const b = blatt(
+    BLATT_FEST,
     el('h2', {}, 'Eine PIN?'),
     el('p', { class: 'leise klein', style: { margin: '8px 0 16px' } },
       'Mit PIN bleibt alles verschlossen, wenn dir jemand das Handy aus der Hand nimmt. Ohne PIN nicht.'),

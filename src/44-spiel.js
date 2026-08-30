@@ -41,7 +41,7 @@ SEITEN.spiel = function (seite) {
     el('div', { class: 'trenner' }),
     el('div', { class: 'knopfreihe' },
       el('button', { class: 'knopf leer', onclick: muenzwurf }, 'Münze'),
-      el('button', { class: 'knopf leer', onclick: () => zeigeSeite('spiel') }, 'Neu mischen')
+      el('button', { class: 'knopf glut', onclick: ueberraschMich }, 'Überrasch mich')
     )
   );
 
@@ -256,6 +256,34 @@ function fachVerwalten(name, karten) {
       onclick: () => { b.schliessen(); dareAnlegen(name); },
     }, '+ Karte in dieses Fach')
   );
+}
+
+/* --- Überrasch mich -------------------------------------------------------- */
+
+/* Die App entscheidet selbst, was jetzt dran ist. Der halbe Reiz liegt
+   darin, den Daumen einmal NICHT entscheiden zu lassen. */
+function ueberraschMich() {
+  const wege = [];
+
+  const decks = vorratDeckListe();
+  if (decks.length) wege.push(() => {
+    const deck = zufall(decks);
+    karteZiehen(deck.name, deck.karten.map((k) => ({
+      titel: null, text: k.text, stufe: k.intensitaet, dauer: k.dauer_min, vorrat: true,
+    })));
+  });
+
+  const raeder = vorratRaeder();
+  if (raeder.length) wege.push(() => radDrehen([_vorratRadFuerDrehung(zufall(raeder))]));
+
+  if (vorratAn() && vorratSzenario()) wege.push(() => szenarioGenerieren());
+
+  wege.push(() => timerLaufen((3 + Math.random() * 17) * 60000, null));
+  wege.push(muenzwurf);
+
+  puls('hinweis');
+  tonSpielen('tick');
+  zufall(wege)();
 }
 
 /* --- Die Münze ------------------------------------------------------------ */

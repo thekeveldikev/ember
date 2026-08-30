@@ -305,6 +305,15 @@ function losOeffnen(los) {
     },
   });
 
+  /* Ein Lichtstreifen wandert über die unberührte Schicht — Metall,
+     das auf den Daumen wartet. Beim ersten Kratzer verschwindet er. */
+  const glanz = el('div', {
+    style: {
+      position: 'absolute', inset: '0', borderRadius: '16px',
+      pointerEvents: 'none', zIndex: '2', overflow: 'hidden',
+    },
+  }, el('div', { class: 'losglanz' }));
+
   const rahmen = el('div', {
     style: {
       position: 'relative', width: '100%', maxWidth: breite + 'px',
@@ -314,7 +323,7 @@ function losOeffnen(los) {
       border: '1px solid transparent',
       transition: 'border-color .5s ease, box-shadow .5s ease',
     },
-  }, darunter, tafel);
+  }, darunter, tafel, glanz);
 
   const hinweis = el('p', { class: 'still klein mitte', style: { marginTop: '14px' } }, 'Rubbel es frei.');
   const nachspiel = el('div');
@@ -350,6 +359,8 @@ function losOeffnen(los) {
   let rubbelt = false;
   let fertig = false;
   let letzte = null;
+  let letzteFlocke = 0;
+  let letztePruefung = 0;
 
   const stelle = (e) => {
     const kasten = tafel.getBoundingClientRect();
@@ -357,7 +368,26 @@ function losOeffnen(los) {
     return {
       x: (p.clientX - kasten.left) / kasten.width * tafel.width,
       y: (p.clientY - kasten.top) / kasten.height * tafel.height,
+      seiteX: p.clientX, seiteY: p.clientY,
     };
+  };
+
+  /* Kleine Kupferflocken springen vom Daumen weg — höchstens alle 70 ms
+     eine, sonst frisst die Deko das Rubbeln auf. */
+  const flocke = (x, y) => {
+    const nun = performance.now();
+    if (nun - letzteFlocke < 70) return;
+    letzteFlocke = nun;
+    const teil = el('div', { class: 'kruemel' });
+    teil.style.left = (x + (Math.random() * 14 - 7)) + 'px';
+    teil.style.top = y + 'px';
+    teil.style.width = teil.style.height = (2 + Math.random() * 3) + 'px';
+    teil.style.background = Math.random() < 0.5 ? '#c4785a' : '#8f5539';
+    teil.style.setProperty('--kx', (Math.random() * 50 - 25) + 'px');
+    teil.style.setProperty('--ky', (24 + Math.random() * 40) + 'px');
+    teil.style.animationDuration = '.55s';
+    document.body.append(teil);
+    setTimeout(() => teil.remove(), 600);
   };
 
   const kratzen = (e) => {
@@ -372,10 +402,18 @@ function losOeffnen(los) {
     if (letzte) { stift.moveTo(letzte.x, letzte.y); stift.lineTo(p.x, p.y); }
     else { stift.moveTo(p.x, p.y); stift.lineTo(p.x + 0.1, p.y); }
     stift.stroke();
+
+    /* Die Kratz-Spur klingt so laut, wie sich der Finger bewegt. */
+    if (letzte) {
+      const weg = Math.hypot(p.x - letzte.x, p.y - letzte.y);
+      kratzenPegel(Math.min(0.16, weg / 260));
+      if (weg > 5) flocke(p.seiteX, p.seiteY);
+    }
     letzte = p;
 
     if (Math.random() < 0.13) puls('hinweis');
-    if (Math.random() < 0.09) pruefen();
+    const nun = performance.now();
+    if (nun - letztePruefung > 320) { letztePruefung = nun; pruefen(); }
   };
 
   function pruefen() {
@@ -391,10 +429,30 @@ function losOeffnen(los) {
   async function enthuellen() {
     if (fertig) return;
     fertig = true;
+    kratzenStopp();
     tafel.style.transition = 'opacity .5s ease';
     tafel.style.opacity = '0';
     hinweis.textContent = '';
     setTimeout(() => tafel.remove(), 520);
+
+    /* Ein kurzer Lichtblitz aus der Mitte und ein Glanz, der über den
+       Inhalt streicht — die Enthüllung soll sich verdient anfühlen. */
+    const blitz = el('div', {
+      style: {
+        position: 'absolute', inset: '0', borderRadius: '16px', zIndex: '3',
+        pointerEvents: 'none',
+        background: 'radial-gradient(circle, rgba(255,236,200,.55), transparent 65%)',
+        animation: 'losBlitz .6s ease-out forwards',
+      },
+    });
+    const streich = el('div', {
+      style: {
+        position: 'absolute', inset: '0', borderRadius: '16px', zIndex: '3',
+        pointerEvents: 'none', overflow: 'hidden',
+      },
+    }, el('div', { class: 'losglanz', style: { animationDuration: '.9s', animationIterationCount: '1' } }));
+    rahmen.append(blitz, streich);
+    setTimeout(() => { blitz.remove(); streich.remove(); }, 950);
 
     await datenAendern('lose', los.id, { aufgedeckt: true, aufgedecktWann: jetzt(), blindWartet: blind });
     if (!istDomme() && !blind) pushSenden('domme', 'hinweis', 'Er hat gerubbelt.');
@@ -411,9 +469,10 @@ function losOeffnen(los) {
     }
 
     if (los.typ === 'jackpot' || s === 5) {
-      tonSpielen('weich');
-      puls('antwortJa');
+      tonSpielen('schimmer');
+      puls('belohnung');
       konfetti();
+      setTimeout(konfetti, 350);
     } else if (niete) {
       puls('antwortNein');
       nachspiel.append(el('p', { class: 'still klein mitte', style: { marginTop: '10px' } }, 'So ist das mit Losen.'));
@@ -461,10 +520,15 @@ function losOeffnen(los) {
     }
   }
 
-  tafel.addEventListener('pointerdown', (e) => { rubbelt = true; letzte = null; kratzen(e); });
+  tafel.addEventListener('pointerdown', (e) => {
+    rubbelt = true; letzte = null;
+    glanz.remove();
+    kratzenStart();
+    kratzen(e);
+  });
   tafel.addEventListener('pointermove', kratzen);
-  tafel.addEventListener('pointerup', () => { rubbelt = false; letzte = null; pruefen(); });
-  tafel.addEventListener('pointerleave', () => { rubbelt = false; letzte = null; });
+  tafel.addEventListener('pointerup', () => { rubbelt = false; letzte = null; kratzenStopp(); pruefen(); });
+  tafel.addEventListener('pointerleave', () => { rubbelt = false; letzte = null; kratzenStopp(); });
   tafel.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
 }
 
