@@ -99,7 +99,7 @@ async function sperreKarte(platz, ruhig = false) {
     style: {
       marginBottom: '6px',
       background: 'linear-gradient(160deg, #211510, #17100c)',
-      borderColor: abgelaufen ? 'rgba(232,168,124,.45)' : 'rgba(178,69,60,.35)',
+      borderColor: abgelaufen ? 'color-mix(in srgb, var(--glut-hell) 45%, transparent)' : 'rgba(178,69,60,.35)',
     },
   },
     el('div', { style: { display: 'flex', gap: '13px', alignItems: 'center' } },

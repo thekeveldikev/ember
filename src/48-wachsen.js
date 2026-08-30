@@ -426,7 +426,7 @@ function stufeAufFeiern(stufe, rang) {
   const schirm = el('div', {
     style: {
       position: 'fixed', inset: '0', zIndex: '790', display: 'grid', placeItems: 'center',
-      background: 'radial-gradient(circle at 50% 45%, rgba(196,120,90,.3), rgba(6,4,3,.94) 68%)',
+      background: 'radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--glut) 30%, transparent), rgba(6,4,3,.94) 68%)',
       animation: 'deckelAn .45s ease',
     },
     onclick: () => schirm.remove(),

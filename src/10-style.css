@@ -308,7 +308,7 @@ h3 { font-size: 18px; }
 .karte + .karte { margin-top: 12px; }
 
 .karte.glimmt {
-  border-color: rgba(196, 120, 90, .3);
+  border-color: color-mix(in srgb, var(--glut) 30%, transparent);
   box-shadow: 0 2px 14px var(--schatten), 0 0 26px -8px var(--schein);
 }
 
@@ -389,8 +389,8 @@ h3 { font-size: 18px; }
 .feld::placeholder { color: var(--schrift-still); }
 
 .feld:focus {
-  border-color: rgba(196, 120, 90, .45);
-  box-shadow: 0 0 0 3px rgba(196, 120, 90, .1);
+  border-color: color-mix(in srgb, var(--glut) 45%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--glut) 10%, transparent);
 }
 
 textarea.feld { resize: none; line-height: 1.5; }
@@ -421,7 +421,7 @@ textarea.feld { resize: none; line-height: 1.5; }
   width: 198px;
   height: 198px;
   border-radius: 50%;
-  background: radial-gradient(circle at 34% 30%, #d98f68, #b56746 46%, #6f3a26 100%);
+  background: radial-gradient(circle at 34% 30%, color-mix(in srgb, var(--glut-hell) 72%, var(--glut)), color-mix(in srgb, var(--glut) 82%, var(--glut-tief)) 46%, color-mix(in srgb, var(--glut-tief) 72%, #000) 100%);
   color: #1b0f09;
   font-family: 'Playfair', Georgia, serif;
   font-size: 21px;
@@ -429,8 +429,8 @@ textarea.feld { resize: none; line-height: 1.5; }
   letter-spacing: .1em;
   text-transform: uppercase;
   box-shadow:
-    0 0 0 1px rgba(232, 168, 124, .3),
-    0 14px 44px -12px rgba(196, 120, 90, .55),
+    0 0 0 1px color-mix(in srgb, var(--glut-hell) 30%, transparent),
+    0 14px 44px -12px color-mix(in srgb, var(--glut) 55%, transparent),
     inset 0 2px 18px rgba(255, 214, 180, .3),
     inset 0 -12px 26px rgba(60, 22, 10, .5);
   transition: transform .18s cubic-bezier(.2, .7, .3, 1);
@@ -444,7 +444,7 @@ textarea.feld { resize: none; line-height: 1.5; }
   position: absolute;
   inset: -2px;
   border-radius: 50%;
-  border: 1px solid rgba(232, 168, 124, .5);
+  border: 1px solid color-mix(in srgb, var(--glut-hell) 50%, transparent);
   animation: atmen 3.6s cubic-bezier(.4, 0, .3, 1) infinite;
   pointer-events: none;
 }
@@ -461,12 +461,12 @@ textarea.feld { resize: none; line-height: 1.5; }
   width: 128px;
   height: 128px;
   font-size: 14px;
-  background: radial-gradient(circle at 34% 30%, #3a2a22, #241a15 60%, #17100c 100%);
+  background: radial-gradient(circle at 34% 30%, color-mix(in srgb, var(--glut-tief) 34%, #16100c), color-mix(in srgb, var(--glut-tief) 18%, #140e0a) 60%, #120d09 100%);
   color: var(--glut-hell);
   box-shadow:
-    0 0 0 1px rgba(232, 168, 124, .22),
+    0 0 0 1px color-mix(in srgb, var(--glut-hell) 22%, transparent),
     0 8px 26px -10px rgba(0, 0, 0, .8),
-    inset 0 1px 10px rgba(232, 168, 124, .1);
+    inset 0 1px 10px color-mix(in srgb, var(--glut-hell) 10%, transparent);
 }
 
 .derknopf.bitte::before, .derknopf.bitte::after { animation-duration: 5.2s; opacity: .3; }
@@ -501,7 +501,7 @@ textarea.feld { resize: none; line-height: 1.5; }
   font-size: 13px;
   letter-spacing: .34em;
   text-transform: uppercase;
-  color: rgba(232, 168, 124, .6);
+  color: color-mix(in srgb, var(--glut-hell) 60%, transparent);
 }
 
 .befehl .text {
@@ -721,7 +721,7 @@ textarea.feld { resize: none; line-height: 1.5; }
   stroke-linecap: round;
 }
 
-.haltering .spur { stroke: rgba(232, 168, 124, .14); }
+.haltering .spur { stroke: color-mix(in srgb, var(--glut-hell) 14%, transparent); }
 
 .haltering .lauf {
   stroke: var(--glut-hell);
@@ -740,9 +740,9 @@ textarea.feld { resize: none; line-height: 1.5; }
 }
 
 @keyframes zuendung {
-  0% { transform: scale(.94); box-shadow: 0 0 0 0 rgba(232, 168, 124, .55), 0 14px 44px -12px rgba(196, 120, 90, .55); }
+  0% { transform: scale(.94); box-shadow: 0 0 0 0 color-mix(in srgb, var(--glut-hell) 55%, transparent), 0 14px 44px -12px color-mix(in srgb, var(--glut) 55%, transparent); }
   40% { transform: scale(1.05); }
-  100% { transform: scale(1); box-shadow: 0 0 0 46px rgba(232, 168, 124, 0), 0 14px 44px -12px rgba(196, 120, 90, .55); }
+  100% { transform: scale(1); box-shadow: 0 0 0 46px transparent, 0 14px 44px -12px color-mix(in srgb, var(--glut) 55%, transparent); }
 }
 
 /* --- Der Glückskeks -------------------------------------------------------- */
@@ -893,7 +893,7 @@ textarea.feld { resize: none; line-height: 1.5; }
 
 @keyframes keksLockt {
   0%, 100% { transform: rotate(-2deg); filter: drop-shadow(0 6px 16px rgba(0,0,0,.5)); }
-  50% { transform: rotate(2.5deg) translateY(-3px); filter: drop-shadow(0 10px 22px rgba(196,120,90,.45)); }
+  50% { transform: rotate(2.5deg) translateY(-3px); filter: drop-shadow(0 10px 22px color-mix(in srgb, var(--glut) 45%, transparent)); }
 }
 
 /* Der Kontostand bewegt sich: Verdientes steigt, Bezahltes sinkt. */

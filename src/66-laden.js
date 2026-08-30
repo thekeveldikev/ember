@@ -19,12 +19,12 @@
    ========================================================================== */
 
 const LADEN_ABTEILUNGEN = [
-  { key: 'kleinigkeiten', name: 'Kleine Gesten', wort: 'Kleine Belohnungen für wenig Glut — für zwischendurch.' },
+  { key: 'kleinigkeiten', name: 'Kleine Gesten', wort: 'Kleine Belohnungen für wenige Münzen — für zwischendurch.' },
   { key: 'koerper', name: 'Haut & Hände', wort: 'Berührung, Massage, Nähe — alles zum Anfassen.' },
   { key: 'privilegien', name: 'Freiheiten', wort: 'Erlaubnisse auf Zeit — für eine Weile mehr Leine.' },
   { key: 'erlass', name: 'Gnade', wort: 'Löst Schulden, Strafen und Ausstehendes ab.' },
   { key: 'gross', name: 'Das Große', wort: 'Die großen Wünsche. Nur für Siegel — und die muss man sich verdienen.' },
-  { key: 'gluecksspiel', name: 'Das Risiko', wort: 'Lose, Münzwurf, Rad: Glut einsetzen und gewinnen — oder verlieren.' },
+  { key: 'gluecksspiel', name: 'Das Risiko', wort: 'Lose, Münzwurf, Rad: Münzen einsetzen und gewinnen — oder verlieren.' },
 ];
 
 const SIEGEL_KURS = 50;
@@ -240,7 +240,7 @@ async function ladenPflegen() {
     await datenSchreib('konto', { ...(await datenLies('konto')), glutMonat: monat });
     konto = await datenLies('konto');
     const verlust = inflationAuf(konto.karma || 0, konto.gespart || 0);
-    if (verlust) await kontoBuchen(verlust, 'karma', 'Glutverlust des Monats', true);
+    if (verlust) await kontoBuchen(verlust, 'karma', 'Monatsschwund', true);
 
     for (const abo of (konto.abos || [])) {
       konto = await datenLies('konto');
@@ -297,7 +297,7 @@ async function heimKontoZeile(platz) {
     el('span', { class: 'lichtpunkt' }),
     el('span', { class: 'klein', style: { flex: '1', textAlign: 'left' } },
       /* Das Konto ist SEINS — bei ihr darf die Zeile nicht „Deine" sagen. */
-      istDomme() ? 'Seine Glut' : 'Deine Glut'),
+      istDomme() ? 'Seine Münzen' : 'Deine Münzen'),
     el('span', { class: 'klein', style: { flex: 'none', color: 'var(--glut-hell)', fontVariantNumeric: 'tabular-nums' } },
       (konto.karma || 0) + ' ●' + ((konto.siegel || 0) > 0 ? '  ·  ' + konto.siegel + ' ✦' : '')),
     el('span', { class: 'still', style: { flex: 'none', fontSize: '15px' } }, '›')
@@ -331,7 +331,7 @@ SEITEN.laden = function (seite) {
 
     if (!konto || !konto.an) {
       platz.append(leerlauf('Der Laden ist zu',
-        istDomme() ? 'Öffne ihn — ab dann verdient er Glut mit Aufgaben und gibt sie hier aus.'
+        istDomme() ? 'Öffne ihn — ab dann verdient er Münzen mit Aufgaben und gibt sie hier aus.'
           : 'Hier könnte er sein: verdienen, sparen, kaufen. Ob er öffnet, entscheidet sie.'));
       platz.append(el('button', {
         class: 'winzig still', style: { display: 'block', margin: '10px auto 0' },
@@ -367,7 +367,7 @@ SEITEN.laden = function (seite) {
         el('div', {},
           el('div', { class: 'zier glutschrift', style: { fontSize: '42px', fontVariantNumeric: 'tabular-nums' } },
             String(konto.karma || 0)),
-          el('div', { class: 'winzig still' }, '● Glut')
+          el('div', { class: 'winzig still' }, '● Münzen')
         ),
         el('div', {},
           el('div', { class: 'zier', style: { fontSize: '30px', color: 'var(--glut-hell)', fontVariantNumeric: 'tabular-nums' } },
@@ -375,6 +375,11 @@ SEITEN.laden = function (seite) {
           el('div', { class: 'winzig still' }, '✦ Siegel')
         )
       ),
+      /* Konkret statt abstrakt: WANN kommt das nächste Geld, und wie viel.
+         Das eine Zeile beantwortet die häufigste Frage von selbst. */
+      el('p', { class: 'winzig still', style: { marginTop: '9px' } },
+        'Zahltag: Sonntag 20 Uhr — in ' + dauerText(_letzterFaelligerSonntag() + 7 * 86400000 - jetzt()) +
+        ' kommen +' + (konto.gehalt != null ? konto.gehalt : 10) + ' ●'),
       stufe ? el('p', { class: 'winzig', style: { marginTop: '10px', color: 'var(--rot)', letterSpacing: '.14em' } },
         stufe.name.toUpperCase()) : null,
       /* Die Stufe darf kein Rätsel sein: Was sie konkret bedeutet, steht
@@ -510,7 +515,7 @@ function artikelKarte(a, konto, kaeufe, stufe, zeichnen) {
        passiert, wenn er tippt. Und worauf es sich zu sparen lohnt. */
     !istDomme() && !ausverkauft && !rest && !gesperrtDurchSchulden && zuTeuer
       ? el('p', { class: 'winzig still', style: { marginTop: '4px' } },
-          siegelWare ? 'Dafür fehlen dir Siegel.' : 'Noch nicht genug Glut. Halt gedrückt, um darauf zu sparen.')
+          siegelWare ? 'Dafür fehlen dir Siegel.' : 'Noch nicht genug Münzen. Halt gedrückt, um darauf zu sparen.')
       : null
   );
 
@@ -655,7 +660,7 @@ function siegelSchmelzen(zeichnen) {
           b.schliessen();
           await kontoBuchen(-1, 'siegel', 'Siegel eingeschmolzen', true);
           await kontoBuchen(SIEGEL_KURS, 'karma', 'Aus einem Siegel');
-          meldung('Geschmolzen. ' + SIEGEL_KURS + ' ● liegen in der Glut.');
+          meldung('Geschmolzen. ' + SIEGEL_KURS + ' ● mehr im Beutel.');
           zeichnen();
         },
       }, 'Einschmelzen')
@@ -675,12 +680,12 @@ function ladenErklaerung() {
   );
 
   const seine = [
-    absatz('● Glut — dein Geld hier',
-      'Du verdienst Glut, indem du Dinge erledigst: Tagesaufgaben, Aufträge, Serien. ' +
-      'Jeden Sonntag um 20 Uhr kommt dein Gehalt dazu. Mit Glut kaufst du im Laden ein.'),
+    absatz('● Münzen — dein Geld hier',
+      'Du verdienst Münzen, indem du Dinge erledigst: Tagesaufgaben, Aufträge, Serien. ' +
+      'Jeden Sonntag um 20 Uhr kommt dein Gehalt dazu. Mit Münzen kaufst du im Laden ein.'),
     absatz('✦ Siegel — die seltene Währung',
       'Siegel gibt es nur für Meilensteine: eine neue Stufe, ein besiegter Boss, dreißig Tage Serie. ' +
-      'Sie verfallen nie. Ein Siegel lässt sich in ' + SIEGEL_KURS + ' Glut einschmelzen — der Weg zurück existiert nicht. ' +
+      'Sie verfallen nie. Ein Siegel lässt sich in ' + SIEGEL_KURS + ' Münzen einschmelzen — der Weg zurück existiert nicht. ' +
       'Nur „Das Große" kostet Siegel.'),
     absatz('Kaufen — und dann?',
       'Ein Kauf verschwindet nicht: Er liegt als offener Kauf in deinem Stapel. ' +
@@ -688,13 +693,13 @@ function ladenErklaerung() {
       'Nur das Risiko wirkt sofort.'),
     absatz('Sparen',
       'Halt einen Artikel gedrückt und wähl „Sparen" — auf dem Heim zeigt dir dann ein Balken, wie nah du dran bist. ' +
-      'Ersparte Glut ist außerdem vor dem Monatsschwund sicher.'),
-    absatz('Was deine Glut von selbst tut',
-      'Am Monatsersten verglimmt ungenutzte Glut ein wenig (ab 20 freier Glut, fünf Prozent) — ausgeben oder sparen schützt. ' +
+      'Ersparte Münzen sind außerdem vor dem Monatsschwund sicher.'),
+    absatz('Was deine Münzen von selbst tun',
+      'Am Monatsersten schrumpfen ungenutzte Münzen ein wenig (ab 20 freien Münzen, fünf Prozent) — ausgeben oder sparen schützt. ' +
       'Schulden kosten jeden Sonntag zehn Prozent Zinsen. Und je tiefer im Minus, desto enger wird der Laden: ' +
       'erst gibt es nur noch Gnade, dann gar nichts mehr.'),
     absatz('Abos und Katalog',
-      'Abos sind Dauer-Freiheiten, die monatlich Glut kosten — kannst du sie nicht zahlen, erlöschen sie sofort. ' +
+      'Abos sind Dauer-Freiheiten, die monatlich Münzen kosten — kannst du sie nicht zahlen, erlöschen sie sofort. ' +
       'Der Katalog zeigt dir jeden Bußgeld-Preis im Voraus: Du weißt immer, was dich was kostet. ' +
       'Dasselbe Vergehen binnen sieben Tagen kostet doppelt.'),
     absatz('Fest versprochen',
@@ -704,7 +709,7 @@ function ladenErklaerung() {
 
   const ihre = [
     absatz('Worum es geht',
-      'Er verdient Glut (●) mit Aufgaben und Aufträgen und gibt sie hier aus. ' +
+      'Er verdient Münzen (●) mit Aufgaben und Aufträgen und gibt sie hier aus. ' +
       'Siegel (✦) gibt es nur für Meilensteine. Der Reiz liegt nicht im Kaufen — ' +
       'er liegt darin, dass DU die Regeln dieser kleinen Welt bestimmst.'),
     absatz('Deine Hebel, kurz erklärt',
@@ -712,13 +717,13 @@ function ladenErklaerung() {
       'Bußgeld: fester Katalogpreis, Wiederholung binnen sieben Tagen kostet von selbst doppelt. ' +
       'Sonderabgabe: ein Betrag deiner Wahl, er sieht nur die Zahl. ' +
       'Gehalt: was jeden Sonntag um 20 Uhr automatisch kommt. ' +
-      'Versiegeln: Glut hinter Glas — er sieht sie, erreicht sie nicht.'),
+      'Versiegeln: Münzen hinter Glas — er sieht sie, erreicht sie nicht.'),
     absatz('Je Artikel',
       'Halt einen Artikel gedrückt: Preis ändern, ausverkauft stellen oder ein 24-Stunden-Angebot starten. ' +
       'Er sieht immer nur das Ergebnis, nie den Grund.'),
     absatz('Was von selbst läuft',
       'Sonntags 20 Uhr: Gehalt, und auf Schulden zehn Prozent Zinsen. ' +
-      'Am Monatsersten: fünf Prozent Schwund auf ungenutzte Glut ab 20 (Erspartes ist sicher) und die Abo-Abbuchung — ' +
+      'Am Monatsersten: fünf Prozent Schwund auf ungenutzte Münzen ab 20 (Erspartes ist sicher) und die Abo-Abbuchung — ' +
       'was er nicht zahlen kann, wird wortlos gekündigt.'),
     absatz('Kauf und Einlösung',
       'Ein Kauf liegt erst als offener Kauf bei ihm. Zum Einlösen legt er ihn dir vor — ' +
@@ -788,7 +793,7 @@ function aboBlatt(konto, zeichnen) {
   blatt(
     el('h2', {}, 'Abos'),
     el('p', { class: 'leise klein', style: { margin: '7px 0 12px' } },
-      'Dauerhafte Freiheiten, monatlich aus der Glut bezahlt. Wer nicht zahlen kann, verliert sie — sofort und wortlos. ' +
+      'Dauerhafte Freiheiten, monatlich mit Münzen bezahlt. Wer nicht zahlen kann, verliert sie — sofort und wortlos. ' +
       (istDomme() ? 'Du schaltest frei und kündigst — jederzeit, ohne Grund.' : 'Fang mit höchstens zwei an.')),
     ...VORRAT.abos.map((abo) => {
       const an = aktive.has(abo.name);
@@ -846,7 +851,7 @@ function ladenVerwaltung(konto, zeichnen) {
   );
 
   halter.append(
-    reihe('Geben oder nehmen', 'Glut und Siegel, frei — mit oder ohne Grund', () => gebenBlatt(zeichnen)),
+    reihe('Geben oder nehmen', 'Münzen und Siegel, frei — mit oder ohne Grund', () => gebenBlatt(zeichnen)),
     reihe('Ein Bußgeld verhängen', 'Aus dem Katalog, zum festen Preis', () => bussgeldBlatt(zeichnen)),
     reihe('Sonderabgabe', 'Ein Betrag deiner Wahl, ohne Begründung', () => {
       eingabeBlatt({ titel: 'Sonderabgabe', hinweis: 'Er sieht nur die Zahl.', platzhalter: 'z. B. 5' }, async (text) => {
@@ -886,7 +891,7 @@ function gebenBlatt(zeichnen) {
   const wahl = el('div', { class: 'knopfreihe', style: { marginTop: '9px' } });
   const zeichneWahl = () => {
     wahl.innerHTML = '';
-    [['karma', '● Glut'], ['siegel', '✦ Siegel']].forEach(([w, marke]) => {
+    [['karma', '● Münzen'], ['siegel', '✦ Siegel']].forEach(([w, marke]) => {
       wahl.append(el('button', {
         class: 'knopf ' + (waehrung === w ? 'glut' : 'leer'), style: { minHeight: '40px', fontSize: '13px' },
         onclick: () => { waehrung = w; zeichneWahl(); },
@@ -906,7 +911,7 @@ function gebenBlatt(zeichnen) {
         if (!z) return meldung('Eine Zahl — positiv oder negativ.');
         b.schliessen();
         await kontoBuchen(z, waehrung, grund.value.trim() || (z > 0 ? 'Von ihr' : 'Von ihr genommen'));
-        pushSenden('sub', 'hinweis', z > 0 ? 'Die Glut ist gewachsen.' : 'Die Glut ist geschrumpft.');
+        pushSenden('sub', 'hinweis', z > 0 ? 'Deine Münzen sind mehr geworden.' : 'Deine Münzen sind weniger geworden.');
         meldung('Gebucht.');
         zeichnen();
       },
@@ -940,7 +945,7 @@ function bussgeldBlatt(zeichnen) {
 function sperrBlatt(zeichnen) {
   eingabeBlatt({
     titel: 'Versiegeln oder freigeben',
-    hinweis: 'Positiv versiegelt Glut (er sieht sie, erreicht sie nicht). Negativ gibt sie zurück.',
+    hinweis: 'Positiv versiegelt Münzen (er sieht sie, erreicht sie nicht). Negativ gibt sie zurück.',
     platzhalter: 'z. B. 10 oder -10',
   }, async (text) => {
     const z = parseInt(text, 10);
@@ -958,7 +963,7 @@ function sperrBlatt(zeichnen) {
       quelle: z > 0 ? 'Versiegelt' : 'Entsiegelt',
       saldo: (konto.karma || 0) + (z > 0 ? -menge : menge),
     });
-    pushSenden('sub', 'hinweis', z > 0 ? 'Ein Teil deiner Glut liegt jetzt hinter Glas.' : 'Etwas ist zurück.');
+    pushSenden('sub', 'hinweis', z > 0 ? 'Ein Teil deiner Münzen liegt jetzt hinter Glas.' : 'Etwas ist zurück.');
     meldung('Erledigt.');
     zeichnen();
   });

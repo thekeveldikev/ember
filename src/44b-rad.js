@@ -206,7 +206,7 @@ function einRadDrehen(platz, rad, fertig) {
   felder.forEach((_, i) => {
     const von = i * proFeld;
     const bis = (i + 1) * proFeld;
-    const farbe = i % 2 ? 'rgba(196,120,90,.86)' : 'rgba(122,63,42,.92)';
+    const farbe = i % 2 ? farbeVon('--glut') : farbeVon('--glut-tief');
     stuecke.push(`${farbe} ${von}deg ${Math.max(von, bis - 0.9)}deg`);
     stuecke.push(`rgba(240,214,170,.55) ${Math.max(von, bis - 0.9)}deg ${bis}deg`);
   });
@@ -296,8 +296,8 @@ function einRadDrehen(platz, rad, fertig) {
       position: 'absolute', left: '50%', top: '50%', width: '36px', height: '36px',
       margin: '-18px 0 0 -18px', borderRadius: '50%', zIndex: '3',
       background: 'radial-gradient(circle at 36% 32%, #3a2a20, #17100c 70%)',
-      border: '1px solid rgba(232,168,124,.4)',
-      boxShadow: 'inset 0 1px 6px rgba(232,168,124,.25), 0 2px 8px rgba(0,0,0,.5)',
+      border: '1px solid color-mix(in srgb, var(--glut-hell) 40%, transparent)',
+      boxShadow: 'inset 0 1px 6px color-mix(in srgb, var(--glut-hell) 25%, transparent), 0 2px 8px rgba(0,0,0,.5)',
       display: 'grid', placeItems: 'center',
     },
   }, el('div', {

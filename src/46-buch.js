@@ -55,9 +55,9 @@ function waermeZeichnen(platz, liste) {
     'var(--flaeche)',
     'rgba(143, 79, 54, .45)',
     'rgba(176, 106, 76, .7)',
-    'rgba(196, 120, 90, .88)',
+    'color-mix(in srgb, var(--glut) 88%, transparent)',
     'rgba(219, 148, 108, 1)',
-    'rgba(232, 168, 124, 1)',
+    'var(--glut-hell)',
   ];
 
   for (let i = 0; i < WOCHEN * 7; i++) {
@@ -71,7 +71,7 @@ function waermeZeichnen(platz, liste) {
       style: {
         aspectRatio: '1', borderRadius: '3px',
         background: kuenftig ? 'transparent' : farben[Math.min(stufe, 5)],
-        border: stufe > 3 ? '1px solid rgba(232,168,124,.4)' : 'none',
+        border: stufe > 3 ? '1px solid color-mix(in srgb, var(--glut-hell) 40%, transparent)' : 'none',
         opacity: kuenftig ? '.18' : '1',
         boxShadow: stufe >= 4 ? '0 0 8px -2px var(--schein)' : 'none',
       },
@@ -159,7 +159,7 @@ function logAnlegen() {
       stimmreihe.append(el('button', {
         style: {
           fontSize: '13.5px', padding: '9px 12px', borderRadius: '11px',
-          border: '1px solid ' + (stimmung === s ? 'rgba(196,120,90,.5)' : 'transparent'),
+          border: '1px solid ' + (stimmung === s ? 'color-mix(in srgb, var(--glut) 50%, transparent)' : 'transparent'),
           background: stimmung === s ? 'var(--flaeche-hoch)' : 'transparent',
           opacity: stimmung === s ? '1' : '.5',
         },

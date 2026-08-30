@@ -124,7 +124,7 @@ function bossZeichnen(platz, bosse) {
         class: 'winzig',
         style: {
           padding: '7px 12px', borderRadius: '9px', color: 'var(--glut-hell)',
-          background: 'var(--flaeche)', border: '1px solid rgba(196,120,90,.3)',
+          background: 'var(--flaeche)', border: '1px solid color-mix(in srgb, var(--glut) 30%, transparent)',
         },
       }, el('span', { style: { display: 'inline-flex', alignItems: 'center', gap: '6px' } }, sinnbild('funke', 12), x.titel)))
     ));

@@ -187,6 +187,12 @@ function mischen(liste) {
   return raus;
 }
 
+/* Liest den tatsächlichen Wert eines Farb-Tokens — für Canvas-Verläufe,
+   SVG-Füllungen und andere Orte, die kein var() verstehen. So folgen
+   auch Rubbellose, Rad und Unterschrift der gewählten Farbwelt. */
+const farbeVon = (token) =>
+  (getComputedStyle(document.documentElement).getPropertyValue(token) || '').trim() || '#c4785a';
+
 /* Async-Renderer räumen ihren Platz erst leer und bauen dann — nach
    mehreren awaits — neu auf. Laufen zwei davon gleichzeitig (Seitenaufbau
    und ein Horcher etwa), hängen BEIDE ihre Karte an: „Timos Aufgabe"

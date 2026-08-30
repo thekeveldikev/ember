@@ -163,8 +163,11 @@ test('jedes gerufene Sinnbild ist gezeichnet', () => {
 test('jede Seite hat ihren Hilfe-Eintrag — niemand bleibt unerklärt', () => {
   const hilfe = alles.match(/const HILFE = \{([\s\S]*?)\n\};/)[1];
   const erklaert = new Set(sammle(/^\s{2}(\w+): \{/gm, hilfe));
+  const beispiele = alles.match(/const HILFE_BEISPIEL = \{([\s\S]*?)\n\};/)[1];
+  const mitBeispiel = new Set(sammle(/^\s{2}(\w+):/gm, beispiele));
   for (const id of sammle(/SEITEN\.(\w+)\s*=/g)) {
     assert.ok(erklaert.has(id), `Seite '${id}' hat keinen Hilfe-Eintrag`);
+    assert.ok(mitBeispiel.has(id), `Seite '${id}' hat kein Beispiel`);
   }
 });
 

@@ -129,6 +129,7 @@ export function ladeApp({ rolle = 'domme', dateien, ablage = baueAblage() } = {}
       visibilityState: 'visible',
     },
     window: { addEventListener: () => {}, matchMedia: () => ({ matches: false }) },
+    getComputedStyle: () => ({ getPropertyValue: () => '' }),
     /* Zählt seine Geschöpfe — der Sechs-Waisen-Fehler darf nie zurück. */
     EventSource: class {
       constructor(url) { this.url = url; this.readyState = 0; this.constructor.gebaut++; }

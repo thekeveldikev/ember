@@ -342,7 +342,7 @@ function losOeffnen(los) {
   const stift = tafel.getContext('2d');
   const verlauf = stift.createLinearGradient(0, 0, tafel.width, tafel.height);
   verlauf.addColorStop(0, '#8f5539');
-  verlauf.addColorStop(0.5, '#c4785a');
+  verlauf.addColorStop(0.5, farbeVon('--glut'));
   verlauf.addColorStop(1, '#7a4630');
   stift.fillStyle = verlauf;
   stift.fillRect(0, 0, tafel.width, tafel.height);
@@ -387,7 +387,7 @@ function losOeffnen(los) {
     teil.style.left = (x + (Math.random() * 14 - 7)) + 'px';
     teil.style.top = y + 'px';
     teil.style.width = teil.style.height = (2 + Math.random() * 3) + 'px';
-    teil.style.background = Math.random() < 0.5 ? '#c4785a' : '#8f5539';
+    teil.style.background = Math.random() < 0.5 ? farbeVon('--glut') : farbeVon('--glut-tief');
     teil.style.setProperty('--kx', (Math.random() * 50 - 25) + 'px');
     teil.style.setProperty('--ky', (24 + Math.random() * 40) + 'px');
     teil.style.animationDuration = '.55s';
@@ -544,7 +544,7 @@ function konfetti() {
     teil.style.left = (window.innerWidth / 2 + (Math.random() * 60 - 30)) + 'px';
     teil.style.top = (window.innerHeight * 0.35) + 'px';
     teil.style.width = teil.style.height = (3 + Math.random() * 4) + 'px';
-    teil.style.background = ['#e8a87c', '#c4785a', '#e0b45a', '#f0e6d3'][i % 4];
+    teil.style.background = [farbeVon('--glut-hell'), farbeVon('--glut'), '#e0b45a', '#f0e6d3'][i % 4];
     teil.style.setProperty('--kx', (Math.random() * 260 - 130) + 'px');
     teil.style.setProperty('--ky', (Math.random() * 200 - 40) + 'px');
     teil.style.animationDuration = (0.7 + Math.random() * 0.5) + 's';

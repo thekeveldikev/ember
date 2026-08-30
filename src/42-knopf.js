@@ -369,7 +369,7 @@ function denkAnDichZeigen() {
   const funke = el('div', {
     style: {
       position: 'fixed', inset: '0', zIndex: '760', display: 'grid', placeItems: 'center',
-      pointerEvents: 'none', background: 'radial-gradient(circle, rgba(196,120,90,.16), transparent 62%)',
+      pointerEvents: 'none', background: 'radial-gradient(circle, color-mix(in srgb, var(--glut) 16%, transparent), transparent 62%)',
       animation: 'deckelAn .3s ease',
     },
   }, el('div', { class: 'funke', style: { width: '18px', height: '18px' } }));

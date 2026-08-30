@@ -69,7 +69,7 @@ function vertragBlatt(fassung) {
       padding: '28px 24px 24px',
       borderRadius: 'var(--rund)',
       background: 'linear-gradient(168deg, #1f1813, #171310)',
-      border: '1px solid rgba(232,168,124,.22)',
+      border: '1px solid color-mix(in srgb, var(--glut-hell) 22%, transparent)',
       boxShadow: '0 4px 30px -12px var(--schein)',
     },
   },
@@ -91,7 +91,7 @@ function vertragBlatt(fassung) {
     el('div', {
       style: {
         display: 'flex', gap: '18px', marginTop: '28px', paddingTop: '18px',
-        borderTop: '1px solid rgba(232,168,124,.16)',
+        borderTop: '1px solid color-mix(in srgb, var(--glut-hell) 16%, transparent)',
       },
     },
       ...['domme', 'sub'].map((rolle) => el('div', { style: { flex: '1', textAlign: 'center' } },
@@ -103,7 +103,7 @@ function vertragBlatt(fassung) {
           : el('div', { style: { height: '52px', display: 'grid', placeItems: 'center' } },
               el('span', { class: 'still klein' }, 'noch nicht')),
         el('div', {
-          style: { height: '1px', background: 'rgba(232,168,124,.28)', margin: '2px 0 7px' },
+          style: { height: '1px', background: 'color-mix(in srgb, var(--glut-hell) 28%, transparent)', margin: '2px 0 7px' },
         }),
         el('div', { class: 'winzig still' }, nameVon(rolle)),
         unter[rolle]
@@ -165,7 +165,7 @@ function unterschreiben(fassung) {
   });
 
   const stift = tafel.getContext('2d');
-  stift.strokeStyle = '#e8a87c';
+  stift.strokeStyle = farbeVon('--glut-hell');
   stift.lineWidth = 4.5;
   stift.lineCap = 'round';
   stift.lineJoin = 'round';

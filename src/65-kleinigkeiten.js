@@ -56,7 +56,7 @@ function timerLaufen(ms, marke) {
 
   const ziffern = el('div', { class: 'uhr', style: { fontSize: '64px' } });
   const schirm = el('div', { class: 'befehl', style: { zIndex: '740', gap: '18px' } },
-    el('p', { class: 'winzig', style: { color: 'rgba(232,168,124,.55)', letterSpacing: '.3em' } },
+    el('p', { class: 'winzig', style: { color: 'color-mix(in srgb, var(--glut-hell) 55%, transparent)', letterSpacing: '.3em' } },
       blind ? 'ES LÄUFT' : marke.toUpperCase()),
     blind ? el('div', { class: 'funke', style: { width: '18px', height: '18px', margin: '14px auto' } }) : ziffern,
     el('button', {

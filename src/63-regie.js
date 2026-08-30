@@ -148,7 +148,7 @@ async function regieRunnerOeffnen() {
     style: { fontSize: 'clamp(24px, 6.4vw, 36px)', lineHeight: '1.3', maxWidth: '17ch', margin: '0 auto' },
   });
   const uhr = el('div', { class: 'uhr' });
-  const zaehler = el('p', { class: 'winzig', style: { color: 'rgba(232,168,124,.55)', letterSpacing: '.3em' } });
+  const zaehler = el('p', { class: 'winzig', style: { color: 'color-mix(in srgb, var(--glut-hell) 55%, transparent)', letterSpacing: '.3em' } });
 
   const steuerung = el('div', { style: { display: 'flex', gap: '9px', justifyContent: 'center', flexWrap: 'wrap' } });
 

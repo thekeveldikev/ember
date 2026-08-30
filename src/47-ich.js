@@ -178,7 +178,7 @@ function klappGruppe(schluessel, bild, titel, unter, ...zeilen) {
     style: {
       width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center',
       justifyContent: 'space-between', gap: '12px', marginTop: '9px', padding: '13px 15px',
-      borderColor: offen ? 'rgba(196,120,90,.4)' : '',
+      borderColor: offen ? 'color-mix(in srgb, var(--glut) 40%, transparent)' : '',
     },
     onclick: () => {
       offen = !offen;
@@ -189,7 +189,7 @@ function klappGruppe(schluessel, bild, titel, unter, ...zeilen) {
       pfeil.style.transform = offen ? 'rotate(90deg)' : 'none';
       pfeil.style.borderColor = offen ? 'var(--glut)' : 'var(--kante)';
       pfeil.style.color = offen ? 'var(--glut-hell)' : 'var(--still)';
-      kopf.style.borderColor = offen ? 'rgba(196,120,90,.4)' : '';
+      kopf.style.borderColor = offen ? 'color-mix(in srgb, var(--glut) 40%, transparent)' : '';
       tonSpielen('tick');
     },
   },
@@ -589,7 +589,7 @@ async function bausteineBauen(platz) {
 
   platz.append(
     schalter('Der Laden', !!(konto && konto.an),
-      'Glut, Siegel, Preise, Zahltag', 'alles ruht, nichts geht verloren',
+      'Münzen, Siegel, Preise, Zahltag', 'alles ruht, nichts geht verloren',
       async (neu) => {
         if (!konto && neu) return zeigeSeite('laden');   // Ersteröffnung mit Startguthaben
         await datenSchreib('konto', { ...konto, an: neu });

@@ -14,12 +14,12 @@ const HILFE = {
   heim: {
     titel: 'Das Heim',
     sie: [
-      'Das Heim ist die gemeinsame Startseite. Alles, was heute zählt, steht hier untereinander: seine Aufgabe, die Frage des Tages, laufende Sperren oder Foto-Aufträge, sein Glut-Stand, der große Knopf.',
+      'Das Heim ist die gemeinsame Startseite. Alles, was heute zählt, steht hier untereinander: seine Aufgabe, die Frage des Tages, laufende Sperren oder Foto-Aufträge, sein Münzstand, der große Knopf.',
       'Du kannst eine Tagesnachricht hinterlegen (Text oder Foto) — sie steht dann bei ihm ganz oben. Der Schriftzug EMBER reagiert auf dreimal Tippen: Tarnung.',
       'Was hier auftaucht und was nicht, steuerst du unter Verwaltung → Bausteine.',
     ],
     er: [
-      'Das Heim ist deine Startseite. Von oben nach unten: was sie dir hinterlassen hat, deine Aufgabe heute, die Frage des Tages, deine Glut, der große Knopf.',
+      'Das Heim ist deine Startseite. Von oben nach unten: was sie dir hinterlassen hat, deine Aufgabe heute, die Frage des Tages, deine Münzen, der große Knopf.',
       'Alles ist antippbar. Dreimal auf EMBER tippen tarnt die App sofort.',
     ],
   },
@@ -54,7 +54,7 @@ const HILFE = {
     ],
     er: [
       'Deine offenen Aufträge, die Zahl deiner ausstehenden Strafen und die Regeln, die gerade gelten.',
-      'Erledigt melden heißt: Sie sieht es und bestätigt. Erst dann zählt es — auch für deine Glut.',
+      'Erledigt melden heißt: Sie sieht es und bestätigt. Erst dann zählt es — auch für deine Münzen.',
     ],
   },
   ich: {
@@ -80,12 +80,12 @@ const HILFE = {
   laden: {
     titel: 'Der Laden',
     sie: [
-      'Seine kleine Wirtschaft: Er verdient Glut (●) mit Aufgaben, du steuerst alles andere — Gehalt, Preise, Angebote, Bußgelder, Gnade.',
+      'Seine kleine Wirtschaft: Er verdient Münzen (●) mit Aufgaben, du steuerst alles andere — Gehalt, Preise, Angebote, Bußgelder, Gnade.',
       'Unten bei „Deine Hebel" greifst du ein. Einen Artikel gedrückt halten: Preis, Ausverkauft, Angebot.',
       'Der Knopf „Wie es funktioniert" erklärt das ganze System in Ruhe.',
     ],
     er: [
-      'Hier gibst du deine Glut aus. Jeder Artikel sagt dir, was er kostet und was dann passiert.',
+      'Hier gibst du deine Münzen aus. Jeder Artikel sagt dir, was er kostet und was dann passiert.',
       'Gekauftes liegt erst als offener Kauf bei dir — einlösen heißt: ihr vorlegen, sie wählt den Moment. Artikel gedrückt halten startet ein Sparziel.',
       '„Wie es funktioniert" erklärt alles — auch Zahltag, Zinsen und den Monatsschwund.',
     ],
@@ -322,6 +322,42 @@ const HILFE = {
   },
 };
 
+/* Zu jeder Seite EIN greifbares Beispiel — nichts erklärt schneller.
+   Die Statik-Wache erzwingt eins je Seite, für immer. */
+const HILFE_BEISPIEL = {
+  heim: 'Du legst morgens ein Foto als Tagesnachricht hin — er sieht es beim ersten Öffnen ganz oben.',
+  plausch: 'Ein Foto mit Ablauf „1 Stunde" schicken — danach ist es weg, als wäre es nie da gewesen.',
+  spiel: '„Überrasch mich" antippen — die App zieht eine Karte, dreht ein Rad oder startet einen Timer.',
+  auftrag: '„Trink heute zwei Liter Wasser, Frist 22 Uhr" — er meldet erledigt, du bestätigst, er bekommt Münzen.',
+  ich: 'Die Ampel auf Gelb stellen — die App nimmt von selbst alles Harte aus den Vorschlägen.',
+  verwaltung: 'Bausteine → Der Laden auf Aus schieben — alles ruht, nichts geht verloren, der Schieber holt es zurück.',
+  laden: 'Er kauft für 3 ● „Zehn Minuten Kuscheln" und legt es dir abends vor — du sagst: jetzt.',
+  rad: 'Ein Rad mit „Massage · Kuss · Du entscheidest · Nichts" — drehen, das Feld unterm Zeiger gilt.',
+  szenario: 'Der Würfel sagt „Schlafzimmer · langsam · Augenbinde" — gefällt der Ort nicht, würfelst du nur ihn neu.',
+  wahrheit: 'Er zieht „Wahrheit" auf Stufe 2: „Wovon träumst du, wenn ich nicht dabei bin?" — ehrlich, oder Pflicht.',
+  rubbeln: 'Unter dem Silber-Los steht „Zehn Minuten Massage — heute einlösbar".',
+  quiz: '„Ihr Lieblingsfilm?" — du antwortest für dich, er rät für dich, die App vergleicht am Ende.',
+  regie: 'Skript „Langsamer Abend", zwanzig Minuten — sein Bildschirm sagt nur: „Schritt 3: Augen zu."',
+  timer: 'Den Blind-Timer starten — keiner weiß, ob er nach drei oder zwanzig Minuten schlägt.',
+  wachsen: 'Sieben Tage Serie voll — die App bucht von selbst Münzen und die Stufe rückt näher.',
+  pfade: 'Pfad „Geduld": Stufe 1 steht offen da, Stufe 2 bleibt verdeckt, bis 1 wirklich geschafft ist.',
+  spannung: '„Samstag, 20 Uhr" als Verborgenes anlegen — er sieht nur einen Countdown, keinen Inhalt.',
+  wuensche: 'Beide tragen heimlich „Augenbinde" ein — erst dann zeigt die App: Ihr wollt es beide.',
+  grenzen: '„Fotos: vielleicht — nur ohne Gesicht" eintragen. Beide sehen es, keiner muss es aussprechen.',
+  koerper: 'Nacken auf „Liebe ich", Füße auf „Bitte nicht" — und die Karte des anderen ist einen Tipp entfernt.',
+  signale: 'Das Wort „Leuchtturm" heißt bei euch „Ich denk an dich" — im Chat reicht das eine Wort.',
+  glossar: '„Der Ort" = euer Platz am Fluss. Einmal angelegt, versteht ihr euch in Stichworten.',
+  vertrag: '„Er fragt vor dem Ausgehen, sie antwortet binnen einer Stunde" — beide unterschreiben mit dem Finger.',
+  buch: 'Nach dem Abend drei Zeilen und vier Flammen — Monate später seht ihr die heißen Wochen auf der Karte.',
+  rituale: '„Guten-Morgen-Nachricht vor 9 Uhr" — vierzehn Tage durchgehalten, und die Serie zeigt es stolz an.',
+  nachher: 'Beide schreiben getrennt „Was war am schönsten?" — erst dann klappt die App beide Antworten auf.',
+  reparatur: 'Nach dem Streit tippt jeder „Bereit" — dann führt die App euch durch drei ruhige Schritte.',
+  tresor: 'Fünf Bilder hochladen, eins freigeben — er sieht genau dieses, bis du es zurückziehst.',
+  toys: '„Augenbinde: vorhanden" ankreuzen — ab da tauchen Karten damit in den Decks auf.',
+  eigenes: 'Ein halber Gedanke um Mitternacht — bleibt hier, bis du ihn aussprechen willst. Oder für immer.',
+  maschine: 'WENN er die Tagesaufgabe verpasst, DANN kostet es abends 2 ● — von selbst, jedes Mal.',
+};
+
 const hilfeAn = () => Gerät.lies('hilfeKnopf', true) !== false;
 
 function hilfeZeigen(id) {
@@ -334,7 +370,16 @@ function hilfeZeigen(id) {
     el('p', { class: 'winzig still' }, 'Kurz erklärt'),
     el('h2', { style: { margin: '4px 0 12px' } }, h.titel),
     ...text.map((s) => el('p', { class: 'leise klein', style: { lineHeight: '1.6', marginBottom: '10px' } }, s)),
-    el('p', { class: 'still klein', style: { marginTop: '6px' } },
+    HILFE_BEISPIEL[id] ? el('div', {
+      style: {
+        marginTop: '4px', padding: '10px 13px', borderRadius: 'var(--rund-klein)',
+        background: 'var(--flaeche)', borderLeft: '3px solid var(--glut)',
+      },
+    },
+      el('p', { class: 'winzig still', style: { marginBottom: '3px' } }, 'Zum Beispiel'),
+      el('p', { class: 'leise klein', style: { lineHeight: '1.55' } }, HILFE_BEISPIEL[id])
+    ) : null,
+    el('p', { class: 'still klein', style: { marginTop: '14px' } },
       'Diesen Knopf gibt es auf jeder Seite. Abschalten: Einstellungen → Die App.')
   );
 }

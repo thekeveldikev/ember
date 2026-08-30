@@ -33,7 +33,7 @@ SEITEN.spiel = function (seite) {
       spielKachel('Timer', 'Auch mit Zufall', 'timer'),
       /* Der Laden zeigt sich erst, wenn sie ihn eröffnet hat — vorher
          gibt es ihn schlicht nicht. Der Weg hinein: Verwaltung → Bausteine. */
-      ladenAn() ? spielKachel('Der Laden', 'Glut verdienen, Glut ausgeben', 'laden') : null
+      ladenAn() ? spielKachel('Der Laden', 'Münzen verdienen und ausgeben', 'laden') : null
     )
   );
 
@@ -160,7 +160,7 @@ function karteZiehen(fach, karten) {
     style: {
       display: 'none', minHeight: '210px', padding: '24px 22px',
       borderRadius: '18px', background: 'var(--flaeche-hoch)',
-      border: '1px solid rgba(196,120,90,.35)',
+      border: '1px solid color-mix(in srgb, var(--glut) 35%, transparent)',
       boxShadow: '0 8px 34px -12px var(--schein)',
       animation: 'einblenden .34s ease',
     },

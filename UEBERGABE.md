@@ -410,6 +410,26 @@ pointerdown-Horcher in 52-tarnung; Knöpfe/Felder/Blätter sind
 ausgenommen, ~52px-Radius, 650ms-Fenster). Hinaus: drei Tipps auf
 der Notizliste (nicht im Editor).
 
+**0.9.1 — Münzen statt Glut, Farbwelten bis in den Knopf (102):**
+(1) Die WÄHRUNG heißt in allen Nutzertexten jetzt „Münzen" (● bleibt,
+Code-Bezeichner karma/konto bleiben!) — „Glut" war zu abstrakt. Die
+Glut als Stimmung/Marke (Farbwelt „Glut", Wärmekarte, Wortmarke)
+bleibt. „Glutverlust des Monats" heißt im Buch „Monatsschwund".
+(2) Farbwelten färben jetzt ALLES: sämtliche hart verdrahteten
+Kupfer-Töne (SEX-Knopf-Gradient, Fokus-Ringe, Zündung, Klapp-Ränder,
+Rad-Segmente, Rubbel-Konfetti, Wärmekarte, Unterschrift-Stift,
+Regie/Timer-Akzente) sind durch color-mix(...)-Mischungen aus den
+Tokens ersetzt; für Canvas/SVG gibt es farbeVon(token) in 20-core
+(liest den berechneten Wert; Prüfstand hat getComputedStyle-Stub).
+Screenshot-Beweis: Heim in Mitternacht — Knopf, Wortmarke,
+Lichtpunkte, alles blau. (3) HILFE_BEISPIEL in 39-hilfe: jede Seite
+hat ein konkretes „Zum Beispiel"-Kärtchen im Hilfe-Blatt;
+Statik-Wache erzwingt eins je Seite. (4) Laden-Kopf sagt konkret:
+„Zahltag: Sonntag 20 Uhr — in X kommen +N ●". Merke fürs Testen am
+PC: Läuft die Ablage-Marke ab, hagelt es kurz 401er, bis die
+Selbstheilung greift — Seiten-Sweeps deshalb losgelöst laufen lassen
+(window.__sweep-Muster), das 45s-Werkzeuglimit reißt sonst.
+
 ## Was in der Bugjagd zutage kam
 
 Sieben Fehler, alle vor der Veröffentlichung gefunden. Sie stehen hier,
