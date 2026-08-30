@@ -29,6 +29,15 @@ const LADEN_ABTEILUNGEN = [
 
 const SIEGEL_KURS = 50;
 
+/* Die Münze als gezeichnetes Zeichen — zwei Ringe im Strich-Stil des
+   Hauses. In laufenden Sätzen bleibt das schlichte ●; überall, wo eine
+   ZAHL steht, sitzt daneben die gezeichnete Münze in Textfarbe. */
+function muenzSinn(groesse = 13) {
+  const s = sinnbild('muenze', groesse);
+  s.style.verticalAlign = '-2px';
+  return s;
+}
+
 /* Zu jedem Artikel ein Satz in einfacher Sprache: was das konkret ist
    und was nach dem Kauf passiert. Die Namen verkaufen — diese Zeilen
    erklären. Die Statik-Wache prüft, dass KEIN Artikel ohne Satz bleibt. */
@@ -269,7 +278,7 @@ function kontoFunkeln(diff) {
       color: diff > 0 ? 'var(--glut-hell)' : 'var(--rot)',
       animation: (diff > 0 ? 'kontoRauf' : 'kontoRunter') + ' 1.1s ease-out forwards',
     },
-  }, (diff > 0 ? '+' : '') + diff + ' ●');
+  }, (diff > 0 ? '+' : '') + diff + ' ', muenzSinn(13));
   document.body.append(flug);
   setTimeout(() => flug.remove(), 1150);
 }
@@ -299,7 +308,8 @@ async function heimKontoZeile(platz) {
       /* Das Konto ist SEINS — bei ihr darf die Zeile nicht „Deine" sagen. */
       istDomme() ? 'Seine Münzen' : 'Deine Münzen'),
     el('span', { class: 'klein', style: { flex: 'none', color: 'var(--glut-hell)', fontVariantNumeric: 'tabular-nums' } },
-      (konto.karma || 0) + ' ●' + ((konto.siegel || 0) > 0 ? '  ·  ' + konto.siegel + ' ✦' : '')),
+      (konto.karma || 0) + ' ', muenzSinn(12),
+      (konto.siegel || 0) > 0 ? '  ·  ' + konto.siegel + ' ✦' : ''),
     el('span', { class: 'still', style: { flex: 'none', fontSize: '15px' } }, '›')
   );
   ziel.append(zeile);
@@ -310,7 +320,7 @@ async function heimKontoZeile(platz) {
       el('div', { style: { height: '3px', borderRadius: '2px', background: 'var(--grund2)', overflow: 'hidden' } },
         el('div', { style: { height: '100%', width: (anteil * 100) + '%', background: 'var(--verlauf)', borderRadius: '2px', transition: 'width .6s ease' } })),
       el('p', { class: 'winzig still', style: { marginTop: '3px' } },
-        (istDomme() ? 'Er spart auf: ' : 'Du sparst auf: ') + spar.artikel + ' (' + sparPreis + ' ●)')
+        (istDomme() ? 'Er spart auf: ' : 'Du sparst auf: ') + spar.artikel + ' (' + sparPreis + ' ', muenzSinn(10), ')')
     ));
   }
 }
@@ -367,7 +377,7 @@ SEITEN.laden = function (seite) {
         el('div', {},
           el('div', { class: 'zier glutschrift', style: { fontSize: '42px', fontVariantNumeric: 'tabular-nums' } },
             String(konto.karma || 0)),
-          el('div', { class: 'winzig still' }, '● Münzen')
+          el('div', { class: 'winzig still' }, muenzSinn(11), ' Münzen')
         ),
         el('div', {},
           el('div', { class: 'zier', style: { fontSize: '30px', color: 'var(--glut-hell)', fontVariantNumeric: 'tabular-nums' } },
@@ -379,7 +389,7 @@ SEITEN.laden = function (seite) {
          Das eine Zeile beantwortet die häufigste Frage von selbst. */
       el('p', { class: 'winzig still', style: { marginTop: '9px' } },
         'Zahltag: Sonntag 20 Uhr — in ' + dauerText(_letzterFaelligerSonntag() + 7 * 86400000 - jetzt()) +
-        ' kommen +' + (konto.gehalt != null ? konto.gehalt : 10) + ' ●'),
+        ' kommen +' + (konto.gehalt != null ? konto.gehalt : 10) + ' ', muenzSinn(10)),
       stufe ? el('p', { class: 'winzig', style: { marginTop: '10px', color: 'var(--rot)', letterSpacing: '.14em' } },
         stufe.name.toUpperCase()) : null,
       /* Die Stufe darf kein Rätsel sein: Was sie konkret bedeutet, steht
@@ -506,7 +516,7 @@ function artikelKarte(a, konto, kaeufe, stufe, zeichnen) {
         el('span', {
           class: 'zier',
           style: { fontSize: '15.5px', color: siegelWare ? 'var(--glut-hell)' : 'var(--gelb)', fontVariantNumeric: 'tabular-nums' },
-        }, preis + ' ' + (siegelWare ? '✦' : '●'))
+        }, preis + ' ', siegelWare ? '✦' : muenzSinn(13))
       )
     ),
     ausverkauft ? el('p', { class: 'winzig still', style: { marginTop: '4px' } }, 'Gerade nicht zu haben. Vielleicht wieder — vielleicht nicht.') : null,
@@ -546,7 +556,7 @@ function kaufBlatt(a, preis, zeichnen) {
     el('p', { class: 'winzig still mitte' }, 'Kaufen'),
     el('p', { class: 'zier mitte', style: { fontSize: '21px', lineHeight: '1.35', padding: '12px 4px 6px' } }, a.artikel),
     el('p', { class: 'mitte', style: { color: siegelWare ? 'var(--glut-hell)' : 'var(--gelb)', fontSize: '18px', marginBottom: '10px' } },
-      preis + ' ' + (siegelWare ? '✦' : '●')),
+      preis + ' ', siegelWare ? '✦' : muenzSinn(15)),
     /* Vor dem Kauf steht, was er auslöst — kein Kleingedrucktes danach. */
     el('p', { class: 'still klein mitte', style: { marginBottom: '14px', lineHeight: '1.5' } },
       a.kategorie === 'gluecksspiel' ? 'Wirkt sofort — was dabei herauskommt, siehst du gleich.'
@@ -615,8 +625,8 @@ function kaufKarte(k, zeichnen) {
   const karte = el('div', { class: 'karte', style: { marginTop: '8px', padding: '11px 14px', borderLeft: '3px solid var(--gelb)' } },
     el('div', { style: { fontSize: '14.5px' } }, k.artikel),
     el('p', { class: 'winzig still', style: { marginTop: '4px' } },
-      k.preis + ' ' + (k.waehrung === 'siegel' ? '✦' : '●') + ' · ' + vorZeit(k.wann) +
-      (k.einloeseWunsch ? ' · zum Einlösen vorgelegt' : ''))
+      k.preis + ' ', k.waehrung === 'siegel' ? '✦' : muenzSinn(10),
+      ' · ' + vorZeit(k.wann) + (k.einloeseWunsch ? ' · zum Einlösen vorgelegt' : ''))
   );
 
   if (!istDomme() && !k.einloeseWunsch) {
@@ -754,7 +764,7 @@ function katalogZeigen() {
         style: { display: 'flex', justifyContent: 'space-between', gap: '12px', padding: '9px 2px', borderBottom: '1px solid var(--kante)' },
       },
         el('span', { class: 'klein' }, bg.vergehen),
-        el('span', { class: 'klein', style: { color: 'var(--rot)', flex: 'none', fontVariantNumeric: 'tabular-nums' } }, bg.betrag + ' ●')
+        el('span', { class: 'klein', style: { color: 'var(--rot)', flex: 'none', fontVariantNumeric: 'tabular-nums' } }, bg.betrag + ' ', muenzSinn(11))
       ))
     ),
     el('p', { class: 'still klein', style: { marginTop: '10px' } },
@@ -778,7 +788,7 @@ async function bilanzZeigen(konto) {
         ),
         el('div', { style: { flex: 'none', textAlign: 'right' } },
           el('div', { class: 'klein', style: { color: z.betrag >= 0 ? 'var(--gruen)' : 'var(--rot)', fontVariantNumeric: 'tabular-nums' } },
-            (z.betrag > 0 ? '+' : '') + z.betrag + (z.waehrung === 'siegel' ? ' ✦' : ' ●')),
+            (z.betrag > 0 ? '+' : '') + z.betrag + ' ', z.waehrung === 'siegel' ? '✦' : muenzSinn(11)),
           el('div', { class: 'winzig still' }, '→ ' + z.saldo)
         )
       ))
@@ -891,11 +901,11 @@ function gebenBlatt(zeichnen) {
   const wahl = el('div', { class: 'knopfreihe', style: { marginTop: '9px' } });
   const zeichneWahl = () => {
     wahl.innerHTML = '';
-    [['karma', '● Münzen'], ['siegel', '✦ Siegel']].forEach(([w, marke]) => {
+    [['karma', 'Münzen'], ['siegel', '✦ Siegel']].forEach(([w, marke]) => {
       wahl.append(el('button', {
         class: 'knopf ' + (waehrung === w ? 'glut' : 'leer'), style: { minHeight: '40px', fontSize: '13px' },
         onclick: () => { waehrung = w; zeichneWahl(); },
-      }, marke));
+      }, w === 'karma' ? muenzSinn(13) : null, (w === 'karma' ? ' ' : '') + marke));
     });
   };
   zeichneWahl();
@@ -936,7 +946,7 @@ function bussgeldBlatt(zeichnen) {
         },
       },
         el('span', { class: 'klein' }, bg.vergehen),
-        el('span', { class: 'klein', style: { color: 'var(--rot)', flex: 'none' } }, bg.betrag + ' ●')
+        el('span', { class: 'klein', style: { color: 'var(--rot)', flex: 'none' } }, bg.betrag + ' ', muenzSinn(11))
       ))
     )
   );

@@ -112,6 +112,31 @@ async function appStarten() {
 
   /* Hinweise stillschweigend erneuern, falls die Anmeldung abgelaufen ist. */
   if (Push.bote && pushErlaubnisErteilt()) pushAnmelden(true);
+
+  /* Der allererste Moment auf diesem Gerät: eine kurze, warme Begrüßung
+     mit den drei Dingen, die den Einstieg tragen. Einmal — nie wieder. */
+  if (!Gerät.lies('begruesst')) {
+    Gerät.schreib('begruesst', true);
+    setTimeout(() => {
+      if (istGetarnt()) return;
+      const punkt = (zahl, text) => el('div', { style: { display: 'flex', gap: '11px', marginTop: '11px', alignItems: 'baseline' } },
+        el('span', { class: 'zier glutschrift', style: { fontSize: '17px', flex: 'none' } }, zahl),
+        el('p', { class: 'leise klein', style: { lineHeight: '1.5' } }, text));
+      const b = blatt(
+        el('h2', {}, istDomme() ? 'Schön, dass du da bist.' : 'Es kann losgehen.'),
+        el('p', { class: 'leise klein', style: { margin: '8px 0 4px' } },
+          istDomme() ? 'Diese App gehört euch beiden — und du führst sie. Drei Dinge zuerst:'
+            : 'Diese App gehört euch beiden. Drei Dinge zuerst:'),
+        punkt('1', 'Das kleine ? unten rechts erklärt dir jede Seite — in einfachen Worten, mit Beispiel.'),
+        punkt('2', istDomme()
+          ? 'Unter Ich → Verwaltung findest du deinen Werkzeugkasten — und unter Bausteine schaltest du die großen Module an und aus.'
+          : 'Auf dem Heim steht alles, was heute zählt — von oben nach unten, alles antippbar.'),
+        punkt('3', 'Schalte die Hinweise ein (Ich → Hinweise), damit euch nichts entgeht.'),
+        el('button', { class: 'knopf glut breit', style: { marginTop: '18px' }, onclick: () => b.schliessen() },
+          istDomme() ? 'Dann führe ich mal' : 'Verstanden')
+      );
+    }, 1200);
+  }
 }
 
 /* Kommt die App aus dem Hintergrund zurück, kann inzwischen ein Krümel
@@ -199,6 +224,11 @@ function regelWachePruefen() {
   Ablage._warteschlange = Gerät.lies('warteschlange', []);
 
   try {
+    /* Aussehen zuerst — auch das Schloss und die Einrichtung sollen schon
+       in der gewählten Farbwelt und mit dem gewählten Symbol dastehen. */
+    farbweltAnwenden();
+    appSymbolAnwenden();
+
     if (!istEingerichtet()) {
       zeigeEinrichtung();
       return;

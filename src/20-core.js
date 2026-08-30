@@ -72,6 +72,7 @@ function sinnbild(name, groesse = 23) {
     feder: '<path d="M6.5 19.5c-.5-7.5 4-13 12-15.5-.7 8-5 13-11 14"/><path d="M6.5 19.5C9 15 12.5 10.5 16 7"/>',
     wuerfel: '<rect x="4.5" y="4.5" width="15" height="15" rx="3.5"/><circle cx="9" cy="9" r="1.1"/><circle cx="15" cy="9" r="1.1"/><circle cx="9" cy="15" r="1.1"/><circle cx="15" cy="15" r="1.1"/>',
     funke: '<path d="M12 3.5c.8 3.9 2.6 5.7 6.5 6.5-3.9.8-5.7 2.6-6.5 6.5-.8-3.9-2.6-5.7-6.5-6.5 3.9-.8 5.7-2.6 6.5-6.5z"/>',
+    muenze: '<circle cx="12" cy="12" r="8.4"/><circle cx="12" cy="12" r="4.9"/>',
   };
   const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   s.setAttribute('viewBox', '0 0 24 24');

@@ -430,6 +430,23 @@ PC: Läuft die Ablage-Marke ab, hagelt es kurz 401er, bis die
 Selbstheilung greift — Seiten-Sweeps deshalb losgelöst laufen lassen
 (window.__sweep-Muster), das 45s-Werkzeuglimit reißt sonst.
 
+**0.9.2 — die gezeichnete Münze, die Begrüßung (102):**
+(1) Das ● hat ein eigenes Sinnbild: 'muenze' im Zeichensatz (zwei
+konzentrische Ringe im Strich-Stil, currentColor). muenzSinn(groesse)
+in 66-laden liefert es mit -2px vertical-align; eingesetzt überall,
+wo eine ZAHL steht (Heim-Kontozeile, Laden-Kopf, Artikelpreise,
+Kaufblatt, Kaufkarten, Katalog, Bußgeld-Blatt, Bilanz, Sparziel,
+Zahltag-Zeile, Konto-Funkeln, Geben/Nehmen-Wahl). In laufenden
+SÄTZEN und in meldung()/frage()-Strings bleibt das schlichte ● —
+Textknoten können kein SVG tragen. (2) appStarten zeigt beim
+allerersten Öffnen eines Geräts eine Begrüßung (Gerät 'begruesst',
+einmalig): drei nummerierte Einstiegspunkte, je Rolle anders
+(?-Knopf, Verwaltung/Bausteine bzw. Heim-Aufbau, Hinweise
+einschalten). Erscheint nach Update auch je einmal auf
+Bestandsgeräten — gewollt. (3) farbweltAnwenden/appSymbolAnwenden
+laufen jetzt im Boot VOR der Einrichtungs-/Schloss-Weiche — auch
+das Schloss steht in der gewählten Farbwelt.
+
 ## Was in der Bugjagd zutage kam
 
 Sieben Fehler, alle vor der Veröffentlichung gefunden. Sie stehen hier,
