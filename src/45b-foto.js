@@ -75,7 +75,7 @@ function fotoHorcherStarten() {
       puls('befehl');
       meldungMitTat('Ein Foto-Auftrag — die Uhr läuft.', 'Ansehen', () => zeigeSeite('heim'), 10000);
     }
-    heimAuffrischen('foto');
+    heimAuffrischen('foto', true);
   }).catch(() => {});
 }
 

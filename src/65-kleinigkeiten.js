@@ -88,7 +88,7 @@ function timerLaufen(ms, marke) {
         setTimeout(zu, 2500);
       }
       puls('timerEnde');
-      tonSpielen('weich');
+      tonSpielen('gong');
       return;
     }
     if (!blind) ziffern.textContent = dauerText(uebrig);

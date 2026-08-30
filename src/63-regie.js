@@ -222,7 +222,7 @@ async function regieRunnerOeffnen() {
       schrittText.style.animation = 'none';
       requestAnimationFrame(() => { schrittText.style.animation = 'einblenden .45s ease'; });
       if (!erster) {
-        if (schritt.signal === 'ton') tonSpielen('weich');
+        if (schritt.signal === 'ton') tonSpielen('gong');
         else if (schritt.signal !== 'still') { puls('bitte'); tonSpielen('tick'); }
       }
     }

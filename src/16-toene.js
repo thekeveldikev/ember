@@ -51,7 +51,21 @@ function _klang() {
   return _klangRaum;
 }
 
-function toeneAn() { return Gerät.lies('toene', true); }
+/* Drei Stellungen statt eines Schalters: an, leise, aus. Und nachts —
+   wenn die App ohnehin dunkler wird — nimmt sie sich auch im Klang
+   zurück. */
+function tonPegel() {
+  const p = Gerät.lies('tonPegel', null);
+  if (p !== null) return p;
+  return Gerät.lies('toene', true) ? 1 : 0;   // Altbestand übernehmen
+}
+
+function toeneAn() { return tonPegel() > 0; }
+
+function _pegelJetzt() {
+  const spaet = document.documentElement.getAttribute('data-stimmung') === 'spaet';
+  return 0.9 * tonPegel() * (spaet ? 0.6 : 1);
+}
 
 /* iOS gibt WebAudio erst nach einer Berührung frei — der allererste
    Tipp in der App entsperrt den Klangraum, damit schon der erste Keks
@@ -84,9 +98,25 @@ function tonSpielen(art) {
   const raum = _klang();
   if (!raum) return;
   const t = raum.currentTime;
+  try { _klangSumme.gain.setTargetAtTime(_pegelJetzt(), t, 0.02); } catch { /* egal */ }
 
   try {
-    if (art === 'knack') {
+    if (art === 'gong') {
+      /* Ein kleiner Bronzeschlag: Grundton mit zwei Teiltönen, die
+         unterschiedlich schnell verklingen. Für Regie-Wechsel und
+         Timer-Enden — hörbar, aber nie schrill. */
+      [[392, 0.16, 1.4], [392 * 2.02, 0.07, 0.9], [392 * 2.94, 0.04, 0.55]].forEach(([freq, staerke, dauer]) => {
+        const o = raum.createOscillator();
+        o.type = 'sine';
+        o.frequency.value = freq;
+        const laut = raum.createGain();
+        laut.gain.setValueAtTime(0.0001, t);
+        laut.gain.exponentialRampToValueAtTime(staerke, t + 0.015);
+        laut.gain.exponentialRampToValueAtTime(0.001, t + dauer);
+        o.connect(laut).connect(_klangSumme);
+        o.start(t); o.stop(t + dauer + 0.05);
+      });
+    } else if (art === 'knack') {
       /* Ein dunkler Körper unter zwei harten Brüchen — mehr Keks, weniger Klick. */
       const o = raum.createOscillator();
       o.type = 'sine';

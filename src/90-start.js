@@ -138,6 +138,11 @@ function regelWachePruefen() {
 
   /* Vor allem anderen: In welchem Raum sind wir? Ohne dieses Vorzeichen
      läse jeder Griff zum Gerät die falsche Welt. */
+  /* Niemals in einem fremden Rahmen laufen: Wer EMBER in ein iframe
+     sperrt, bekommt stattdessen die echte Seite obenauf. (frame-ancestors
+     lässt sich über GitHub Pages nicht setzen — dies ist der Ersatz.) */
+  try { if (window.top !== window.self) window.top.location = window.location; } catch { /* fremde Herkunft: dann eben nur wir */ }
+
   raumMigration();
   fehlerWacheStarten();
 

@@ -87,17 +87,23 @@ async function datenListe(pfad) {
    den Spiegel. Sie käme erst mit dem Leeren der Warteschlange zurück. */
 function spiegelSammlungSetzen(pfad, serverStand) {
   const wartend = {};
+  const geloescht = [];
   const vorsatz = pfad + '/';
 
+  /* Beides zählt: wartende PUTs kommen dazu, wartende DELETEs nehmen
+     weg. Ohne den zweiten Teil stünde ein offline Gelöschtes nach dem
+     Wiederverbinden kurz wieder da — bis die Schlange geleert ist. */
   for (const auftrag of Ablage._warteschlange) {
     if (_auftragVergammelt(auftrag)) continue;
-    if (auftrag.art !== 'PUT' || !auftrag.pfad.startsWith(vorsatz)) continue;
+    if (!auftrag.pfad.startsWith(vorsatz)) continue;
     const id = auftrag.pfad.slice(vorsatz.length);
     if (!id || id.includes('/')) continue;
-    if (auftrag.wert && auftrag.wert.g) wartend[id] = auftrag.wert;
+    if (auftrag.art === 'PUT' && auftrag.wert && auftrag.wert.g) wartend[id] = auftrag.wert;
+    if (auftrag.art === 'DELETE') geloescht.push(id);
   }
 
   const zusammen = { ...(serverStand || {}), ...wartend };
+  for (const id of geloescht) delete zusammen[id];
   spiegelSetzen(pfad, zusammen);
   return zusammen;
 }

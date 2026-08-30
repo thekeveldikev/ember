@@ -210,6 +210,27 @@ lagen Knöpfe unter der iOS-Tastatur). Audio: gemeinsame Echoschleife
 neu „plopp" (Chat ein/aus) und „wusch" (Blätter); nach Rot schweigt
 alles — D.ruhe gilt auch für Töne.
 
+**0.7.2 — die zweite adversariale Welle (74 Prüfungen):** Neu ist die
+STATIK-WACHE (test/statik.mjs): Sie liest den Quelltext selbst und
+schlägt an bei toten zeigeSeite-Zielen, Wisch-Karten ins Leere,
+Push-Arten ohne Hülle, puls()-Mustern ohne Definition, Tönen ohne
+Klang, Decks ohne Sinnbild, Emojis außerhalb der Reaktions-Insel und
+dem nackten append(?:null). test/raum.mjs deckt die Raum-Migration,
+raumEntfernen und alleLoeschen ab (der Prüfstand hat dafür ein echtes
+aufzählbares localStorage als Proxy bekommen). ZWEI FUNDE: (1) Die
+Warteschlangen-Mischung kannte nur PUTs — ein offline Gelöschtes stand
+nach dem Wiederverbinden kurz wieder da, bis die Schlange geleert war;
+jetzt wenden wartende DELETEs sich auch auf die Mischung an. (2) Der
+heimAuffrischen-Umbau ließ HORCHER zum Heim navigieren — ein
+einlaufendes Knopf-Ereignis riss einen mitten aus dem Chat; Horcher
+rufen jetzt mit nurWennDa=true und drängen sich nicht auf (im Browser
+gegen die echte Ablage bewiesen). Audio-Stufe 3: Töne mit drei
+Stellungen (an/leise/aus, Ich → Die App), nachts automatisch auf 60 %
+gedämpft, neuer „gong" (Bronzeschlag mit Teiltönen) für Regie-Wechsel
+und Timer-Enden. Härtung: Rahmenbrecher gegen iframe-Einbettung
+(frame-ancestors geht auf Pages nicht), das Boten-Geheimnis ist ein
+Passwortfeld.
+
 ## Was in der Bugjagd zutage kam
 
 Sieben Fehler, alle vor der Veröffentlichung gefunden. Sie stehen hier,

@@ -98,11 +98,16 @@ SEITEN.ich = function (seite) {
       zeile('Nach einer neuen Fassung sehen', 'Du hast ' + APP_VERSION + ' — hier holst du dir Neues sofort', () => sucheAppUpdate(true)),
       zeile('Sichtwechsel', 'Dieses Gerät zeigt dann die Sicht von ' + nameVon(andereRolle()) + ' — zum Ausprobieren', () => sichtWechseln()),
       zeile('Nachts leiser ab', 'Ab ' + Gerät.lies('spaetAb', 22) + ':00 Uhr wird die App wärmer und dunkler', () => spaetSetzen()),
-      zeile('Töne', toeneAn() ? 'An — Keks, Rad und Knopf klingen leise. Antippen schaltet aus' : 'Aus. Antippen schaltet an', () => {
-        Gerät.schreib('toene', !toeneAn());
-        if (toeneAn()) tonSpielen('weich');
-        zeigeSeite('ich');
-      }),
+      zeile('Töne',
+        tonPegel() >= 1 ? 'An — nachts automatisch gedämpft. Antippen: leise'
+          : tonPegel() > 0 ? 'Leise. Antippen: aus'
+            : 'Aus. Antippen: an', () => {
+          const neu = tonPegel() >= 1 ? 0.45 : tonPegel() > 0 ? 0 : 1;
+          Gerät.schreib('tonPegel', neu);
+          Gerät.loesch('toene');
+          if (neu > 0) tonSpielen('weich');
+          zeigeSeite('ich');
+        }),
       zeile('Letzte Fehler', (Gerät.lies('fehlerlog', []).length || 'Keine') + ' notiert — bei Problemen hier nachsehen', () => fehlerlogZeigen()),
       istDomme() ? zeile('Kopplungscode zeigen', 'Damit ein weiteres Gerät in diesen Raum kommt', () => kopplungscodeNochmal()) : null,
       zeile('Diesen Raum vom Gerät nehmen', 'Nur dieses Gerät vergisst ihn — alles Gemeinsame bleibt gespeichert', () => geraetLeeren(), true)
@@ -223,7 +228,7 @@ function pushAbschnittBauen(platz) {
 function boteEintragen() {
   const url = el('input', { class: 'feld', placeholder: 'https://….workers.dev', autocapitalize: 'off' });
   const schluessel = el('input', { class: 'feld', placeholder: 'Öffentlicher Schlüssel', style: { marginTop: '9px' }, autocapitalize: 'off' });
-  const geheim = el('input', { class: 'feld', placeholder: 'Geheimnis', style: { marginTop: '9px' }, autocapitalize: 'off' });
+  const geheim = el('input', { class: 'feld', type: 'password', placeholder: 'Geheimnis', style: { marginTop: '9px' }, autocapitalize: 'off' });
 
   const b = blatt(
     el('h2', {}, 'Der Bote'),

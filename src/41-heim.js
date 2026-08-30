@@ -13,9 +13,12 @@ let _heim = null;
 /* Nur den betroffenen Teil neu zeichnen — oder zur Seite wechseln, wenn
    wir gar nicht auf dem Heim stehen. DAS ersetzt die alten
    zeigeSeite('heim')-Rundumschläge nach jedem Knopfdruck. */
-function heimAuffrischen(teil) {
+function heimAuffrischen(teil, nurWennDa = false) {
   if (D.seite !== 'heim' || !_heim || !_heim.knopf.isConnected) {
-    if (D.seite !== 'heim') zeigeSeite('heim');
+    /* Horcher (nurWennDa) drängen sich nicht auf — nur eine bewusste
+       Handlung darf zum Heim führen. Sonst risse ein einlaufendes
+       Ereignis einen mitten aus dem Chat. */
+    if (D.seite !== 'heim' && !nurWennDa) zeigeSeite('heim');
     return;
   }
   const ruhig = true;

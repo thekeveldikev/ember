@@ -198,7 +198,7 @@ test('die Übersetzung nimmt nur, was die App wirklich kann', () => {
 
 test('tonSpielen ohne Klangraum und in der Ruhe bleibt einfach still', () => {
   const raum = app();
-  for (const art of ['knack', 'papier', 'weich', 'schimmer', 'tief', 'tick', 'ratsche', 'plopp', 'wusch', 'gibtsNicht']) {
+  for (const art of ['knack', 'papier', 'weich', 'schimmer', 'tief', 'tick', 'ratsche', 'plopp', 'wusch', 'gong', 'gibtsNicht']) {
     raum.tonSpielen(art);
   }
   raum.D.ruhe = true;

@@ -272,7 +272,7 @@ function knopfHorcherStarten() {
     if (aktuell.art === 'befehl' && istDomme() && aktuell.quittiert && !ersterDurchlauf) {
       puls('antwortJa');
       meldung(nameVon('sub') + ': Jawohl.');
-      heimAuffrischen('knopf');
+      heimAuffrischen('knopf', true);
       return;
     }
 
@@ -286,7 +286,7 @@ function knopfHorcherStarten() {
       meldungMitTat('Sie hat geantwortet.', 'Ansehen', () => zeigeSeite('heim'), 10000);
     }
 
-    if (!_befehlOffen) heimAuffrischen('knopf');
+    if (!_befehlOffen) heimAuffrischen('knopf', true);
   });
 
   /* Der stille Impuls: kein Wort, nur Anwesenheit. */

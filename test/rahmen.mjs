@@ -57,7 +57,28 @@ export const rein = (wert) => JSON.parse(JSON.stringify(wert));
 /* --- Den Skriptraum aufbauen ---------------------------------------------- */
 
 export function ladeApp({ rolle = 'domme', dateien, ablage = baueAblage() } = {}) {
-  const lager = new Map();
+  /* localStorage wie im Browser: Die Einträge sind EIGENE, aufzählbare
+     Eigenschaften — Object.keys(localStorage) liefert die Schlüssel.
+     Genau darauf verlassen sich Raumverwaltung und Spiegel-Putzer. */
+  const lager = Object.create(null);
+  const lagerMethoden = {
+    getItem: (k) => (k in lager ? lager[k] : null),
+    setItem: (k, v) => { lager[k] = String(v); },
+    removeItem: (k) => { delete lager[k]; },
+    key: (i) => Object.keys(lager)[i] ?? null,
+  };
+  const lagerObjekt = new Proxy(lager, {
+    get(ziel, name) {
+      if (name === 'length') return Object.keys(ziel).length;
+      if (name in lagerMethoden) return lagerMethoden[name];
+      return ziel[name];
+    },
+    ownKeys(ziel) { return Object.keys(ziel); },
+    getOwnPropertyDescriptor(ziel, name) {
+      if (name in ziel) return { value: ziel[name], enumerable: true, configurable: true };
+      return undefined;
+    },
+  });
 
   const raum = {
     console,
@@ -77,13 +98,7 @@ export function ladeApp({ rolle = 'domme', dateien, ablage = baueAblage() } = {}
 
     APP_VERSION: 'prüfstand',
 
-    localStorage: {
-      getItem: (k) => (lager.has(k) ? lager.get(k) : null),
-      setItem: (k, v) => lager.set(k, String(v)),
-      removeItem: (k) => lager.delete(k),
-      get length() { return lager.size; },
-      key: (i) => [...lager.keys()][i],
-    },
+    localStorage: lagerObjekt,
 
     navigator: { onLine: true, vibrate: () => true, userAgent: 'Prüfstand' },
     location: { protocol: 'https:', search: '', reload: () => {} },
@@ -198,6 +213,10 @@ export function ladeApp({ rolle = 'domme', dateien, ablage = baueAblage() } = {}
             vorratTagesaufgabe, vorratSzenario, vorratWirksameStufe, vorratDeckListe } : {}),
       ...(typeof _bibliothekUebersetzen === 'function' ? { _bibliothekUebersetzen, _bedingungOk } : {}),
       ...(typeof tonSpielen === 'function' ? { tonSpielen } : {}),
+      ...(typeof raumMigration === 'function'
+        ? { raumMigration, raumAnlegen, raumEntfernen, raeumeLies, raumVorzeichenSetzen, geraetKey } : {}),
+      ...(typeof istAbgelaufen === 'function' ? { istAbgelaufen } : {}),
+      ...(typeof _aufgabeZiel === 'function' ? { _aufgabeZiel } : {}),
     };
   `;
 
@@ -212,7 +231,7 @@ export function ladeApp({ rolle = 'domme', dateien, ablage = baueAblage() } = {}
   Object.assign(raum, raum.__raum);
 
   raum.D.rolle = rolle;
-  return { raum, ablage };
+  return { raum, ablage, lager: lagerObjekt };
 }
 
 /* Bringt die Ablage in einen Zustand, in dem geschrieben werden darf. */
