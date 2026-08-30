@@ -122,6 +122,9 @@ async function appStarten() {
   /* Hinweise stillschweigend erneuern, falls die Anmeldung abgelaufen ist. */
   if (Push.bote && pushErlaubnisErteilt()) pushAnmelden(true);
 
+  /* Nach einer neuen Fassung einmal zeigen, was dazugekommen ist. */
+  if (typeof neuerungenPruefen === 'function') neuerungenPruefen();
+
   /* Der allererste Moment auf diesem Gerät: eine kurze, warme Begrüßung
      mit den drei Dingen, die den Einstieg tragen. Einmal — nie wieder. */
   if (!Gerät.lies('begruesst')) {

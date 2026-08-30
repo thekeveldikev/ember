@@ -8,6 +8,9 @@
 
 const REAKTIONEN_FEST = ['🔥', '🧎', '❤️', '💦', '😈'];
 
+/* Der volle Bestand, damit die Suche filtern kann, ohne neu zu laden. */
+let _plauschAlle = [];
+
 SEITEN.plausch = function (seite) {
   /* Der Plausch füllt die Bühne, statt eine Höhe zu erraten: Die Bühne
      hört auf zu scrollen, die Seite nimmt den ganzen Platz, und die Liste
@@ -21,9 +24,32 @@ SEITEN.plausch = function (seite) {
   seite.style.flexDirection = 'column';
   seite.style.height = '100%';
 
-  const kopf = el('div', { style: { flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' } },
+  /* Ein Gespräch, das über Monate wächst, will durchsuchbar sein — sonst
+     scrollt man ewig nach dem einen Satz. Das Feld erscheint erst auf
+     Tippen, damit der Chat oben ruhig bleibt. */
+  const suchfeld = el('input', {
+    class: 'feld', type: 'search', placeholder: 'Im Gespräch suchen …',
+    autocapitalize: 'off', autocorrect: 'off',
+    style: { display: 'none', marginBottom: '10px', flex: 'none' },
+    oninput: () => plauschZeichnen(liste, _plauschAlle, suchfeld.value.trim()),
+  });
+
+  const lupe = el('button', {
+    class: 'winzig still', style: { padding: '6px 8px' },
+    onclick: () => {
+      const auf = suchfeld.style.display === 'none';
+      suchfeld.style.display = auf ? 'block' : 'none';
+      if (auf) setTimeout(() => suchfeld.focus(), 60);
+      else { suchfeld.value = ''; plauschZeichnen(liste, _plauschAlle, ''); }
+    },
+  }, sinnbild('auge', 17));
+
+  const kopf = el('div', { style: { flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', marginBottom: '10px' } },
     el('h2', {}, nameVon(andereRolle())),
-    el('button', { class: 'winzig still', onclick: () => ampelBlatt() }, ampelWort(D.ampel[andereRolle()]))
+    el('div', { style: { display: 'flex', alignItems: 'center', gap: '4px' } },
+      lupe,
+      el('button', { class: 'winzig still', onclick: () => ampelBlatt() }, ampelWort(D.ampel[andereRolle()]))
+    )
   );
 
   const liste = el('div', {
@@ -98,7 +124,7 @@ SEITEN.plausch = function (seite) {
     style: { flex: 'none', display: 'flex', gap: '6px', overflowX: 'auto', padding: '9px 0 2px' },
   });
 
-  seite.append(kopf, liste, schnell, eingabe);
+  seite.append(kopf, suchfeld, liste, schnell, eingabe);
   schnellReaktionenBauen(schnell);
 
   /* Geht die Tastatur auf, schrumpft die Sichthöhe — die Liste soll dann
@@ -130,8 +156,9 @@ SEITEN.plausch = function (seite) {
 
   let letzteAnzahl = 0;
   const stopp = datenHorch('plausch', (nachrichten) => {
+    _plauschAlle = nachrichten;
     const amEnde = liste.scrollHeight - liste.scrollTop - liste.clientHeight < 90;
-    plauschZeichnen(liste, nachrichten);
+    plauschZeichnen(liste, nachrichten, suchfeld.value.trim());
     if (amEnde || nachrichten.length !== letzteAnzahl) {
       requestAnimationFrame(() => { liste.scrollTop = liste.scrollHeight; });
     }
@@ -147,7 +174,7 @@ SEITEN.plausch = function (seite) {
 
 /* --- Die Liste ------------------------------------------------------------ */
 
-function plauschZeichnen(liste, alleNachrichten) {
+function plauschZeichnen(liste, alleNachrichten, suchwort = '') {
   liste.innerHTML = '';
 
   /* Was seine Zeit hinter sich hat, wird nicht nur ausgeblendet, sondern
@@ -158,14 +185,28 @@ function plauschZeichnen(liste, alleNachrichten) {
     return false;
   });
 
-  if (!nachrichten.length) {
+  /* Die Suche schaut nur in Text — Bilder und Sprachnachrichten haben
+     keinen, und ein Treffer wäre ohnehin nicht zeigbar. */
+  const gefiltert = suchwort
+    ? nachrichten.filter((n) => (n.text || '').toLowerCase().includes(suchwort.toLowerCase()))
+    : nachrichten;
+
+  if (suchwort && !gefiltert.length) {
+    liste.append(leerlauf('Nichts gefunden', 'Kein Wort davon steht in eurem Gespräch.'));
+    return;
+  }
+  if (!gefiltert.length) {
     liste.append(leerlauf('Still hier', 'Das erste Wort gehört dir.'));
     return;
+  }
+  if (suchwort) {
+    liste.append(el('p', { class: 'winzig still mitte', style: { padding: '4px 0 8px' } },
+      gefiltert.length + (gefiltert.length === 1 ? ' Nachricht' : ' Nachrichten')));
   }
 
   let letzterTag = '';
 
-  nachrichten.forEach((n) => {
+  gefiltert.forEach((n) => {
     const tag = tagstempel(n.wann);
     if (tag !== letzterTag) {
       letzterTag = tag;

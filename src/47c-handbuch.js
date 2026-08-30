@@ -151,6 +151,11 @@ const HANDBUCH = [
         b: 'Ein Foto mit „1 Stunde" schicken: Danach ist es fort, auf beiden Geräten.',
       },
       {
+        t: 'Im Gespräch suchen',
+        s: 'Oben im Chat sitzt eine kleine Lupe. Ein Tipp öffnet ein Suchfeld, und die Liste zeigt nur noch, was zum Wort passt — mit der Zahl der Treffer darüber. Noch ein Tipp auf die Lupe, und alles ist wieder da.',
+        b: 'Ihr sucht den Satz von letztem Monat? „Wochenende" eintippen statt zehn Minuten scrollen.',
+      },
+      {
         t: 'Sprachnachrichten',
         s: 'Das Mikrofon gedrückt halten und sprechen. Während der Aufnahme siehst du den Pegel wandern — man hört, dass jemand da ist.',
         b: 'Manches sagt eine Stimme in fünf Sekunden besser als drei Absätze Text.',
@@ -508,6 +513,11 @@ const HANDBUCH = [
         b: 'Auch der Bote sieht nur: „Für dieses Gerät, dieses Päckchen." Mehr nicht.',
       },
       {
+        t: 'Der Notfall-Zettel',
+        s: 'Unter Sicherheit steht „Für den Notfall". Dort steht in klaren Worten, was zu tun ist, wenn ein Gerät ausfällt — und was ihr JETZT tun solltet, damit nie beide ausfallen: den Kopplungscode einmal in einen Passwortmanager legen.',
+        b: 'Beide Geräte weg und kein Code weggelegt? Dann ist der Raum weg. Das ist der Preis dafür, dass sonst niemand mitlesen kann.',
+      },
+      {
         t: 'Wenn ein Gerät verloren geht',
         s: 'Mit PIN: Der Finder sieht nichts. Eure Inhalte sind nicht weg — sie liegen in eurer Ablage, und ein neues Gerät kommt mit dem Kopplungscode wieder hinein. Über „Diesen Raum vom Gerät nehmen" räumt ihr ein Gerät ab, ohne dem anderen etwas zu nehmen.',
         b: 'Vorsorge in zwei Sekunden: eine PIN setzen.',
@@ -535,6 +545,11 @@ const HANDBUCH = [
         t: 'Der Vorrat',
         s: 'Hunderte fertige Karten, Räder, Szenarien und Skripte — mit einer Obergrenze für die Intensität, die du setzt. Was darüber liegt, existiert für die App schlicht nicht.',
         b: 'Obergrenze 3 einstellen: Alles Härtere taucht nirgendwo mehr auf.',
+      },
+      {
+        t: 'Was zuletzt dazukam',
+        s: 'Diese App ändert sich oft. Nach jeder neuen Fassung zeigt sie einmal, was dazugekommen ist — und unter Die App lässt sich das jederzeit nachlesen.',
+        b: 'Wenn plötzlich etwas anders aussieht: erst dort nachsehen, dann rätseln.',
       },
       {
         t: 'Aussehen',

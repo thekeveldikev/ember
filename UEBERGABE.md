@@ -567,6 +567,27 @@ Horcher werden sauber abgebaut (11 Interessenten vorher wie
 nachher), und datenLies antwortet in 31ms. Es ist das
 45-Sekunden-Limit des Prüfwerkzeugs.
 
+**0.10.2 — der Notfall-Zettel, die Chat-Suche, was neu ist (115):**
+Drei Boni gegen drei ungedeckte Stellen. (1) `notfallBlatt()` in
+47-ich (Sicherheit → Für den Notfall): Es benennt den unangenehmen
+Fall beim Namen — beide Geräte weg oder beide PINs vergessen heißt
+Raum weg, weil der Schlüssel NUR auf den Geräten liegt — und sagt,
+was jetzt hilft: den Kopplungscode einmal in einen Passwortmanager
+legen. Der Code steht dafür nicht mehr nur der Führenden offen,
+sondern beiden (beide Geräte tragen denselben Schlüssel; wer im
+Notfall ausgesperrt ist, hilft niemandem) und liegt jetzt unter
+Sicherheit statt unter Die App. (2) `NEUERUNGEN` + `neuerungenBlatt`
++ `neuerungenPruefen`: Nach jeder neuen Minor-Fassung erscheint
+EINMAL, was dazugekommen ist (Gerät 'neuGesehen' hält die
+Zweier-Fassung fest); nie beim allerersten Start, und nie auf einem
+Gerät, das die App gerade erst bekommen hat. Jederzeit nachlesbar
+unter Die App. Beim Pflegen bitte NEUERUNGEN oben ergänzen — sonst
+zeigt die App alte Nachrichten als neu. (3) Chat-Suche: Lupe im
+Kopf, ein Suchfeld erscheint auf Tippen, plauschZeichnen nimmt ein
+drittes Argument (suchwort) und `_plauschAlle` hält den Bestand für
+das Filtern ohne Nachladen. Gesucht wird nur in Text — Bilder und
+Sprachnachrichten haben keinen.
+
 ## Was in der Bugjagd zutage kam
 
 Sieben Fehler, alle vor der Veröffentlichung gefunden. Sie stehen hier,

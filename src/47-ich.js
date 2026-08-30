@@ -105,11 +105,14 @@ SEITEN.ich = function (seite) {
         zeile('Jemand schaut mit', 'Ein Tipp, und die App sieht aus wie eine Notizliste. Dreimal aufs Wort EMBER tippen holt sie zurück', () => tarnungAn()),
         Gerät.lies('schrank') ? zeile('Jetzt abschließen', 'Sofort zu — beim nächsten Öffnen fragt die App nach der PIN', () => abschliessen())
           : zeile('Eine PIN setzen', 'Damit niemand die App einfach öffnen kann, der das Handy hat', () => pinNachtraeglich()),
-        zeile('Schließt sich nach', schliessNachText() + ' im Hintergrund — dann braucht es die PIN', () => schliessNachSetzen())
+        zeile('Schließt sich nach', schliessNachText() + ' im Hintergrund — dann braucht es die PIN', () => schliessNachSetzen()),
+        zeile('Für den Notfall', 'Was tun, wenn ein Gerät ausfällt oder die PIN weg ist', () => notfallBlatt()),
+        zeile('Kopplungscode zeigen', 'Damit ein weiteres Gerät in diesen Raum kommt', () => kopplungscodeNochmal())
       ),
 
       klappGruppe('app', 'funke', 'Die App', 'Fassung ' + APP_VERSION + ', Aussehen, Töne, Symbol',
         zeile('Nach einer neuen Fassung sehen', 'Du hast ' + APP_VERSION + ' — hier holst du dir Neues sofort', () => sucheAppUpdate(true)),
+        zeile('Was zuletzt dazukam', 'Die Neuerungen der letzten Fassungen, kurz erklärt', () => neuerungenBlatt(false)),
         zeile('Die Farbwelt', 'Zurzeit: ' + farbweltName() + ' — in welcher Farbe die App glüht', () => farbweltBlatt()),
         zeile('Das App-Symbol', 'Zurzeit: ' + appSymbolName() + ' — auch harmlose Tarn-Symbole', () => appSymbolBlatt()),
         schalterZeile('Der Hilfe-Knopf', 'Das kleine ? unten rechts erklärt jede Seite', hilfeAn(), (neu) => {
@@ -129,7 +132,10 @@ SEITEN.ich = function (seite) {
             zeigeSeite('ich');
           }),
         zeile('Letzte Fehler', (Gerät.lies('fehlerlog', []).length || 'Keine') + ' notiert — bei Problemen hier nachsehen', () => fehlerlogZeigen()),
-        istDomme() ? zeile('Kopplungscode zeigen', 'Damit ein weiteres Gerät in diesen Raum kommt', () => kopplungscodeNochmal()) : null,
+        /* Der Kopplungscode steht jetzt unter Sicherheit — dort, wo auch
+           der Notfall-Zettel liegt, und für BEIDE: Beide Geräte tragen
+           denselben Schlüssel, und wer im Notfall aussperrt ist, hilft
+           niemandem. */
         zeile('Diesen Raum vom Gerät nehmen', 'Nur dieses Gerät vergisst ihn — alles Gemeinsame bleibt gespeichert', () => geraetLeeren(), true)
       )
     )
@@ -410,6 +416,43 @@ async function kopplungscodeNochmal() {
   if (!schluesselDa()) return;
   const code = await kopplungscodeBauen(_schluesselRoh, Gerät.lies('zugang'), Gerät.lies('namen', {}), Gerät.lies('bote', null));
   zeigeKopplungscode(code, _schluesselRoh);
+}
+
+/* --- Der Notfall-Zettel ----------------------------------------------------
+   Der unangenehme Fall, den niemand plant: PIN vergessen, Handy verloren,
+   beide Geräte weg. Dann gibt es keinen zweiten Schlüssel — außer dem,
+   den ihr euch selbst weggelegt habt. Genau dafür ist dieses Blatt da:
+   Es sagt in klaren Worten, was zu tun ist, und macht den Code zugänglich,
+   solange die App noch offen ist. Danach ist es zu spät. */
+function notfallBlatt() {
+  const b = blatt(
+    el('h2', {}, 'Für den Notfall'),
+    el('p', { class: 'leise klein', style: { margin: '8px 0 4px', lineHeight: '1.6' } },
+      'Euer Schlüssel liegt nur auf euren Geräten. Das ist der ganze Sinn — ' +
+      'niemand sonst kann mitlesen, auch nicht die Ablage. Der Preis: ' +
+      'Sind beide Geräte weg oder beide PINs vergessen, ist auch euer Raum weg.'),
+
+    el('div', { class: 'trenner' }),
+    el('p', { class: 'winzig still', style: { marginBottom: '6px' } }, 'Wenn EIN Gerät ausfällt'),
+    el('p', { class: 'leise klein', style: { lineHeight: '1.6' } },
+      'Halb so wild. Das andere Gerät zeigt unter „Kopplungscode zeigen" den Code — ' +
+      'damit kommt ein neues Gerät in den Raum, und alles Gemeinsame ist wieder da.'),
+
+    el('div', { class: 'trenner' }),
+    el('p', { class: 'winzig still', style: { marginBottom: '6px' } }, 'Damit nie BEIDE ausfallen'),
+    el('p', { class: 'leise klein', style: { lineHeight: '1.6' } },
+      'Legt euch den Kopplungscode einmal weg — in einen Passwortmanager, ' +
+      'nicht in Notizen, nicht in einen Chat, nicht in eine Cloud-Datei mit klarem Namen. ' +
+      'Wer diesen Code hat, hat euren Raum. Das ist gleichzeitig sein Wert und seine Gefahr.'),
+
+    el('button', {
+      class: 'knopf glut breit', style: { marginTop: '16px' },
+      onclick: () => { b.schliessen(); kopplungscodeNochmal(); },
+    }, 'Code jetzt anzeigen'),
+    el('p', { class: 'still klein', style: { marginTop: '12px', lineHeight: '1.5' } },
+      'Und das Wichtigste, das nichts kostet: eine PIN, die du wirklich behältst — ' +
+      'und beide Geräte in der App, nicht nur eins.')
+  );
 }
 
 async function geraetLeeren() {
@@ -754,4 +797,67 @@ function appSymbolBlatt() {
       )
     ))
   );
+}
+
+/* --- Was ist neu ------------------------------------------------------------
+   Bei einer App, die sich jede Woche ändert, ist das Wichtigste nicht die
+   Fassungsnummer, sondern: Was kann sie jetzt, das sie gestern nicht
+   konnte? Das Blatt erscheint EINMAL nach jeder neuen Fassung von selbst
+   — und ist danach unter Die App jederzeit nachlesbar. */
+
+const NEUERUNGEN = [
+  {
+    fassung: '0.10',
+    titel: 'Das Handbuch und die drei Weisen',
+    punkte: [
+      'Ein großes, durchsuchbares Handbuch unter Ich — alles, was die App kann, mit Beispielen und über zwanzig Fragen und Antworten.',
+      'Drei Weisen zu spielen: Sie führt, Auf Augenhöhe (beide gleich) oder Er führt. Ein Wechsel braucht immer die Zustimmung von beiden.',
+      'Blätter schließen jetzt auch durch Wischen nach unten.',
+      'Der Notfall-Zettel unter Sicherheit sagt, was zu tun ist, wenn ein Gerät ausfällt.',
+    ],
+  },
+  {
+    fassung: '0.9',
+    titel: 'Farbwelten, Masken und das kleine ?',
+    punkte: [
+      'Auf jeder Seite erklärt ein ? in einfachen Worten, was hier möglich ist.',
+      'Fünf Farbwelten und ein wählbares App-Symbol — auch harmlose, die nach Notizen oder Wetter aussehen.',
+      'Die Tarnung ist eine echte Notizen-App geworden, mit Suche und Editor.',
+      'Die Währung heißt jetzt Münzen und hat ein eigenes Zeichen.',
+    ],
+  },
+];
+
+function neuerungenBlatt(automatisch) {
+  const b = blatt(
+    el('p', { class: 'winzig still' }, automatisch ? 'Die App hat dazugelernt' : 'Was zuletzt dazukam'),
+    el('h2', { style: { margin: '4px 0 12px' } }, 'Neu in ' + APP_VERSION),
+    ...NEUERUNGEN.map((n) => el('div', { style: { marginTop: '14px' } },
+      el('div', { class: 'zier', style: { fontSize: '16.5px', marginBottom: '6px' } }, n.titel),
+      ...n.punkte.map((p) => el('div', { style: { display: 'flex', gap: '9px', marginTop: '7px' } },
+        el('span', { class: 'still', style: { flex: 'none' } }, '·'),
+        el('p', { class: 'leise klein', style: { lineHeight: '1.55' } }, p)
+      ))
+    )),
+    el('button', {
+      class: 'knopf glut breit', style: { marginTop: '20px' },
+      onclick: () => { b.schliessen(); if (automatisch) zeigeSeite('handbuch'); },
+    }, automatisch ? 'Zeig mir das Handbuch' : 'Verstanden'),
+    automatisch ? el('button', {
+      class: 'winzig still', style: { display: 'block', margin: '11px auto 0' },
+      onclick: () => b.schliessen(),
+    }, 'Später') : null
+  );
+}
+
+/* Einmal je Fassung, und nie beim allerersten Start — dort begrüßt die
+   App schon anders, und zwei Blätter übereinander wären zu viel. */
+function neuerungenPruefen() {
+  const gesehen = Gerät.lies('neuGesehen', null);
+  const jetzige = String(APP_VERSION).split('.').slice(0, 2).join('.');
+  if (!Gerät.lies('begruesst')) { Gerät.schreib('neuGesehen', jetzige); return; }
+  if (gesehen === jetzige) return;
+  Gerät.schreib('neuGesehen', jetzige);
+  if (!gesehen) return;            /* erste Fassung auf diesem Gerät: nichts zu melden */
+  setTimeout(() => { if (!istGetarnt()) neuerungenBlatt(true); }, 1600);
 }
